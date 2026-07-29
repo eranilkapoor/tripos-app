@@ -1,14 +1,15 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { COLLECTION_NAMES } from '../../common/constants/collection-names.constants';
 
 export type TriposRecordDocument = HydratedDocument<TriposRecord>;
 
-@Schema({ collection: "tripos_records", timestamps: true })
+@Schema({ collection: COLLECTION_NAMES.MODULE_RECORD, timestamps: true })
 export class TriposRecord {
-  @Prop({ default: "demo-org", index: true })
+  @Prop({ default: 'demo-org', index: true })
   organizationId!: string;
 
-  @Prop({ default: "main", index: true })
+  @Prop({ default: 'main', index: true })
   branchId!: string;
 
   @Prop({ required: true, index: true })
@@ -17,10 +18,10 @@ export class TriposRecord {
   @Prop({ required: true })
   title!: string;
 
-  @Prop({ default: "open", index: true })
+  @Prop({ default: 'open', index: true })
   status!: string;
 
-  @Prop({ default: "medium" })
+  @Prop({ default: 'medium' })
   priority!: string;
 
   @Prop({ type: Object, default: {} })
@@ -28,4 +29,3 @@ export class TriposRecord {
 }
 
 export const TriposRecordSchema = SchemaFactory.createForClass(TriposRecord);
-

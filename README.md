@@ -105,9 +105,18 @@ Useful endpoints:
 Database:
 
 - TripOS uses its own MongoDB database named `tripos`.
+- Collections use clean domain names such as `tenants`, `leads`, `quotations`, `bookings`, `invoices`, and `audit_logs`. Product prefixes are not needed inside the dedicated TripOS database.
 - Redis is planned for cache, queues, rate limits, locks, and short-lived session acceleration.
 - Keep credentials in `tripos-api-server/.env.development`; this file is ignored by git.
 - Use `tripos-api-server/.env.example` as the safe template.
+
+Copy older local data from legacy `tripos_*` collections into the clean collection names:
+
+```bash
+npm --prefix tripos-api-server run migrate:collection-names
+```
+
+This migration is non-destructive. It copies/upserts documents into the clean collections and leaves legacy collections untouched for rollback or manual verification.
 
 Seed the initial CRM demo workspace:
 
