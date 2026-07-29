@@ -177,6 +177,12 @@ p {
   justify-content: space-between;
 }
 
+.auth-card-head > strong {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
 .auth-card h1 {
   color: var(--brand);
   font-size: 28px;
@@ -498,12 +504,13 @@ td button:hover {
   display: grid;
   font-size: 10px;
   font-weight: 950;
-  height: 19px;
-  min-width: 19px;
+  height: 18px;
+  line-height: 1;
+  min-width: 18px;
   padding: 0 4px;
   position: absolute;
-  right: -6px;
-  top: -7px;
+  right: -5px;
+  top: -5px;
 }
 
 .header-workspace {
@@ -513,6 +520,7 @@ td button:hover {
   border-radius: 999px;
   display: inline-flex;
   gap: 4px;
+  flex: 0 0 auto;
   padding: 3px;
 }
 
@@ -533,6 +541,7 @@ td button:hover {
   font-weight: 950;
   min-height: 30px;
   padding: 4px 22px 4px 2px;
+  width: 104px;
 }
 
 .profile-chip {
@@ -540,7 +549,7 @@ td button:hover {
   border-left: 1px solid var(--line);
   display: grid;
   gap: 9px;
-  grid-template-columns: 34px minmax(120px, 1fr);
+  grid-template-columns: 34px 136px;
   padding-left: 12px;
 }
 
@@ -661,11 +670,16 @@ td button:hover {
 }
 
 .hero-panel > strong {
+  align-items: center;
   background: var(--accent-soft);
   border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--accent-soft));
   border-radius: 8px;
   color: var(--accent);
+  display: inline-flex;
+  justify-content: center;
+  min-height: 42px;
   padding: 12px;
+  width: 116px;
 }
 
 .kpi-grid,
@@ -719,9 +733,9 @@ td button:hover {
   align-items: center;
   background: var(--surface-2);
   border-bottom: 1px solid var(--line-strong);
-  display: flex;
+  display: grid;
   gap: 12px;
-  justify-content: space-between;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, auto);
   padding: 14px;
 }
 
@@ -740,6 +754,7 @@ td button:hover {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+  min-height: 40px;
 }
 
 .table-tool-button {
@@ -755,6 +770,12 @@ td button:hover {
   min-height: 38px;
   padding: 8px 12px;
   text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.table-tool-button span {
+  display: inline-block;
+  min-width: 44px;
 }
 
 .table-tool-button:hover:not(:disabled) {
@@ -788,7 +809,8 @@ td button:hover {
   display: inline-flex;
   gap: 8px;
   min-height: 38px;
-  min-width: min(320px, 42vw);
+  flex: 0 0 320px;
+  min-width: 260px;
   padding: 0 10px;
 }
 
@@ -1315,7 +1337,7 @@ tbody tr:nth-child(even) {
 
   .table-head {
     align-items: stretch;
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .table-tools {
@@ -1323,6 +1345,7 @@ tbody tr:nth-child(even) {
   }
 
   .table-search {
+    flex-basis: 100%;
     min-width: 0;
     width: 100%;
   }

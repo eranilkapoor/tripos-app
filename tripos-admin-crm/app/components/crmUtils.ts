@@ -51,11 +51,34 @@ export function valueAtPath(record: ApiRecord, path: string) {
   if (Array.isArray(value)) return value.length ? `${value.length} items` : "-";
   if (typeof value === "number") return formatNumber(value);
   if (value === undefined || value === null || value === "") return "-";
-  return String(value);
+  return formatDisplayValue(String(value), path);
 }
 
 export function recordToRow(record: ApiRecord, module: CrmModule) {
   return module.rowMap.map((path) => valueAtPath(record, path));
+}
+
+export function formatDisplayValue(value: string, path = "") {
+  if (!value || value === "-") return "-";
+  const normalizedPath = path.toLowerCase();
+  const isTechnicalId =
+    normalizedPath.endsWith("id") ||
+    normalizedPath.includes(".id") ||
+    normalizedPath === "_id";
+  if (/^[a-f0-9]{24}$/i.test(value))
+    return `Ref ${value.slice(-6).toUpperCase()}`;
+  if (isTechnicalId && /^[a-z0-9_-]{8,}$/i.test(value))
+    return `Ref ${value.slice(-8).replace(/[_-]/g, " ").toUpperCase()}`;
+  if (/[_-]/.test(value)) return titleize(value);
+  return value;
+}
+
+export function titleize(value: string) {
+  return value
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 export function formatNumber(value: number) {
@@ -101,7 +124,7 @@ function assignPath(
 }
 
 export function statusClass(value: string) {
-  const normalized = value.toLowerCase();
+  const normalized = value.toLowerCase().replace(/\s+/g, "_");
   if (
     [
       "active",

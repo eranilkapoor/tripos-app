@@ -31,6 +31,7 @@ import {
 import type { ApiRecord, CrmModule, CrmSession, ModuleField } from "./crmTypes";
 import {
   apiBaseUrl,
+  formatDisplayValue,
   getRecordId,
   normalizeRecords,
   recordToRow,
@@ -1077,7 +1078,6 @@ export default function CrmShell() {
   if (!session)
     return (
       <LoginScreen
-        onThemeChange={changeTheme}
         theme={theme}
         onLogin={(nextSession) => {
           window.localStorage.setItem(
@@ -1153,7 +1153,7 @@ export default function CrmShell() {
                 >
                   {tenantOptions.map((item) => (
                     <option key={item} value={item}>
-                      {item}
+                      {formatDisplayValue(item, "tenantCode")}
                     </option>
                   ))}
                 </select>
@@ -1169,7 +1169,7 @@ export default function CrmShell() {
                 >
                   {branchOptions.map((item) => (
                     <option key={item} value={item}>
-                      {item}
+                      {formatDisplayValue(item, "branchId")}
                     </option>
                   ))}
                 </select>
@@ -1180,7 +1180,11 @@ export default function CrmShell() {
               <span>{String(session.user.name ?? "Admin").slice(0, 1)}</span>
               <div>
                 <strong>{String(session.user.name ?? "TripOS Admin")}</strong>
-                <small>{String(session.user.role ?? "tenant_admin")}</small>
+                <small>
+                  {formatDisplayValue(
+                    String(session.user.role ?? "tenant_admin"),
+                  )}
+                </small>
               </div>
             </div>
             <button
@@ -1190,7 +1194,7 @@ export default function CrmShell() {
               type="button"
             >
               <FontAwesomeIcon aria-hidden icon={faBell} />
-              <span>{notificationCount}</span>
+              {notificationCount ? <span>{notificationCount}</span> : null}
             </button>
             <button
               className="logout-action"
@@ -1214,7 +1218,7 @@ export default function CrmShell() {
               </h2>
               <p>{selected.description}</p>
             </div>
-            <strong>{isLoading ? "Syncing" : "API-backed"}</strong>
+            <strong aria-busy={isLoading}>API Ready</strong>
           </section>
 
           <section className="kpi-grid" aria-label="TripOS metrics">
@@ -1442,7 +1446,7 @@ function RecordTable({
             type="button"
           >
             <FontAwesomeIcon aria-hidden icon={faArrowRotateRight} />
-            <span>{isLoading ? "Refreshing" : "Refresh"}</span>
+            <span>Refresh</span>
           </button>
           {module.fields.length ? (
             <button
@@ -1642,11 +1646,9 @@ function RecordTable({
 
 function LoginScreen({
   onLogin,
-  onThemeChange,
   theme,
 }: {
   onLogin: (session: CrmSession) => void;
-  onThemeChange: (theme: CrmTheme) => void;
   theme: CrmTheme;
 }) {
   const [email, setEmail] = useState("admin@tripos.test");
@@ -1682,7 +1684,7 @@ function LoginScreen({
       <section className="auth-card">
         <div className="auth-card-head">
           <span className="brand-mark">T</span>
-          <ThemeSwitcher onChange={onThemeChange} selectedTheme={theme} />
+          <strong>Secure Workspace</strong>
         </div>
         <h1>TripOS Admin CRM</h1>
         <p>
@@ -1870,16 +1872,19 @@ function DetailPanel({
         <div className="detail-row" key={path}>
           <span>{module.columns[index]}</span>
           <strong>
-            {String(
-              path
-                .split(".")
-                .reduce<unknown>(
-                  (value, key) =>
-                    value && typeof value === "object"
-                      ? (value as Record<string, unknown>)[key]
-                      : undefined,
-                  record,
-                ) ?? "-",
+            {formatDisplayValue(
+              String(
+                path
+                  .split(".")
+                  .reduce<unknown>(
+                    (value, key) =>
+                      value && typeof value === "object"
+                        ? (value as Record<string, unknown>)[key]
+                        : undefined,
+                    record,
+                  ) ?? "-",
+              ),
+              path,
             )}
           </strong>
         </div>
