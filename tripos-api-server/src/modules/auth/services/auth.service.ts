@@ -345,6 +345,15 @@ export class AuthService {
     return { items: items.map(sanitizeUser), total, page, limit };
   }
 
+  async findUser(id: string, query: CrmListQueryDto) {
+    const user = await this.userModel
+      .findOne(userScopeFilter(query, { _id: id }))
+      .lean()
+      .exec();
+    if (!user) throw new ForbiddenException('CRM user not found');
+    return sanitizeUser(user);
+  }
+
   async updateUserPermissions(
     id: string,
     dto: UpdateCrmUserPermissionsDto,
@@ -361,6 +370,45 @@ export class AuthService {
       })
       .exec();
     if (!user) throw new ForbiddenException('CRM user not found');
+    return sanitizeUser(user.toObject());
+  }
+
+  async updateUser(
+    id: string,
+    dto: UpdateCrmUserPermissionsDto & { name?: string; email?: string },
+    query: CrmListQueryDto,
+  ) {
+    const update: Record<string, unknown> = {};
+    if (dto.name) update.name = dto.name;
+    if (dto.email) update.email = dto.email.toLowerCase();
+    if (dto.role) update.role = dto.role;
+    if (dto.status) update.status = dto.status;
+    if (dto.branchId) update.branchId = dto.branchId;
+    if (dto.permissions) update.permissions = dto.permissions;
+    const user = await this.userModel
+      .findOneAndUpdate(userScopeFilter(query, { _id: id }), update, {
+        new: true,
+      })
+      .exec();
+    if (!user) throw new ForbiddenException('CRM user not found');
+    return sanitizeUser(user.toObject());
+  }
+
+  async removeUser(id: string, query: CrmListQueryDto) {
+    const user = await this.userModel
+      .findOneAndUpdate(
+        userScopeFilter(query, { _id: id }),
+        { status: 'inactive' },
+        { new: true },
+      )
+      .exec();
+    if (!user) throw new ForbiddenException('CRM user not found');
+    await this.sessionModel
+      .updateMany(
+        { userId: id, revokedAt: { $exists: false } },
+        { revokedAt: new Date() },
+      )
+      .exec();
     return sanitizeUser(user.toObject());
   }
 

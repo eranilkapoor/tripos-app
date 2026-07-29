@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { CreateTenantDto } from '../dto/tenant.dto';
@@ -17,5 +25,14 @@ export class TenantsController {
   }
   @Get(':id') findOne(@Param('id') id: string) {
     return this.service.findOne(id);
+  }
+  @Patch(':id') update(
+    @Param('id') id: string,
+    @Body() dto: Record<string, unknown>,
+  ) {
+    return this.service.update(id, dto);
+  }
+  @Delete(':id') remove(@Param('id') id: string) {
+    return this.service.remove(id);
   }
 }

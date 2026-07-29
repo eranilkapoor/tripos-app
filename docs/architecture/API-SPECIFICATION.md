@@ -47,11 +47,16 @@
 - `POST /tenants` - implemented
 - `GET /tenants` - implemented
 - `GET /tenants/:id` - implemented
+- `PATCH /tenants/:id` - implemented
+- `DELETE /tenants/:id` - implemented as inactive status transition
 - `GET /organizations/current` - implemented
 - `PATCH /organizations/current` - implemented
 - `POST /auth/invitations` - implemented
 - `GET /auth/users` - implemented
+- `GET /auth/users/:id` - implemented
+- `PATCH /auth/users/:id` - implemented
 - `PATCH /auth/users/:id/permissions` - implemented
+- `DELETE /auth/users/:id` - implemented as inactive status transition and session revocation
 - `GET /auth/permissions/catalog` - implemented
 
 ### Implemented Travel CRM Modules
@@ -133,6 +138,9 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 - `GET /audit-logs/export.csv` - implemented
 - `GET /storage/files` - implemented
 - `POST /storage/files/upload-intent` - implemented
+- `GET /storage/files/:id` - implemented
+- `PATCH /storage/files/:id` - implemented
+- `DELETE /storage/files/:id` - implemented
 - `GET /integrations/health` - implemented
 - `GET /reporting/overview` - implemented
 - `GET /reporting/sales-funnel` - implemented

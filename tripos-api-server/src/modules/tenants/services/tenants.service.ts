@@ -48,6 +48,15 @@ export class TenantsService {
     return tenant;
   }
 
+  async remove(id: string) {
+    const tenant = await this.model
+      .findByIdAndUpdate(id, { status: 'inactive' }, { new: true })
+      .lean()
+      .exec();
+    if (!tenant) throw new NotFoundException('Tenant not found');
+    return tenant;
+  }
+
   async ensureDemoTenant() {
     const existing = await this.model.findOne({ code: 'WEBNZA' }).exec();
     if (existing) return existing;

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Param,
@@ -96,6 +97,28 @@ export class AuthController {
   }
 
   @Roles('platform_admin', 'tenant_admin')
+  @Get('users/:id')
+  findUser(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.findUser(id, tenantScopedQuery(query, request));
+  }
+
+  @Roles('platform_admin', 'tenant_admin')
+  @Patch('users/:id')
+  updateUser(
+    @Param('id') id: string,
+    @Body()
+    dto: UpdateCrmUserPermissionsDto & { name?: string; email?: string },
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateUser(id, dto, tenantScopedQuery(query, request));
+  }
+
+  @Roles('platform_admin', 'tenant_admin')
   @Patch('users/:id/permissions')
   updateUserPermissions(
     @Param('id') id: string,
@@ -108,6 +131,16 @@ export class AuthController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+
+  @Roles('platform_admin', 'tenant_admin')
+  @Delete('users/:id')
+  removeUser(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.removeUser(id, tenantScopedQuery(query, request));
   }
 }
 

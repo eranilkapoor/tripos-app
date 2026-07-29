@@ -1,8 +1,21 @@
-import { Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import { CreateStoredFileDto } from '../dto/storage.dto';
 import { StorageService } from '../services/storage.service';
 
@@ -20,11 +33,7 @@ export class StorageController {
     @Body() dto: CreateStoredFileDto,
     @Req() request: TenantRequest,
   ) {
-    return this.service.createUploadIntent({
-      ...dto,
-      organizationId: String(request.user?.tenantId ?? dto.organizationId),
-      branchId: String(request.user?.branchId ?? dto.branchId ?? ''),
-    });
+    return this.service.createUploadIntent(tenantScopedBody(dto, request));
   }
 
   @Get()
@@ -34,5 +43,34 @@ export class StorageController {
     @Req() request: Request,
   ) {
     return this.service.list(tenantScopedQuery(query, request));
+  }
+
+  @Get(':id')
+  findOne(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.findOne(id, tenantScopedQuery(query, request));
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body()
+    dto: Partial<CreateStoredFileDto> & { status?: string; url?: string },
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.update(id, dto, tenantScopedQuery(query, request));
+  }
+
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.remove(id, tenantScopedQuery(query, request));
   }
 }

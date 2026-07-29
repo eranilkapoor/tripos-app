@@ -3,7 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { scopeFilter } from '../../../common/utils/crm-list.util';
+import {
+  deleteScopedCrmRecord,
+  findScopedCrmRecord,
+  scopeFilter,
+  updateScopedCrmRecord,
+} from '../../../common/utils/crm-list.util';
 import { CreateStoredFileDto } from '../dto/storage.dto';
 import { StoredFile } from '../schemas/stored-file.schema';
 
@@ -42,6 +47,33 @@ export class StorageService {
     if (query.entityType) filter.entityType = query.entityType;
     if (query.entityId) filter.entityId = query.entityId;
     return this.model.find(filter).sort({ updatedAt: -1 }).lean().exec();
+  }
+
+  findOne(id: string, query: CrmListQueryDto) {
+    return findScopedCrmRecord(this.model, id, query, 'Stored file not found');
+  }
+
+  update(
+    id: string,
+    dto: Partial<CreateStoredFileDto> & { status?: string; url?: string },
+    query: CrmListQueryDto,
+  ) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Stored file not found',
+    );
+  }
+
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      'Stored file not found',
+    );
   }
 }
 

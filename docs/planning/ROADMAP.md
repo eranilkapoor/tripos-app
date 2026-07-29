@@ -31,11 +31,11 @@ Completed in the repo:
 - MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, tenants, auth, finance invoices, and audit logs.
 - Admin CRM connected to dedicated production APIs with bearer session handling.
 - CRM list pagination, status filtering, server-side search, tenant/branch-scoped create/detail/update/delete, and status mutation scoping.
-- Tenant, branch, CRM user, login, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only tenant management.
+- Tenant, branch, CRM user CRUD, login, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only tenant management.
 - Basic audit logging for authenticated mutations and sensitive finance/payment/document/tenant reads, with scoped list and CSV export APIs.
 - Local/log provider configuration for email, SMS, WhatsApp, payments, maps, AI, monitoring, and local/S3-style file storage.
 - File upload-intent registry for passports, vouchers, tickets, contracts, receipts, and generated document references.
-- Backend permission catalog and scoped CRM user role/permission update APIs.
+- Backend permission catalog and scoped CRM user detail/update/delete APIs.
 - Booking conversion from quotation, passenger capture, payment schedule, and voucher subflows.
 - Finance receivables, payables, refunds, booking profitability, and reconciliation endpoints.
 - Organization-current aliases, reporting overview/funnel/operations/finance APIs, and local/provider-ready AI travel assistant endpoints.
