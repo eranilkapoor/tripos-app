@@ -153,6 +153,17 @@ const modules: Module[] = [
     actions: ["Record Payment", "Approve Refund", "Export Ledger", "Profit Report"],
   },
   {
+    id: "invoices",
+    title: "Invoice Builder",
+    group: "Finance",
+    metric: "Multi-tax",
+    trend: "Country-aware invoices",
+    description: "Generate travel invoices with provider/customer details, dynamic line items, country tax rules, currency, numbering, totals, and API persistence.",
+    columns: ["Invoice", "Customer", "Country", "Tax", "Total", "Status"],
+    rows: [["TRV-0001", "Sharma Family", "India", "GST 18%", "₹129,500", "Draft"]],
+    actions: ["Generate Number", "Save Invoice", "Print Preview", "Lock Invoice"],
+  },
+  {
     id: "marketing",
     title: "Marketing ROI",
     group: "Growth",
@@ -172,7 +183,7 @@ const modules: Module[] = [
 const navGroups = [
   { title: "Control", items: ["dashboard", "leads", "quotations", "itineraries"] },
   { title: "Execution", items: ["bookings", "operations", "suppliers"] },
-  { title: "Business", items: ["b2b", "finance", "marketing"] },
+  { title: "Business", items: ["b2b", "finance", "invoices", "marketing"] },
 ];
 
 const kpis = [
@@ -320,7 +331,9 @@ export function CrmShell() {
           ))}
         </section>
 
-        <section className="table-card">
+        {selectedId === "invoices" ? <InvoiceBuilder /> : null}
+
+        {selectedId !== "invoices" ? <section className="table-card">
           <div className="table-head">
             <div>
               <span className="eyebrow">{selected.title}</span>
@@ -348,7 +361,7 @@ export function CrmShell() {
               </tbody>
             </table>
           </div>
-        </section>
+        </section> : null}
 
         <section className="quick-grid">
           <article>
@@ -371,6 +384,136 @@ export function CrmShell() {
         <div className="toast" role="status">{toast}</div>
       </main>
     </div>
+  );
+}
+
+const countryPresets = {
+  IN: { country: "India", currencyCode: "INR", currencySymbol: "₹", taxLabel: "GST", taxRate: 18 },
+  AE: { country: "United Arab Emirates", currencyCode: "AED", currencySymbol: "د.إ", taxLabel: "VAT", taxRate: 5 },
+  GB: { country: "United Kingdom", currencyCode: "GBP", currencySymbol: "£", taxLabel: "VAT", taxRate: 20 },
+  EU: { country: "European Union", currencyCode: "EUR", currencySymbol: "€", taxLabel: "VAT", taxRate: 21 },
+  US: { country: "United States", currencyCode: "USD", currencySymbol: "$", taxLabel: "Sales Tax", taxRate: 0 },
+};
+
+type CountryCode = keyof typeof countryPresets;
+
+function InvoiceBuilder() {
+  const [countryCode, setCountryCode] = useState<CountryCode>("IN");
+  const [series, setSeries] = useState("TRV-");
+  const [invoiceNo, setInvoiceNo] = useState("0001");
+  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().slice(0, 10));
+  const [providerName, setProviderName] = useState("Webnza Travels");
+  const [providerTaxNo, setProviderTaxNo] = useState("GSTIN-TRIPOS-DEMO");
+  const [customerName, setCustomerName] = useState("Sharma Family");
+  const [customerTaxNo, setCustomerTaxNo] = useState("");
+  const [entries, setEntries] = useState([
+    { dateProvided: invoiceDate, description: "Dubai hotel, transfers, and activities package", qty: 1, qtyType: "package", rate: 100000, total: 100000 },
+  ]);
+  const [status, setStatus] = useState("Ready to create invoice.");
+  const preset = countryPresets[countryCode];
+  const subtotal = entries.reduce((sum, entry) => sum + Number(entry.total || 0), 0);
+  const taxAmount = subtotal * (preset.taxRate / 100);
+  const totalPayable = subtotal + taxAmount;
+
+  function updateEntry(index: number, field: keyof typeof entries[number], value: string) {
+    setEntries((current) =>
+      current.map((entry, entryIndex) => {
+        if (entryIndex !== index) return entry;
+        const next = { ...entry, [field]: field === "description" || field === "qtyType" || field === "dateProvided" ? value : Number(value) };
+        if (field === "qty" || field === "rate") {
+          next.total = Number(next.qty || 0) * Number(next.rate || 0);
+        }
+        if (field === "total") {
+          next.rate = Number(next.qty || 1) ? Number(next.total || 0) / Number(next.qty || 1) : 0;
+        }
+        return next;
+      }),
+    );
+  }
+
+  async function generateNumber() {
+    const response = await fetch(`${apiBaseUrl}/tripos/invoices/next-number/${encodeURIComponent(series)}`);
+    const result = (await response.json()) as { invoiceNo?: string };
+    setInvoiceNo(result.invoiceNo ?? "0001");
+    setStatus("Invoice number generated from backend history.");
+  }
+
+  async function saveInvoice() {
+    const response = await fetch(`${apiBaseUrl}/tripos/invoices`, {
+      body: JSON.stringify({
+        invoiceSeries: series,
+        invoiceNo,
+        invoiceDate,
+        countryCode,
+        currencyCode: preset.currencyCode,
+        currencySymbol: preset.currencySymbol,
+        taxLabel: preset.taxLabel,
+        taxRate: preset.taxRate,
+        provider: { companyName: providerName, taxNo: providerTaxNo },
+        customer: { companyName: customerName, taxNo: customerTaxNo },
+        entries,
+        status: "draft",
+      }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    if (!response.ok) {
+      setStatus("Invoice save failed. Check API server.");
+      return;
+    }
+    setStatus("Invoice saved to TripOS API and Finance records.");
+  }
+
+  return (
+    <section className="invoice-builder">
+      <div className="invoice-form-panel">
+        <div className="table-head">
+          <div>
+            <span className="eyebrow">Travel Invoice Utility</span>
+            <h2>Country, tax, currency, and line-item invoice builder</h2>
+          </div>
+          <button onClick={generateNumber} type="button">Generate Number</button>
+        </div>
+        <div className="invoice-form-grid">
+          <label>Country<select value={countryCode} onChange={(event) => setCountryCode(event.target.value as CountryCode)}>{Object.entries(countryPresets).map(([code, item]) => <option key={code} value={code}>{item.country}</option>)}</select></label>
+          <label>Series<input value={series} onChange={(event) => setSeries(event.target.value)} /></label>
+          <label>Invoice No<input value={invoiceNo} onChange={(event) => setInvoiceNo(event.target.value)} /></label>
+          <label>Date<input type="date" value={invoiceDate} onChange={(event) => setInvoiceDate(event.target.value)} /></label>
+          <label>Provider<input value={providerName} onChange={(event) => setProviderName(event.target.value)} /></label>
+          <label>Provider Tax No<input value={providerTaxNo} onChange={(event) => setProviderTaxNo(event.target.value)} /></label>
+          <label>Customer<input value={customerName} onChange={(event) => setCustomerName(event.target.value)} /></label>
+          <label>Customer Tax No<input value={customerTaxNo} onChange={(event) => setCustomerTaxNo(event.target.value)} /></label>
+        </div>
+        <div className="table-wrap invoice-lines">
+          <table>
+            <thead><tr><th>Date</th><th>Description</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead>
+            <tbody>{entries.map((entry, index) => <tr key={index}>
+              <td><input type="date" value={entry.dateProvided} onChange={(event) => updateEntry(index, "dateProvided", event.target.value)} /></td>
+              <td><input value={entry.description} onChange={(event) => updateEntry(index, "description", event.target.value)} /></td>
+              <td><input type="number" value={entry.qty} onChange={(event) => updateEntry(index, "qty", event.target.value)} /></td>
+              <td><input value={entry.qtyType} onChange={(event) => updateEntry(index, "qtyType", event.target.value)} /></td>
+              <td><input type="number" value={entry.rate} onChange={(event) => updateEntry(index, "rate", event.target.value)} /></td>
+              <td><input type="number" value={entry.total} onChange={(event) => updateEntry(index, "total", event.target.value)} /></td>
+            </tr>)}</tbody>
+          </table>
+        </div>
+        <div className="action-bar">
+          <button onClick={() => setEntries([...entries, { dateProvided: invoiceDate, description: "Additional service", qty: 1, qtyType: "unit", rate: 0, total: 0 }])} type="button">Add Line</button>
+          <button onClick={saveInvoice} type="button">Save Invoice</button>
+          <span>{status}</span>
+        </div>
+      </div>
+      <aside className="invoice-preview">
+        <span className="eyebrow">{preset.country} / {preset.currencyCode}</span>
+        <h2>{series}{invoiceNo}</h2>
+        <p>{providerName} to {customerName}</p>
+        <dl>
+          <div><dt>Subtotal</dt><dd>{preset.currencySymbol}{subtotal.toFixed(2)}</dd></div>
+          <div><dt>{preset.taxLabel} {preset.taxRate}%</dt><dd>{preset.currencySymbol}{taxAmount.toFixed(2)}</dd></div>
+          <div><dt>Total Payable</dt><dd>{preset.currencySymbol}{totalPayable.toFixed(2)}</dd></div>
+        </dl>
+      </aside>
+    </section>
   );
 }
 

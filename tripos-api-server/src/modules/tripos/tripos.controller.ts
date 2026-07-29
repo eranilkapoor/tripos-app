@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { CreateRecordDto } from "./create-record.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { CreateDemoLeadDto } from "./create-demo-lead.dto";
+import { CreateInvoiceDto } from "./create-invoice.dto";
 import { TriposService } from "./tripos.service";
 
 @ApiTags("tripos")
@@ -77,5 +78,20 @@ export class TriposController {
   @Post("demo-leads")
   createDemoLead(@Body() dto: CreateDemoLeadDto) {
     return this.triposService.createDemoLead(dto);
+  }
+
+  @Get("invoices")
+  invoices() {
+    return this.triposService.invoices();
+  }
+
+  @Get("invoices/next-number/:series")
+  nextInvoiceNumber(@Param("series") series: string) {
+    return this.triposService.nextInvoiceNumber(series);
+  }
+
+  @Post("invoices")
+  createInvoice(@Body() dto: CreateInvoiceDto) {
+    return this.triposService.createInvoice(dto);
   }
 }

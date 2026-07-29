@@ -4,6 +4,8 @@ import { Model } from "mongoose";
 import { CreateDemoLeadDto } from "./create-demo-lead.dto";
 import { CreateRecordDto } from "./create-record.dto";
 import { TriposRecord } from "./tripos-record.schema";
+import { CreateInvoiceDto } from "./create-invoice.dto";
+import { TriposInvoice } from "./tripos-invoice.schema";
 
 @Injectable()
 export class TriposService {
@@ -12,6 +14,8 @@ export class TriposService {
   constructor(
     @InjectModel(TriposRecord.name)
     private readonly recordModel: Model<TriposRecord>,
+    @InjectModel(TriposInvoice.name)
+    private readonly invoiceModel: Model<TriposInvoice>,
   ) {}
 
   health() {
@@ -173,4 +177,60 @@ export class TriposService {
       },
     };
   }
+
+  async invoices() {
+    return this.invoiceModel.find().sort({ updatedAt: -1 }).lean().exec();
+  }
+
+  async nextInvoiceNumber(series: string) {
+    const invoices = await this.invoiceModel
+      .find({ invoiceSeries: series })
+      .select({ invoiceNo: 1 })
+      .lean()
+      .exec();
+    const maxLength = Math.max(4, ...invoices.map((invoice) => String(invoice.invoiceNo).length));
+    const maxNumber = Math.max(0, ...invoices.map((invoice) => Number(invoice.invoiceNo) || 0));
+    return {
+      invoiceSeries: series,
+      invoiceNo: String(maxNumber + 1).padStart(maxLength, "0"),
+    };
+  }
+
+  async createInvoice(dto: CreateInvoiceDto) {
+    const totals = calculateInvoiceTotals(dto.entries, dto.taxRate);
+    const invoice = await this.invoiceModel.create({
+      ...dto,
+      totals,
+      status: dto.status ?? "draft",
+      locked: dto.locked ?? false,
+    });
+    await this.createRecord({
+      moduleKey: "finance",
+      title: `${dto.invoiceSeries}${dto.invoiceNo} ${String(dto.customer.companyName ?? "Customer")}`,
+      status: dto.status ?? "draft",
+      priority: "medium",
+      payload: {
+        countryCode: dto.countryCode,
+        currencyCode: dto.currencyCode,
+        totalPayable: totals.totalPayable,
+        taxLabel: dto.taxLabel,
+        taxRate: dto.taxRate,
+      },
+    });
+    return {
+      message: "TripOS invoice saved.",
+      invoice,
+    };
+  }
+}
+
+function calculateInvoiceTotals(entries: Array<Record<string, unknown>>, taxRate: number) {
+  const subtotal = entries.reduce((sum, entry) => sum + Number(entry.total ?? 0), 0);
+  const taxAmount = subtotal * (Number(taxRate || 0) / 100);
+  return {
+    subtotal,
+    taxAmount,
+    taxBasis: subtotal,
+    totalPayable: subtotal + taxAmount,
+  };
 }
