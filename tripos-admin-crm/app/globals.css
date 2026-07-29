@@ -1,18 +1,80 @@
 :root {
+  color-scheme: light;
   --bg: #eef4f5;
   --surface: #ffffff;
   --surface-2: #f6faf9;
+  --surface-3: #e9f4f1;
   --ink: #132321;
   --muted: #66736f;
   --line: #d8e4e1;
+  --line-strong: #bdcfca;
   --brand: #0f766e;
   --brand-dark: #12413d;
+  --brand-soft: #e3f5f2;
   --accent: #c56b2c;
   --accent-soft: #fff2e8;
+  --on-brand: #ffffff;
   --good: #0f7b55;
   --warn: #9a5b11;
   --danger: #b42318;
+  --sidebar-text: #d8f3ed;
   --shadow: 0 14px 36px rgba(19, 35, 33, 0.08);
+  --shadow-soft: 0 8px 24px rgba(19, 35, 33, 0.05);
+  --auth-overlay: linear-gradient(
+    135deg,
+    rgba(18, 65, 61, 0.94),
+    rgba(15, 118, 110, 0.78)
+  );
+}
+
+.theme-dark {
+  color-scheme: dark;
+  --bg: #0f1720;
+  --surface: #151f2a;
+  --surface-2: #1b2936;
+  --surface-3: #223444;
+  --ink: #edf6f3;
+  --muted: #b7c8c2;
+  --line: #2b3d4a;
+  --line-strong: #405767;
+  --brand: #5cd7c9;
+  --brand-dark: #0a3434;
+  --brand-soft: #123d3c;
+  --accent: #f3a15d;
+  --accent-soft: #3b2819;
+  --on-brand: #06201f;
+  --sidebar-text: #cff5ef;
+  --shadow: 0 14px 42px rgba(0, 0, 0, 0.3);
+  --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.2);
+  --auth-overlay: linear-gradient(
+    135deg,
+    rgba(6, 23, 30, 0.96),
+    rgba(10, 52, 52, 0.9)
+  );
+}
+
+.theme-coastal {
+  color-scheme: light;
+  --bg: #eef7fb;
+  --surface: #ffffff;
+  --surface-2: #f5fbfd;
+  --surface-3: #e2f4fa;
+  --ink: #112436;
+  --muted: #617587;
+  --line: #d2e3ec;
+  --line-strong: #b8d1dc;
+  --brand: #126a8a;
+  --brand-dark: #0a3f56;
+  --brand-soft: #e0f3fa;
+  --accent: #0f8b6f;
+  --accent-soft: #e5f8f2;
+  --on-brand: #ffffff;
+  --sidebar-text: #dceff7;
+  --auth-overlay: linear-gradient(
+    135deg,
+    rgba(10, 63, 86, 0.94),
+    rgba(18, 106, 138, 0.78)
+  );
 }
 
 * {
@@ -22,15 +84,20 @@
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   margin: 0;
+  min-width: 320px;
 }
 
 button,
-input {
-  font: inherit;
-}
-
+input,
 select,
 textarea {
   font: inherit;
@@ -40,19 +107,28 @@ button {
   cursor: pointer;
 }
 
-.admin-shell {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  min-height: 100vh;
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand) 30%, transparent);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
 }
 
 .auth-screen {
   align-items: center;
-  background: radial-gradient(circle at top left, #d9f3ee, transparent 32%), var(--bg);
-  display: flex;
-  justify-content: center;
+  background: var(--auth-overlay), var(--bg);
+  display: grid;
   min-height: 100vh;
-  padding: 22px;
+  padding: 24px;
+  place-items: center;
 }
 
 .auth-card {
@@ -61,25 +137,28 @@ button {
   border-radius: 8px;
   box-shadow: var(--shadow);
   display: grid;
-  gap: 12px;
-  max-width: 430px;
-  padding: 22px;
-  width: 100%;
+  gap: 13px;
+  max-width: 460px;
+  padding: 26px;
+  width: min(100%, 460px);
 }
 
-.auth-card .brand-mark {
-  background: var(--brand);
-  color: #fff;
+.auth-card-head {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
 }
 
 .auth-card h1 {
-  color: var(--brand-dark);
+  color: var(--brand);
+  font-size: 28px;
 }
 
 .auth-card p {
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .auth-card label {
@@ -91,29 +170,79 @@ button {
   text-transform: uppercase;
 }
 
-.auth-card input {
-  border: 1px solid var(--line);
+.auth-card input,
+.formrow input,
+.formrow select,
+.formrow textarea,
+.invoice-form-grid input,
+.invoice-form-grid select,
+.invoice-lines input,
+.top-actions input,
+td select,
+td button {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
   border-radius: 8px;
-  min-height: 40px;
+  color: var(--ink);
+  min-height: 38px;
   padding: 8px 10px;
 }
 
-.auth-card button {
+.auth-card button,
+.top-actions button,
+.action-bar button,
+.record-modal-actions button:last-child,
+.invoice-form-panel .table-head button {
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.auth-card > button,
+.top-actions button.primary,
+.action-bar button,
+.record-modal-actions button:last-child,
+.invoice-form-panel .table-head button {
   background: var(--brand);
   border: 1px solid var(--brand-dark);
-  border-radius: 8px;
-  color: #fff;
-  font-weight: 900;
-  min-height: 42px;
+  color: var(--on-brand);
+}
+
+.admin-shell {
+  --crm-shell-header-height: 68px;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.right-sec {
+  background: var(--bg);
+  min-width: 0;
 }
 
 .sidebar {
   background: linear-gradient(180deg, var(--brand-dark), var(--brand));
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   min-height: 100vh;
-  padding: 18px 14px;
+  overflow: hidden;
   position: sticky;
   top: 0;
+}
+
+.sidebar-head {
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  gap: 12px;
+  height: var(--crm-shell-header-height);
+  justify-content: space-between;
+  padding: 12px 16px;
 }
 
 .brand {
@@ -123,14 +252,13 @@ button {
   color: #fff;
   display: flex;
   gap: 12px;
-  margin-bottom: 22px;
-  padding: 0 4px;
+  min-width: 0;
+  padding: 0;
   text-align: left;
-  width: 100%;
 }
 
 .brand-mark {
-  background: #fff;
+  background: var(--surface);
   border-radius: 8px;
   color: var(--brand);
   display: grid;
@@ -147,9 +275,28 @@ button {
 }
 
 .brand small {
-  color: #d8f3ed;
+  color: var(--sidebar-text);
   font-size: 12px;
   margin-top: 2px;
+}
+
+.sidebar-status {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 5px 8px;
+  text-transform: uppercase;
+}
+
+.main-menu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px 22px;
+  scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
+  scrollbar-width: thin;
 }
 
 .nav-group {
@@ -167,7 +314,7 @@ button {
 }
 
 .nav-group h2 {
-  color: #bde9df;
+  color: var(--sidebar-text);
   padding: 0 8px;
 }
 
@@ -178,6 +325,7 @@ button {
   border-radius: 8px;
   color: #eefdfa;
   display: flex;
+  gap: 8px;
   justify-content: space-between;
   margin: 7px 0;
   min-height: 42px;
@@ -188,7 +336,7 @@ button {
 
 .nav-group button.selected,
 .nav-group button:hover {
-  background: #fff;
+  background: var(--surface);
   color: var(--brand);
 }
 
@@ -198,65 +346,159 @@ button {
   font-weight: 900;
 }
 
-.workspace {
-  min-width: 0;
-  padding: 22px;
-}
-
 .topbar,
 .hero-panel,
 .table-card,
 .quick-grid article,
-.metric-card {
+.metric-card,
+.invoice-form-panel,
+.invoice-preview,
+.detail-panel {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
 }
 
 .topbar {
   align-items: center;
+  border-radius: 0;
   display: flex;
   gap: 18px;
   justify-content: space-between;
-  margin-bottom: 16px;
-  padding: 16px;
+  min-height: var(--crm-shell-header-height);
+  padding: 12px 22px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
-h1,
-h2,
-p {
-  margin: 0;
+.topbar-title {
+  display: grid;
+  gap: 2px;
+  min-width: 220px;
 }
 
-h1 {
-  font-size: 26px;
+.topbar-title strong {
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.topbar-title small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .top-actions {
+  align-items: center;
   display: flex;
   gap: 10px;
+  justify-content: flex-end;
 }
 
 .top-actions input {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  min-height: 40px;
   min-width: 260px;
-  padding: 8px 11px;
 }
 
-.top-actions button,
-.action-bar button {
-  background: var(--brand);
-  border: 1px solid var(--brand-dark);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  min-height: 40px;
-  padding: 8px 13px;
+.top-actions button {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  color: var(--brand);
+}
+
+.logout-action {
+  color: var(--danger) !important;
+}
+
+.profile-chip {
+  align-items: center;
+  border-left: 1px solid var(--line);
+  display: grid;
+  gap: 9px;
+  grid-template-columns: 34px minmax(120px, 1fr);
+  padding-left: 12px;
+}
+
+.profile-chip > span {
+  background: var(--brand-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--brand);
+  display: grid;
+  font-weight: 950;
+  height: 34px;
+  place-items: center;
   text-transform: uppercase;
+  width: 34px;
+}
+
+.profile-chip strong,
+.profile-chip small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-chip strong {
+  font-size: 12px;
+}
+
+.profile-chip small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.theme-switcher {
+  border: 0;
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+}
+
+.theme-switcher legend {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.theme-radio-group {
+  display: flex;
+  gap: 2px;
+}
+
+.theme-radio-group label {
+  align-items: center;
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 900;
+  min-height: 28px;
+  padding: 5px 8px;
+}
+
+.theme-radio-group label.selected {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.theme-radio-group input {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.workspace {
+  min-width: 0;
+  padding: 22px;
 }
 
 .hero-panel {
@@ -276,7 +518,8 @@ h1 {
 
 .hero-panel p,
 .metric-card p,
-.quick-grid p {
+.quick-grid p,
+.module-grid p {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.45;
@@ -284,7 +527,7 @@ h1 {
 
 .hero-panel > strong {
   background: var(--accent-soft);
-  border: 1px solid #f0cfb4;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--accent-soft));
   border-radius: 8px;
   color: var(--accent);
   padding: 12px;
@@ -319,11 +562,13 @@ h1 {
   margin-bottom: 6px;
 }
 
-.action-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
+.quick-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.quick-grid strong {
+  display: block;
+  margin-bottom: 8px;
 }
 
 .table-card {
@@ -363,10 +608,14 @@ td {
 }
 
 th {
-  background: #edf6f4;
+  background: var(--surface-3);
   color: var(--brand);
   font-size: 12px;
   text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+  background: var(--surface-2);
 }
 
 .badge {
@@ -391,15 +640,6 @@ th {
 .badge.danger {
   background: #fde7e5;
   color: var(--danger);
-}
-
-.quick-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.quick-grid strong {
-  display: block;
-  margin-bottom: 8px;
 }
 
 .module-grid {
@@ -428,40 +668,27 @@ th {
   margin: 6px 0;
 }
 
-.module-grid p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-td select,
-td button {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  min-height: 32px;
-  padding: 5px 8px;
-}
-
 .detail-panel {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
   padding: 16px;
   position: fixed;
   right: 18px;
-  top: 18px;
+  top: 86px;
   width: min(380px, calc(100vw - 36px));
   z-index: 20;
 }
 
-.detail-panel > button {
+.detail-panel > button,
+.record-modal button {
   background: var(--surface-2);
   border: 1px solid var(--line);
   border-radius: 8px;
-  float: right;
+  color: var(--ink);
   min-height: 34px;
   padding: 6px 10px;
+}
+
+.detail-panel > button {
+  float: right;
 }
 
 .detail-panel h2 {
@@ -528,26 +755,6 @@ td button {
   border-top: 1px solid var(--line);
 }
 
-.record-modal button,
-.record-modal-actions button {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  min-height: 36px;
-  padding: 7px 12px;
-}
-
-.record-modal-actions button:last-child {
-  background: var(--brand);
-  border-color: var(--brand-dark);
-  color: #fff;
-  font-weight: 900;
-}
-
-.record-modal-actions button:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
 .record-form-grid {
   display: grid;
   gap: 12px;
@@ -571,11 +778,6 @@ td button {
 .formrow input,
 .formrow select,
 .formrow textarea {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--ink);
-  min-height: 36px;
-  padding: 7px 9px;
   text-transform: none;
   width: 100%;
 }
@@ -617,23 +819,7 @@ td button {
 
 .invoice-form-panel,
 .invoice-preview {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
   overflow: hidden;
-}
-
-.invoice-form-panel .table-head button {
-  background: var(--brand);
-  border: 1px solid var(--brand-dark);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  min-height: 38px;
-  padding: 8px 12px;
-  text-transform: uppercase;
 }
 
 .invoice-form-grid {
@@ -641,13 +827,6 @@ td button {
   gap: 12px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   padding: 14px;
-}
-
-.invoice-form-grid label,
-.invoice-lines input,
-.invoice-form-grid input,
-.invoice-form-grid select {
-  min-width: 0;
 }
 
 .invoice-form-grid label {
@@ -659,19 +838,15 @@ td button {
   text-transform: uppercase;
 }
 
-.invoice-form-grid input,
-.invoice-form-grid select,
-.invoice-lines input {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--ink);
-  min-height: 34px;
-  padding: 7px 9px;
-  width: 100%;
-}
-
 .invoice-lines table {
   min-width: 1040px;
+}
+
+.action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .invoice-preview {
@@ -721,21 +896,9 @@ td button {
   margin: 0;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .admin-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    min-height: auto;
-    position: static;
-  }
-
-  .kpi-grid,
-  .quick-grid,
-  .module-grid,
-  .hero-panel {
-    grid-template-columns: 1fr;
+    grid-template-columns: 240px minmax(0, 1fr);
   }
 
   .topbar {
@@ -744,7 +907,30 @@ td button {
   }
 
   .top-actions {
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    height: auto;
+    min-height: auto;
+    position: static;
+  }
+
+  .kpi-grid,
+  .quick-grid,
+  .module-grid,
+  .hero-panel,
+  .invoice-builder,
+  .invoice-form-grid,
+  .record-form-grid {
+    grid-template-columns: 1fr;
   }
 
   .top-actions input {
@@ -752,9 +938,8 @@ td button {
     width: 100%;
   }
 
-  .invoice-builder,
-  .invoice-form-grid,
-  .record-form-grid {
-    grid-template-columns: 1fr;
+  .profile-chip {
+    border-left: 0;
+    padding-left: 0;
   }
 }

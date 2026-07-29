@@ -735,6 +735,13 @@ const countryPresets = {
 };
 
 type CountryCode = keyof typeof countryPresets;
+type CrmTheme = "light" | "dark" | "coastal";
+
+const crmThemes: { id: CrmTheme; label: string }[] = [
+  { id: "light", label: "Light" },
+  { id: "dark", label: "Dark" },
+  { id: "coastal", label: "Coastal" },
+];
 
 export default function CrmShell() {
   const router = useRouter();
@@ -757,9 +764,18 @@ export default function CrmShell() {
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
   const [session, setSession] = useState<CrmSession | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [theme, setTheme] = useState<CrmTheme>("light");
   const selected = modules.find((item) => item.id === selectedId) ?? modules[0];
 
   useEffect(() => {
+    const storedTheme = window.localStorage.getItem("tripos-crm-theme");
+    if (
+      storedTheme === "light" ||
+      storedTheme === "dark" ||
+      storedTheme === "coastal"
+    ) {
+      setTheme(storedTheme);
+    }
     const raw = window.localStorage.getItem("tripos-crm-session");
     if (!raw) {
       setAuthReady(true);
@@ -787,6 +803,11 @@ export default function CrmShell() {
       setAuthReady(true);
     }
   }, []);
+
+  function changeTheme(nextTheme: CrmTheme) {
+    setTheme(nextTheme);
+    window.localStorage.setItem("tripos-crm-theme", nextTheme);
+  }
 
   useEffect(() => {
     if (pathModule && modules.some((item) => item.id === pathModule))
@@ -904,7 +925,7 @@ export default function CrmShell() {
 
   if (!authReady)
     return (
-      <div className="auth-screen">
+      <div className={`auth-screen theme-${theme}`}>
         <section className="auth-card">
           <h1>TripOS</h1>
           <p>Loading secure workspace...</p>
@@ -914,6 +935,8 @@ export default function CrmShell() {
   if (!session)
     return (
       <LoginScreen
+        onThemeChange={changeTheme}
+        theme={theme}
         onLogin={(nextSession) => {
           window.localStorage.setItem(
             "tripos-crm-session",
@@ -926,20 +949,23 @@ export default function CrmShell() {
     );
 
   return (
-    <div className="admin-shell">
+    <div className={`admin-shell theme-${theme}`}>
       <aside className="sidebar">
-        <button
-          className="brand"
-          onClick={() => selectModule("dashboard")}
-          type="button"
-        >
-          <span className="brand-mark">T</span>
-          <span>
-            <strong>TripOS</strong>
-            <small>Travel Operating System</small>
-          </span>
-        </button>
-        <nav aria-label="TripOS modules">
+        <div className="sidebar-head">
+          <button
+            className="brand"
+            onClick={() => selectModule("dashboard")}
+            type="button"
+          >
+            <span className="brand-mark">T</span>
+            <span>
+              <strong>TripOS</strong>
+              <small>Travel Operating System</small>
+            </span>
+          </button>
+          <span className="sidebar-status">Live CRM</span>
+        </div>
+        <nav className="main-menu" aria-label="TripOS modules">
           {navGroups.map((group) => (
             <section className="nav-group" key={group.title}>
               <h2>{group.title}</h2>
@@ -963,14 +989,15 @@ export default function CrmShell() {
         </nav>
       </aside>
 
-      <main className="workspace">
+      <section className="right-sec">
         <header className="topbar">
-          <div>
-            <span className="eyebrow">
+          <div className="topbar-title">
+            <span className="eyebrow">TripOS Admin CRM</span>
+            <strong>{selected.title}</strong>
+            <small>
               {String(session.tenant.name ?? "Tenant")} /{" "}
               {String(session.user.branchId ?? "Branch")}
-            </span>
-            <h1>{selected.title}</h1>
+            </small>
           </div>
           <div className="top-actions">
             <input
@@ -979,107 +1006,155 @@ export default function CrmShell() {
               placeholder="Search live records"
               value={query}
             />
+            <ThemeSwitcher onChange={changeTheme} selectedTheme={theme} />
             <button
+              className="utility-button"
               onClick={() => void loadModule(selected, query)}
               type="button"
             >
               Refresh
             </button>
             {selected.fields.length ? (
-              <button onClick={() => setModalOpen(true)} type="button">
+              <button
+                className="utility-button primary"
+                onClick={() => setModalOpen(true)}
+                type="button"
+              >
                 Create
               </button>
             ) : null}
-            <button onClick={() => void logout()} type="button">
+            <div className="profile-chip">
+              <span>{String(session.user.name ?? "Admin").slice(0, 1)}</span>
+              <div>
+                <strong>{String(session.user.name ?? "TripOS Admin")}</strong>
+                <small>{String(session.user.role ?? "tenant_admin")}</small>
+              </div>
+            </div>
+            <button
+              className="logout-action"
+              onClick={() => void logout()}
+              type="button"
+            >
               Logout
             </button>
           </div>
         </header>
 
-        <section className="hero-panel">
-          <div>
-            <span className="eyebrow">{selected.group}</span>
-            <h2>
-              {selected.id === "dashboard"
-                ? "Live Control"
-                : `${records.length} Records`}
-            </h2>
-            <p>{selected.description}</p>
-          </div>
-          <strong>{isLoading ? "Syncing" : "API-backed"}</strong>
-        </section>
+        <main className="workspace">
+          <section className="hero-panel">
+            <div>
+              <span className="eyebrow">{selected.group}</span>
+              <h2>
+                {selected.id === "dashboard"
+                  ? "Live Control"
+                  : `${records.length} Records`}
+              </h2>
+              <p>{selected.description}</p>
+            </div>
+            <strong>{isLoading ? "Syncing" : "API-backed"}</strong>
+          </section>
 
-        <section className="kpi-grid" aria-label="TripOS metrics">
-          {metrics.map(([label, value, helper]) => (
-            <article className="metric-card" key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-              <p>{helper}</p>
+          <section className="kpi-grid" aria-label="TripOS metrics">
+            {metrics.map(([label, value, helper]) => (
+              <article className="metric-card" key={label}>
+                <span>{label}</span>
+                <strong>{value}</strong>
+                <p>{helper}</p>
+              </article>
+            ))}
+          </section>
+
+          {selected.id === "invoices" ? (
+            <InvoiceBuilder onSaved={() => void loadModule(selected)} />
+          ) : null}
+          {selected.id === "dashboard" ? (
+            <DashboardPanel dashboard={dashboard} />
+          ) : (
+            <RecordTable
+              columns={selected.columns}
+              filteredRows={filteredRows}
+              module={selected}
+              onSelect={setSelectedRecord}
+              onStatus={updateStatus}
+            />
+          )}
+
+          <section className="quick-grid">
+            <article>
+              <span className="eyebrow">Production Data</span>
+              <strong>Direct module APIs</strong>
+              <p>
+                CRM records now load from dedicated TripOS endpoints instead of
+                generic demo records.
+              </p>
             </article>
-          ))}
-        </section>
+            <article>
+              <span className="eyebrow">B2B + Operations</span>
+              <strong>Inside admin CRM</strong>
+              <p>
+                Agents, supplier ops, vouchers, payments, documents, and tickets
+                stay in one back-office workspace.
+              </p>
+            </article>
+            <article>
+              <span className="eyebrow">Next Sync</span>
+              <strong>Mobile customer flows</strong>
+              <p>
+                The same APIs can power B2C trip status, vouchers, documents,
+                support, and payments in the app.
+              </p>
+            </article>
+          </section>
 
-        {selected.id === "invoices" ? (
-          <InvoiceBuilder onSaved={() => void loadModule(selected)} />
-        ) : null}
-        {selected.id === "dashboard" ? (
-          <DashboardPanel dashboard={dashboard} />
-        ) : (
-          <RecordTable
-            columns={selected.columns}
-            filteredRows={filteredRows}
-            module={selected}
-            onSelect={setSelectedRecord}
-            onStatus={updateStatus}
-          />
-        )}
-
-        <section className="quick-grid">
-          <article>
-            <span className="eyebrow">Production Data</span>
-            <strong>Direct module APIs</strong>
-            <p>
-              CRM records now load from dedicated TripOS endpoints instead of
-              generic demo records.
-            </p>
-          </article>
-          <article>
-            <span className="eyebrow">B2B + Operations</span>
-            <strong>Inside admin CRM</strong>
-            <p>
-              Agents, supplier ops, vouchers, payments, documents, and tickets
-              stay in one back-office workspace.
-            </p>
-          </article>
-          <article>
-            <span className="eyebrow">Next Sync</span>
-            <strong>Mobile customer flows</strong>
-            <p>
-              The same APIs can power B2C trip status, vouchers, documents,
-              support, and payments in the app.
-            </p>
-          </article>
-        </section>
-
-        {selectedRecord ? (
-          <DetailPanel
-            module={selected}
-            record={selectedRecord}
-            onClose={() => setSelectedRecord(null)}
-          />
-        ) : null}
-        {modalOpen ? (
-          <RecordForm
-            module={selected}
-            onClose={() => setModalOpen(false)}
-            onSubmit={createRecord}
-          />
-        ) : null}
-        <div className="toast" role="status">
-          {toast}
-        </div>
-      </main>
+          {selectedRecord ? (
+            <DetailPanel
+              module={selected}
+              record={selectedRecord}
+              onClose={() => setSelectedRecord(null)}
+            />
+          ) : null}
+          {modalOpen ? (
+            <RecordForm
+              module={selected}
+              onClose={() => setModalOpen(false)}
+              onSubmit={createRecord}
+            />
+          ) : null}
+          <div className="toast" role="status">
+            {toast}
+          </div>
+        </main>
+      </section>
     </div>
+  );
+}
+
+function ThemeSwitcher({
+  onChange,
+  selectedTheme,
+}: {
+  onChange: (theme: CrmTheme) => void;
+  selectedTheme: CrmTheme;
+}) {
+  return (
+    <fieldset className="theme-switcher">
+      <legend>Theme</legend>
+      <div className="theme-radio-group">
+        {crmThemes.map((item) => (
+          <label
+            className={selectedTheme === item.id ? "selected" : ""}
+            key={item.id}
+          >
+            <input
+              checked={selectedTheme === item.id}
+              onChange={() => onChange(item.id)}
+              type="radio"
+            />
+            <span>{item.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }
 
@@ -1162,7 +1237,15 @@ function RecordTable({
   );
 }
 
-function LoginScreen({ onLogin }: { onLogin: (session: CrmSession) => void }) {
+function LoginScreen({
+  onLogin,
+  onThemeChange,
+  theme,
+}: {
+  onLogin: (session: CrmSession) => void;
+  onThemeChange: (theme: CrmTheme) => void;
+  theme: CrmTheme;
+}) {
   const [email, setEmail] = useState("admin@tripos.test");
   const [password, setPassword] = useState("TripOS@123");
   const [tenantCode, setTenantCode] = useState("WEBNZA");
@@ -1189,13 +1272,16 @@ function LoginScreen({ onLogin }: { onLogin: (session: CrmSession) => void }) {
   }
 
   return (
-    <div className="auth-screen">
+    <div className={`auth-screen theme-${theme}`}>
       <section className="auth-card">
-        <span className="brand-mark">T</span>
+        <div className="auth-card-head">
+          <span className="brand-mark">T</span>
+          <ThemeSwitcher onChange={onThemeChange} selectedTheme={theme} />
+        </div>
         <h1>TripOS Admin CRM</h1>
         <p>
-          Multi-tenant travel CRM for agencies, DMC teams, branches, operations,
-          finance, and B2B agents.
+          Multi-tenant travel command center for agencies, DMC teams, branches,
+          operations, finance, and B2B agents.
         </p>
         <label>
           Email
