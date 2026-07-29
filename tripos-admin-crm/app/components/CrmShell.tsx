@@ -1893,6 +1893,17 @@ function buildMetrics(
   records: ApiRecord[],
   dashboard: Record<string, unknown> | null,
 ): [string, string, string][] {
+  if (Array.isArray(dashboard?.metrics)) {
+    return dashboard.metrics.map((metric) => {
+      const item = metric as Record<string, unknown>;
+      return [
+        String(item.label ?? "Metric"),
+        String(item.value ?? "0"),
+        String(item.helper ?? "Live"),
+      ];
+    });
+  }
+
   const dashboardTotal =
     typeof dashboard?.totalRecords === "number"
       ? String(dashboard.totalRecords)

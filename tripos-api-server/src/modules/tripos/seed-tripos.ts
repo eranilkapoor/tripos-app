@@ -23,7 +23,6 @@ import { CampaignSchema } from '../campaigns/schemas/campaign.schema';
 import { StoredFileSchema } from '../storage/schemas/stored-file.schema';
 import { SavedReportSchema } from '../reporting/schemas/saved-report.schema';
 import { AuditLogSchema } from '../audit/schemas/audit-log.schema';
-import { TriposRecordSchema } from './tripos-record.schema';
 
 config({ path: '.env.development' });
 config();
@@ -55,7 +54,6 @@ async function main() {
   const StoredFile = model('StoredFile', StoredFileSchema);
   const SavedReport = model('SavedReport', SavedReportSchema);
   const AuditLog = model('AuditLog', AuditLogSchema);
-  const TriposRecord = model('TriposRecord', TriposRecordSchema);
 
   const tenant = await Tenant.findOneAndUpdate(
     { code: 'WEBNZA' },
@@ -558,38 +556,6 @@ async function main() {
       metadata: { tenantCode: 'WEBNZA' },
     },
   ]);
-
-  await upsertMany(
-    TriposRecord,
-    'title',
-    [
-      [
-        'leads',
-        'Sharma Family',
-        'quotation_sent',
-        { destination: 'Dubai', source: 'Website', owner: 'Ritika' },
-      ],
-      [
-        'bookings',
-        'BKG-SHARMA-DXB',
-        'confirmed',
-        { destination: 'Dubai', travelDates: '25 Dec - 30 Dec 2026' },
-      ],
-      [
-        'finance',
-        'Dubai Profit Snapshot',
-        'healthy',
-        { sellingPrice: 129500, supplierCost: 104000, netProfit: 25500 },
-      ],
-    ].map(([moduleKey, title, status, payload]) => ({
-      organizationId,
-      moduleKey,
-      title,
-      status,
-      priority: 'medium',
-      payload,
-    })),
-  );
 
   await mongoose.disconnect();
   console.log(

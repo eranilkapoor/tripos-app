@@ -1,22 +1,44 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { CreateDemoLeadDto } from "./create-demo-lead.dto";
-import { CreateRecordDto } from "./create-record.dto";
-import { TriposRecord } from "./tripos-record.schema";
-import { CreateInvoiceDto } from "./create-invoice.dto";
-import { InvoicesService } from "../finance/services/invoices.service";
-import { CrmListQueryDto } from "../../common/dto/crm-list-query.dto";
-import { AppService } from "../../app.service";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { AppService } from '../../app.service';
+import { CrmListQueryDto } from '../../common/dto/crm-list-query.dto';
+import { AuditLog } from '../audit/schemas/audit-log.schema';
+import { B2BAgent } from '../b2b-agents/schemas/b2b-agent.schema';
+import { Booking } from '../bookings/schemas/booking.schema';
+import { Customer } from '../customers/schemas/customer.schema';
+import { Invoice } from '../finance/schemas/invoice.schema';
+import { Lead } from '../leads/schemas/leads.schema';
+import { OperationTask } from '../operations/schemas/operation-task.schema';
+import { Payment } from '../payments/schemas/payment.schema';
+import { Quotation } from '../quotations/schemas/quotation.schema';
+import { Supplier } from '../suppliers/schemas/supplier.schema';
+import { Tenant } from '../tenants/schemas/tenant.schema';
+
+type ScopedFilter = {
+  organizationId: string;
+  branchId?: string;
+};
 
 @Injectable()
 export class TriposService {
-  private readonly demoLeads: Array<CreateDemoLeadDto & { id: string; source: string; stage: string }> = [];
-
   constructor(
-    @InjectModel(TriposRecord.name)
-    private readonly recordModel: Model<TriposRecord>,
-    private readonly invoicesService: InvoicesService,
+    @InjectModel(Lead.name) private readonly leadModel: Model<Lead>,
+    @InjectModel(Quotation.name)
+    private readonly quotationModel: Model<Quotation>,
+    @InjectModel(Booking.name) private readonly bookingModel: Model<Booking>,
+    @InjectModel(Customer.name)
+    private readonly customerModel: Model<Customer>,
+    @InjectModel(Supplier.name)
+    private readonly supplierModel: Model<Supplier>,
+    @InjectModel(OperationTask.name)
+    private readonly operationTaskModel: Model<OperationTask>,
+    @InjectModel(B2BAgent.name)
+    private readonly b2bAgentModel: Model<B2BAgent>,
+    @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
+    @InjectModel(Invoice.name) private readonly invoiceModel: Model<Invoice>,
+    @InjectModel(Tenant.name) private readonly tenantModel: Model<Tenant>,
+    @InjectModel(AuditLog.name) private readonly auditLogModel: Model<AuditLog>,
     private readonly appService: AppService,
   ) {}
 
@@ -24,187 +46,204 @@ export class TriposService {
     const isShuttingDown = this.appService.isShuttingDown();
 
     return {
-      service: "tripos-api-server",
-      status: isShuttingDown ? "shutting_down" : "ok",
-      version: "0.1.0",
+      service: 'tripos-api-server',
+      status: isShuttingDown ? 'shutting_down' : 'ok',
+      version: '0.1.0',
       timestamp: new Date().toISOString(),
     };
   }
 
-  dashboard() {
+  async dashboard(query: CrmListQueryDto) {
+    const scope = this.scope(query);
+    const organizationScope = { organizationId: scope.organizationId };
+
+    const [
+      tenant,
+      leadTotal,
+      newLeads,
+      hotLeads,
+      openQuotations,
+      sentQuotations,
+      acceptedQuotations,
+      activeBookings,
+      confirmedBookings,
+      completedBookings,
+      customers,
+      suppliers,
+      activeAgents,
+      pendingOperations,
+      issueOperations,
+      receivables,
+      payables,
+      invoiced,
+      recentAuditLogs,
+    ] = await Promise.all([
+      this.tenantModel.findById(scope.organizationId).lean().exec(),
+      this.leadModel.countDocuments(scope).exec(),
+      this.leadModel.countDocuments({ ...scope, stage: 'new' }).exec(),
+      this.leadModel.countDocuments({ ...scope, temperature: 'hot' }).exec(),
+      this.quotationModel
+        .countDocuments({
+          ...scope,
+          status: { $nin: ['accepted', 'rejected'] },
+        })
+        .exec(),
+      this.quotationModel.countDocuments({ ...scope, status: 'sent' }).exec(),
+      this.quotationModel
+        .countDocuments({ ...scope, status: 'accepted' })
+        .exec(),
+      this.bookingModel
+        .countDocuments({
+          ...scope,
+          status: {
+            $in: ['pending_payment', 'confirmed', 'partially_confirmed'],
+          },
+        })
+        .exec(),
+      this.bookingModel
+        .countDocuments({ ...scope, status: 'confirmed' })
+        .exec(),
+      this.bookingModel
+        .countDocuments({ ...scope, status: 'completed' })
+        .exec(),
+      this.customerModel.countDocuments(scope).exec(),
+      this.supplierModel.countDocuments(scope).exec(),
+      this.b2bAgentModel.countDocuments({ ...scope, status: 'active' }).exec(),
+      this.operationTaskModel
+        .countDocuments({ ...scope, status: { $nin: ['completed'] } })
+        .exec(),
+      this.operationTaskModel
+        .countDocuments({ ...scope, status: 'issue' })
+        .exec(),
+      this.sumPayments(scope, 'receivable', [
+        'pending',
+        'partially_paid',
+        'overdue',
+      ]),
+      this.sumPayments(scope, 'payable', [
+        'pending',
+        'partially_paid',
+        'overdue',
+      ]),
+      this.sumInvoices(scope),
+      this.auditLogModel
+        .find(organizationScope)
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .lean()
+        .exec(),
+    ]);
+
     return {
-      tenant: "Webnza Travels Demo",
-      branch: "Delhi",
+      tenant: tenant?.name ?? 'TripOS Workspace',
+      branch: this.branchName(tenant?.branches ?? [], query.branchId),
       metrics: [
-        { label: "New Leads", value: "38", helper: "+12 today" },
-        { label: "Open Quotes", value: "INR 18.2L", helper: "14 awaiting approval" },
-        { label: "Trips Active", value: "22", helper: "7 start this week" },
-        { label: "Gross Profit", value: "INR 12.4L", helper: "29% margin" },
+        {
+          label: 'Total Leads',
+          value: leadTotal,
+          helper: `${newLeads} new, ${hotLeads} hot`,
+        },
+        {
+          label: 'Open Quotes',
+          value: openQuotations,
+          helper: `${sentQuotations} sent, ${acceptedQuotations} accepted`,
+        },
+        {
+          label: 'Active Trips',
+          value: activeBookings,
+          helper: `${confirmedBookings} confirmed, ${completedBookings} completed`,
+        },
+        {
+          label: 'Receivables',
+          value: receivables,
+          helper: `Payables ${payables}`,
+        },
       ],
-      pipeline: ["New", "Requirement", "Quotation", "Advance", "Booking", "Operations", "Completed"],
+      counters: {
+        customers,
+        suppliers,
+        activeAgents,
+        pendingOperations,
+        issueOperations,
+        invoiced,
+      },
+      pipeline: [
+        { stage: 'New', count: newLeads },
+        { stage: 'Hot Leads', count: hotLeads },
+        { stage: 'Quotes Sent', count: sentQuotations },
+        { stage: 'Accepted', count: acceptedQuotations },
+        { stage: 'Confirmed Trips', count: confirmedBookings },
+        { stage: 'Operations Pending', count: pendingOperations },
+        { stage: 'Issues', count: issueOperations },
+      ],
+      recentActivity: recentAuditLogs.map((log) => ({
+        id: String(log._id),
+        path: log.path,
+        method: log.method,
+        action: log.action,
+        actorId: log.actorId,
+        createdAt: (log as { createdAt?: Date }).createdAt,
+      })),
+      generatedAt: new Date().toISOString(),
     };
   }
 
   modules() {
     return [
-      "identity",
-      "tenant",
-      "crm",
-      "quotation",
-      "itinerary",
-      "booking",
-      "supplier",
-      "operations",
-      "b2b-agent-management",
-      "finance",
-      "marketing",
-      "communication",
-      "reporting",
-      "ai",
+      { key: 'identity', status: 'active', owner: 'platform' },
+      { key: 'tenant', status: 'active', owner: 'platform' },
+      { key: 'crm', status: 'active', owner: 'sales' },
+      { key: 'quotation', status: 'active', owner: 'sales' },
+      { key: 'itinerary', status: 'active', owner: 'product' },
+      { key: 'booking', status: 'active', owner: 'operations' },
+      { key: 'supplier', status: 'active', owner: 'operations' },
+      { key: 'operations', status: 'active', owner: 'operations' },
+      { key: 'b2b-agent-management', status: 'active', owner: 'sales' },
+      { key: 'finance', status: 'active', owner: 'finance' },
+      { key: 'marketing', status: 'active', owner: 'growth' },
+      { key: 'communication', status: 'active', owner: 'support' },
+      { key: 'reporting', status: 'active', owner: 'management' },
+      { key: 'ai', status: 'active', owner: 'platform' },
     ];
   }
 
-  leads() {
-    return this.records("leads").then((records) => records.length ? records : [
-      { id: "lead-1", customer: "Sharma Family", destination: "Dubai", source: "Website", stage: "Requirement", owner: "Ritika" },
-      { id: "lead-2", customer: "Mehta Group", destination: "Singapore", source: "B2B Agent", stage: "Quotation Sent", owner: "Aman" },
-      { id: "lead-3", customer: "Corporate Offsite", destination: "Goa", source: "LinkedIn", stage: "New", owner: "Unassigned" },
-    ]);
-  }
-
-  quotations() {
-    return this.records("quotations").then((records) => records.length ? records : [
-      { id: "Q-1029", customer: "Sharma Family", destination: "Dubai", internalCost: 100000, sellingPrice: 129500, status: "Sent" },
-      { id: "Q-1030", customer: "Mehta Group", destination: "Singapore", internalCost: 720000, sellingPrice: 864000, status: "Draft" },
-    ]);
-  }
-
-  bookings() {
-    return this.records("bookings").then((records) => records.length ? records : [
-      { id: "BKG-2081", customer: "Sharma Family", destination: "Dubai", travelDates: "25 Dec - 30 Dec", status: "Confirmed" },
-      { id: "BKG-2082", customer: "Mehta Group", destination: "Singapore", travelDates: "12 Aug - 15 Aug", status: "Part Confirmed" },
-    ]);
-  }
-
-  operations() {
-    return this.records("operations").then((records) => records.length ? records : [
-      { id: "OPS-551", customer: "Sharma Family", service: "Airport Pickup", supplier: "DXB Prime Cars", status: "Assigned" },
-      { id: "OPS-552", customer: "Sharma Family", service: "Burj Khalifa", supplier: "Dubai Tickets Co", status: "Confirmed" },
-    ]);
-  }
-
-  b2bAgents() {
-    return this.records("b2b-agents").then((records) => records.length ? records : [
-      { id: "agent-1", name: "Skyline Travels", market: "Delhi", creditLimit: 1000000, receivable: 240000, status: "Active" },
-      { id: "agent-2", name: "Pearl Holidays", market: "Mumbai", creditLimit: 500000, receivable: 76000, status: "KYC Review" },
-    ]);
-  }
-
-  suppliers() {
-    return this.records("suppliers").then((records) => records.length ? records : [
-      { id: "supplier-1", name: "Hotel ABC", type: "Hotel", destination: "Dubai", rating: 4.6 },
-      { id: "supplier-2", name: "DXB Prime Cars", type: "Transport", destination: "Dubai", rating: 4.8 },
-    ]);
-  }
-
-  finance() {
+  private scope(query: CrmListQueryDto): ScopedFilter {
     return {
-      receivables: 850000,
-      payables: 620000,
-      grossProfit: 1240000,
-      marginPercent: 29,
-      bookings: [
-        { bookingId: "BKG-2081", sellingPrice: 129500, supplierCost: 100000, netProfit: 25000 },
-        { bookingId: "BKG-2082", sellingPrice: 864000, supplierCost: 720000, netProfit: 91000 },
-      ],
+      organizationId: query.organizationId ?? 'demo-org',
+      ...(query.branchId ? { branchId: query.branchId } : {}),
     };
   }
 
-  createDemoLead(dto: CreateDemoLeadDto) {
-    const lead = {
-      ...dto,
-      id: `demo-${this.demoLeads.length + 1}`,
-      source: "public-website",
-      stage: "New",
-    };
-    this.demoLeads.push(lead);
-    void this.createRecord({
-      moduleKey: "leads",
-      title: dto.companyName,
-      status: "new",
-      priority: "high",
-      payload: {
-        contactName: dto.contactName,
-        email: dto.email,
-        phone: dto.phone,
-        businessType: dto.businessType,
-        monthlyBookings: dto.monthlyBookings,
-        source: "public-website",
-      },
-    });
-    return {
-      message: "Demo lead captured in TripOS CRM.",
-      lead,
-    };
+  private async sumPayments(
+    scope: ScopedFilter,
+    type: string,
+    statuses: string[],
+  ) {
+    const [result] = await this.paymentModel
+      .aggregate<{ total: number }>([
+        { $match: { ...scope, type, status: { $in: statuses } } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ])
+      .exec();
+    return result?.total ?? 0;
   }
 
-  async records(moduleKey?: string) {
-    const query = moduleKey ? { moduleKey } : {};
-    const records = await this.recordModel.find(query).sort({ updatedAt: -1 }).lean().exec();
-    return records.map((record) => ({
-      id: String(record._id),
-      moduleKey: record.moduleKey,
-      title: record.title,
-      status: record.status,
-      priority: record.priority,
-      payload: record.payload,
-    }));
+  private async sumInvoices(scope: ScopedFilter) {
+    const [result] = await this.invoiceModel
+      .aggregate<{ total: number }>([
+        { $match: { ...scope, status: { $nin: ['cancelled', 'void'] } } },
+        { $group: { _id: null, total: { $sum: '$totals.totalPayable' } } },
+      ])
+      .exec();
+    return result?.total ?? 0;
   }
 
-  async createRecord(dto: CreateRecordDto) {
-    const record = await this.recordModel.create({
-      moduleKey: dto.moduleKey,
-      title: dto.title,
-      status: dto.status ?? "open",
-      priority: dto.priority ?? "medium",
-      payload: dto.payload ?? {},
-    });
-    return {
-      message: "TripOS record created.",
-      record: {
-        id: String(record._id),
-        moduleKey: record.moduleKey,
-        title: record.title,
-        status: record.status,
-        priority: record.priority,
-        payload: record.payload,
-      },
-    };
-  }
-
-  async invoices() {
-    return this.invoicesService.list(new CrmListQueryDto());
-  }
-
-  async nextInvoiceNumber(series: string) {
-    return this.invoicesService.nextInvoiceNumber(series, new CrmListQueryDto());
-  }
-
-  async createInvoice(dto: CreateInvoiceDto) {
-    const result = await this.invoicesService.create(dto);
-    await this.createRecord({
-      moduleKey: "finance",
-      title: `${dto.invoiceSeries}${dto.invoiceNo} ${String(dto.customer.companyName ?? "Customer")}`,
-      status: dto.status ?? "draft",
-      priority: "medium",
-      payload: {
-        countryCode: dto.countryCode,
-        currencyCode: dto.currencyCode,
-        totalPayable: result.invoice.totals.totalPayable,
-        taxLabel: dto.taxLabel,
-        taxRate: dto.taxRate,
-      },
-    });
-    return result;
+  private branchName(
+    branches: Array<Record<string, unknown>>,
+    branchId?: string,
+  ) {
+    if (!branchId) return 'All branches';
+    const branch = branches.find((item) => item.id === branchId);
+    return String(branch?.name ?? branchId);
   }
 }

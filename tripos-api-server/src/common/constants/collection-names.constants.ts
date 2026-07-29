@@ -2,7 +2,6 @@ export const COLLECTION_NAMES = {
   LEAD: 'leads',
   LEAD_ACTIVITY: 'lead_activities',
   INVOICE: 'invoices',
-  MODULE_RECORD: 'module_records',
   QUOTATION: 'quotations',
   ITINERARY: 'itineraries',
   BOOKING: 'bookings',

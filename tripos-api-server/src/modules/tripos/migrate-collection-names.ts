@@ -10,7 +10,6 @@ const LEGACY_COLLECTIONS: Array<[legacy: string, current: string]> = [
   ['tripos_leads', COLLECTION_NAMES.LEAD],
   ['tripos_lead_activities', COLLECTION_NAMES.LEAD_ACTIVITY],
   ['tripos_invoices', COLLECTION_NAMES.INVOICE],
-  ['tripos_records', COLLECTION_NAMES.MODULE_RECORD],
   ['tripos_quotations', COLLECTION_NAMES.QUOTATION],
   ['tripos_itineraries', COLLECTION_NAMES.ITINERARY],
   ['tripos_bookings', COLLECTION_NAMES.BOOKING],

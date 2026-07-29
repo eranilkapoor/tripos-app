@@ -90,16 +90,10 @@ Useful endpoints:
   - `GET /api/v1/finance/invoices`
   - `GET /api/v1/finance/invoices/next-number/:series`
   - `POST /api/v1/finance/invoices`
-- Compatibility/MVP routes:
+- Platform overview routes:
 - `GET /api/v1/tripos/health`
 - `GET /api/v1/tripos/dashboard`
-- `GET /api/v1/tripos/leads`
-- `GET /api/v1/tripos/quotations`
-- `GET /api/v1/tripos/bookings`
-- `GET /api/v1/tripos/operations`
-- `GET /api/v1/tripos/b2b-agents`
-- `GET /api/v1/tripos/finance`
-- `POST /api/v1/tripos/demo-leads`
+- `GET /api/v1/tripos/modules`
 - `GET /api/docs`
 
 Database:
