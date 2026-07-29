@@ -32,19 +32,19 @@
 
 .theme-dark {
   color-scheme: dark;
-  --bg: #0f1720;
-  --surface: #151f2a;
-  --surface-2: #1b2936;
-  --surface-3: #223444;
-  --ink: #edf6f3;
-  --muted: #b7c8c2;
-  --line: #2b3d4a;
-  --line-strong: #405767;
-  --brand: #5cd7c9;
-  --brand-dark: #0a3434;
-  --brand-soft: #123d3c;
-  --accent: #f3a15d;
-  --accent-soft: #3b2819;
+  --bg: #0b1118;
+  --surface: #121d27;
+  --surface-2: #192735;
+  --surface-3: #24394a;
+  --ink: #f4fbf8;
+  --muted: #d0ddd8;
+  --line: #334858;
+  --line-strong: #557083;
+  --brand: #7ee7dc;
+  --brand-dark: #103f43;
+  --brand-soft: #173f42;
+  --accent: #ffc078;
+  --accent-soft: #42301d;
   --on-brand: #06201f;
   --good: #74e3b1;
   --good-soft: #123b2f;
@@ -69,19 +69,19 @@
 @media (prefers-color-scheme: dark) {
   .theme-system {
     color-scheme: dark;
-    --bg: #0f1720;
-    --surface: #151f2a;
-    --surface-2: #1b2936;
-    --surface-3: #223444;
-    --ink: #edf6f3;
-    --muted: #b7c8c2;
-    --line: #2b3d4a;
-    --line-strong: #405767;
-    --brand: #5cd7c9;
-    --brand-dark: #0a3434;
-    --brand-soft: #123d3c;
-    --accent: #f3a15d;
-    --accent-soft: #3b2819;
+    --bg: #0b1118;
+    --surface: #121d27;
+    --surface-2: #192735;
+    --surface-3: #24394a;
+    --ink: #f4fbf8;
+    --muted: #d0ddd8;
+    --line: #334858;
+    --line-strong: #557083;
+    --brand: #7ee7dc;
+    --brand-dark: #103f43;
+    --brand-soft: #173f42;
+    --accent: #ffc078;
+    --accent-soft: #42301d;
     --on-brand: #06201f;
     --good: #74e3b1;
     --good-soft: #123b2f;
@@ -128,6 +128,10 @@ textarea {
 
 button {
   cursor: pointer;
+}
+
+button svg {
+  flex: 0 0 auto;
 }
 
 button:focus-visible,
@@ -216,9 +220,13 @@ td button {
 .action-bar button,
 .record-modal-actions button:last-child,
 .invoice-form-panel .table-head button {
+  align-items: center;
   border-radius: 8px;
+  display: inline-flex;
   font-size: 12px;
   font-weight: 900;
+  gap: 8px;
+  justify-content: center;
   min-height: 38px;
   padding: 8px 12px;
   text-transform: uppercase;
@@ -434,6 +442,16 @@ td button {
   color: var(--brand);
 }
 
+.top-actions button:hover,
+.pagination-actions button:hover:not(:disabled),
+.detail-panel > button:hover,
+.record-modal button:hover,
+td button:hover {
+  background: var(--surface-3);
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
 .logout-action {
   color: var(--danger) !important;
 }
@@ -469,6 +487,7 @@ td button {
 }
 
 .profile-chip strong {
+  color: var(--ink);
   font-size: 12px;
 }
 
@@ -616,7 +635,12 @@ td button {
 }
 
 .table-head h2 {
+  color: var(--ink);
   font-size: 18px;
+}
+
+.table-head strong {
+  color: var(--ink);
 }
 
 .table-wrap {
@@ -639,9 +663,13 @@ td {
 
 th {
   background: var(--surface-3);
-  color: var(--brand);
+  color: var(--ink);
   font-size: 12px;
   text-transform: uppercase;
+}
+
+td {
+  color: var(--ink);
 }
 
 tbody tr:nth-child(even) {
@@ -683,6 +711,11 @@ tbody tr:nth-child(even) {
   min-height: 32px;
   min-width: 32px;
   padding: 6px 9px;
+}
+
+.pagination-actions button svg {
+  height: 13px;
+  width: 13px;
 }
 
 .pagination-actions button.selected {
@@ -816,6 +849,7 @@ tbody tr:nth-child(even) {
 }
 
 .detail-row strong {
+  color: var(--ink);
   font-size: 13px;
   text-align: right;
 }
@@ -849,6 +883,14 @@ tbody tr:nth-child(even) {
   display: flex;
   justify-content: space-between;
   padding: 14px;
+}
+
+.record-modal-head h2,
+.invoice-form-panel h2,
+.invoice-preview h2,
+.quick-grid strong,
+.module-grid strong {
+  color: var(--ink);
 }
 
 .record-modal-actions {

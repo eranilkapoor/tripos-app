@@ -2,6 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faAnglesLeft,
+  faAnglesRight,
+  faArrowRotateRight,
+  faChevronLeft,
+  faChevronRight,
+  faFolderOpen,
+  faPlus,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
 import type { ApiRecord, CrmModule, CrmSession, ModuleField } from "./crmTypes";
 import {
   apiBaseUrl,
@@ -1012,7 +1023,8 @@ export default function CrmShell() {
               onClick={() => void loadModule(selected, query)}
               type="button"
             >
-              Refresh
+              <FontAwesomeIcon aria-hidden icon={faArrowRotateRight} />
+              <span>Refresh</span>
             </button>
             {selected.fields.length ? (
               <button
@@ -1020,7 +1032,8 @@ export default function CrmShell() {
                 onClick={() => setModalOpen(true)}
                 type="button"
               >
-                Create
+                <FontAwesomeIcon aria-hidden icon={faPlus} />
+                <span>Create</span>
               </button>
             ) : null}
             <div className="profile-chip">
@@ -1035,7 +1048,8 @@ export default function CrmShell() {
               onClick={() => void logout()}
               type="button"
             >
-              Logout
+              <FontAwesomeIcon aria-hidden icon={faRightFromBracket} />
+              <span>Logout</span>
             </button>
           </div>
         </header>
@@ -1236,7 +1250,8 @@ function RecordTable({
                     </select>
                   ) : (
                     <button type="button" onClick={() => onSelect(record)}>
-                      Open
+                      <FontAwesomeIcon aria-hidden icon={faFolderOpen} />
+                      <span>Open</span>
                     </button>
                   )}
                 </td>
@@ -1259,16 +1274,18 @@ function RecordTable({
             disabled={safePage <= 1}
             onClick={() => setCurrentPage(1)}
             type="button"
+            title="First page"
           >
-            First
+            <FontAwesomeIcon aria-hidden icon={faAnglesLeft} />
           </button>
           <button
             aria-label="Previous page"
             disabled={safePage <= 1}
             onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
             type="button"
+            title="Previous page"
           >
-            Prev
+            <FontAwesomeIcon aria-hidden icon={faChevronLeft} />
           </button>
           {pageNumbers.map((page) => (
             <button
@@ -1286,16 +1303,18 @@ function RecordTable({
             disabled={safePage >= totalPages}
             onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
             type="button"
+            title="Next page"
           >
-            Next
+            <FontAwesomeIcon aria-hidden icon={faChevronRight} />
           </button>
           <button
             aria-label="Last page"
             disabled={safePage >= totalPages}
             onClick={() => setCurrentPage(totalPages)}
             type="button"
+            title="Last page"
           >
-            Last
+            <FontAwesomeIcon aria-hidden icon={faAnglesRight} />
           </button>
           <label className="page-size-control">
             <select
