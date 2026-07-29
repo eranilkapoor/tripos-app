@@ -735,12 +735,12 @@ const countryPresets = {
 };
 
 type CountryCode = keyof typeof countryPresets;
-type CrmTheme = "light" | "dark" | "coastal";
+type CrmTheme = "system" | "light" | "dark";
 
 const crmThemes: { id: CrmTheme; label: string }[] = [
+  { id: "system", label: "System" },
   { id: "light", label: "Light" },
   { id: "dark", label: "Dark" },
-  { id: "coastal", label: "Coastal" },
 ];
 
 export default function CrmShell() {
@@ -764,15 +764,15 @@ export default function CrmShell() {
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
   const [session, setSession] = useState<CrmSession | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [theme, setTheme] = useState<CrmTheme>("light");
+  const [theme, setTheme] = useState<CrmTheme>("system");
   const selected = modules.find((item) => item.id === selectedId) ?? modules[0];
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("tripos-crm-theme");
     if (
+      storedTheme === "system" ||
       storedTheme === "light" ||
-      storedTheme === "dark" ||
-      storedTheme === "coastal"
+      storedTheme === "dark"
     ) {
       setTheme(storedTheme);
     }
@@ -1171,14 +1171,33 @@ function RecordTable({
   onSelect: (record: ApiRecord) => void;
   onStatus: (record: ApiRecord, status: string) => Promise<void>;
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const total = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageRows = filteredRows.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
+  );
+  const pageNumbers = Array.from(
+    { length: totalPages },
+    (_, index) => index + 1,
+  )
+    .filter(
+      (page) =>
+        Math.abs(page - safePage) <= 2 || page === 1 || page === totalPages,
+    )
+    .slice(0, 7);
+
   return (
-    <section className="table-card">
+    <section className="table-card listmanager">
       <div className="table-head">
         <div>
           <span className="eyebrow">{module.title}</span>
           <h2>Live Work Queue</h2>
         </div>
-        <strong>{filteredRows.length} records</strong>
+        <strong>{total} records</strong>
       </div>
       <div className="table-wrap">
         <table>
@@ -1191,7 +1210,7 @@ function RecordTable({
             </tr>
           </thead>
           <tbody>
-            {filteredRows.map(({ record, row }) => (
+            {pageRows.map(({ record, row }) => (
               <tr
                 key={getRecordId(record) || row.join("-")}
                 onClick={() => onSelect(record)}
@@ -1223,7 +1242,7 @@ function RecordTable({
                 </td>
               </tr>
             ))}
-            {!filteredRows.length ? (
+            {!total ? (
               <tr>
                 <td colSpan={columns.length + 1}>
                   No API records found for this module.
@@ -1232,6 +1251,71 @@ function RecordTable({
             ) : null}
           </tbody>
         </table>
+      </div>
+      <div className="pagination-bar">
+        <div className="pagination-actions" aria-label="Listing pagination">
+          <button
+            aria-label="First page"
+            disabled={safePage <= 1}
+            onClick={() => setCurrentPage(1)}
+            type="button"
+          >
+            First
+          </button>
+          <button
+            aria-label="Previous page"
+            disabled={safePage <= 1}
+            onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
+            type="button"
+          >
+            Prev
+          </button>
+          {pageNumbers.map((page) => (
+            <button
+              aria-current={page === safePage ? "page" : undefined}
+              className={page === safePage ? "selected" : ""}
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              type="button"
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            aria-label="Next page"
+            disabled={safePage >= totalPages}
+            onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
+            type="button"
+          >
+            Next
+          </button>
+          <button
+            aria-label="Last page"
+            disabled={safePage >= totalPages}
+            onClick={() => setCurrentPage(totalPages)}
+            type="button"
+          >
+            Last
+          </button>
+          <label className="page-size-control">
+            <select
+              aria-label="Rows per page"
+              onChange={(event) => {
+                setPageSize(Number(event.target.value));
+                setCurrentPage(1);
+              }}
+              value={pageSize}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+          </label>
+        </div>
+        <span className="pagination-total">
+          Page {safePage} of {totalPages} / {total} records
+        </span>
       </div>
     </section>
   );

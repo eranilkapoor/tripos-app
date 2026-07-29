@@ -53,28 +53,36 @@
   );
 }
 
-.theme-coastal {
-  color-scheme: light;
-  --bg: #eef7fb;
-  --surface: #ffffff;
-  --surface-2: #f5fbfd;
-  --surface-3: #e2f4fa;
-  --ink: #112436;
-  --muted: #617587;
-  --line: #d2e3ec;
-  --line-strong: #b8d1dc;
-  --brand: #126a8a;
-  --brand-dark: #0a3f56;
-  --brand-soft: #e0f3fa;
-  --accent: #0f8b6f;
-  --accent-soft: #e5f8f2;
-  --on-brand: #ffffff;
-  --sidebar-text: #dceff7;
-  --auth-overlay: linear-gradient(
-    135deg,
-    rgba(10, 63, 86, 0.94),
-    rgba(18, 106, 138, 0.78)
-  );
+.theme-system {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme-system {
+    color-scheme: dark;
+    --bg: #0f1720;
+    --surface: #151f2a;
+    --surface-2: #1b2936;
+    --surface-3: #223444;
+    --ink: #edf6f3;
+    --muted: #b7c8c2;
+    --line: #2b3d4a;
+    --line-strong: #405767;
+    --brand: #5cd7c9;
+    --brand-dark: #0a3434;
+    --brand-soft: #123d3c;
+    --accent: #f3a15d;
+    --accent-soft: #3b2819;
+    --on-brand: #06201f;
+    --sidebar-text: #cff5ef;
+    --shadow: 0 14px 42px rgba(0, 0, 0, 0.3);
+    --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.2);
+    --auth-overlay: linear-gradient(
+      135deg,
+      rgba(6, 23, 30, 0.96),
+      rgba(10, 52, 52, 0.9)
+    );
+  }
 }
 
 * {
@@ -396,6 +404,9 @@ td button {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
 
 .top-actions input {
@@ -576,6 +587,10 @@ td button {
   overflow: hidden;
 }
 
+.listmanager {
+  box-shadow: var(--shadow);
+}
+
 .table-head {
   align-items: center;
   background: var(--surface-2);
@@ -616,6 +631,77 @@ th {
 
 tbody tr:nth-child(even) {
   background: var(--surface-2);
+}
+
+.pagination-bar {
+  align-items: center;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.pagination-actions {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px;
+}
+
+.pagination-actions button {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  color: var(--brand);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 950;
+  justify-content: center;
+  min-height: 32px;
+  min-width: 32px;
+  padding: 6px 9px;
+}
+
+.pagination-actions button.selected {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+}
+
+.pagination-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.page-size-control {
+  align-items: center;
+  display: flex;
+  margin: 0;
+}
+
+.page-size-control select {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 32px;
+  padding: 4px 8px;
+}
+
+.pagination-total {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .badge {
