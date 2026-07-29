@@ -1,5 +1,16 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
 import {
   AssignLeadDto,
   CreateLeadDto,
@@ -19,23 +30,40 @@ export class LeadsController {
   }
 
   @Get()
-  list(@Query() query: LeadListQueryDto) {
-    return this.leadsService.list(query);
+  list(@Query() query: LeadListQueryDto, @Req() request: Request) {
+    return this.leadsService.list(tenantScopedQuery(query, request));
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.leadsService.findOne(id);
+  findOne(
+    @Param('id') id: string,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.findOne(id, tenantScopedQuery(query, request));
   }
 
   @Patch(':id/assign')
-  assign(@Param('id') id: string, @Body() dto: AssignLeadDto) {
-    return this.leadsService.assign(id, dto);
+  assign(
+    @Param('id') id: string,
+    @Body() dto: AssignLeadDto,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.assign(id, dto, tenantScopedQuery(query, request));
   }
 
   @Patch(':id/stage')
-  updateStage(@Param('id') id: string, @Body() dto: UpdateLeadStageDto) {
-    return this.leadsService.updateStage(id, dto);
+  updateStage(
+    @Param('id') id: string,
+    @Body() dto: UpdateLeadStageDto,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.updateStage(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
   }
 }
-

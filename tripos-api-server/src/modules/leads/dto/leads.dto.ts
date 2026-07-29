@@ -74,6 +74,14 @@ export class CreateLeadDto {
   @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsString()
+  organizationId?: string;
+
+  @IsOptional()
+  @IsString()
+  branchId?: string;
 }
 
 export class UpdateLeadStageDto {

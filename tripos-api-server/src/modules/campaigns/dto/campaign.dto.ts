@@ -1,4 +1,10 @@
-import { IsNumber, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateCampaignDto {
   @IsString() @MinLength(2) name!: string;
@@ -10,4 +16,6 @@ export class CreateCampaignDto {
   @IsOptional() @IsNumber() bookings?: number;
   @IsOptional() @IsNumber() revenue?: number;
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }

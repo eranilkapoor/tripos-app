@@ -8,4 +8,6 @@ export class CreateSupportTicketDto {
   @IsOptional() @IsString() priority?: string;
   @IsOptional() @IsString() assignedTo?: string;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }

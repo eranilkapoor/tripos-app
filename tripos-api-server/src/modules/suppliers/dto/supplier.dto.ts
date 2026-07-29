@@ -1,4 +1,10 @@
-import { IsArray, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateSupplierDto {
   @IsString() @MinLength(2) name!: string;
@@ -8,5 +14,6 @@ export class CreateSupplierDto {
   @IsOptional() @IsArray() contracts?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() rates?: Array<Record<string, unknown>>;
   @IsOptional() @IsNumber() creditLimit?: number;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }
-

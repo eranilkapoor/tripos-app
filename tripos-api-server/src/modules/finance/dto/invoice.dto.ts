@@ -51,5 +51,6 @@ export class CreateInvoiceDto {
   @IsOptional()
   @IsBoolean()
   locked?: boolean;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }
-

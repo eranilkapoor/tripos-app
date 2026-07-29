@@ -7,4 +7,6 @@ export class CreateDestinationDto {
   @IsOptional() @IsString() bestSeason?: string;
   @IsOptional() @IsArray() highlights?: string[];
   @IsOptional() @IsString() visaRequirement?: string;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }

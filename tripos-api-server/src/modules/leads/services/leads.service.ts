@@ -8,6 +8,7 @@ import {
   UpdateLeadStageDto,
 } from '../dto/leads.dto';
 import { Lead, LeadActivity } from '../schemas/leads.schema';
+import { scopeFilter } from '../../../common/utils/crm-list.util';
 
 @Injectable()
 export class LeadsService {
@@ -68,8 +69,11 @@ export class LeadsService {
     return { items, total, page, limit };
   }
 
-  async findOne(id: string) {
-    const lead = await this.leadModel.findById(id).lean().exec();
+  async findOne(id: string, query: LeadListQueryDto) {
+    const lead = await this.leadModel
+      .findOne(scopeFilter(query, { _id: id }))
+      .lean()
+      .exec();
     if (!lead) throw new NotFoundException('Lead not found');
     const activities = await this.activityModel
       .find({ leadId: id })
@@ -79,10 +83,10 @@ export class LeadsService {
     return { lead, activities };
   }
 
-  async assign(id: string, dto: AssignLeadDto) {
+  async assign(id: string, dto: AssignLeadDto, query: LeadListQueryDto) {
     const lead = await this.leadModel
-      .findByIdAndUpdate(
-        id,
+      .findOneAndUpdate(
+        scopeFilter(query, { _id: id }),
         { assignedTo: dto.assignedTo, stage: 'assigned' },
         { new: true },
       )
@@ -97,9 +101,17 @@ export class LeadsService {
     return lead;
   }
 
-  async updateStage(id: string, dto: UpdateLeadStageDto) {
+  async updateStage(
+    id: string,
+    dto: UpdateLeadStageDto,
+    query: LeadListQueryDto,
+  ) {
     const lead = await this.leadModel
-      .findByIdAndUpdate(id, { stage: dto.stage }, { new: true })
+      .findOneAndUpdate(
+        scopeFilter(query, { _id: id }),
+        { stage: dto.stage },
+        { new: true },
+      )
       .exec();
     if (!lead) throw new NotFoundException('Lead not found');
     await this.activityModel.create({

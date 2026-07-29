@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
+import { scopeFilter } from '../../../common/utils/crm-list.util';
 import { CreateInvoiceDto } from '../dto/invoice.dto';
 import { Invoice } from '../schemas/invoice.schema';
 
@@ -10,13 +12,17 @@ export class InvoicesService {
     @InjectModel(Invoice.name) private readonly invoiceModel: Model<Invoice>,
   ) {}
 
-  async list() {
-    return this.invoiceModel.find().sort({ updatedAt: -1 }).lean().exec();
+  async list(query: CrmListQueryDto) {
+    return this.invoiceModel
+      .find(scopeFilter(query))
+      .sort({ updatedAt: -1 })
+      .lean()
+      .exec();
   }
 
-  async nextInvoiceNumber(series: string) {
+  async nextInvoiceNumber(series: string, query: CrmListQueryDto) {
     const invoices = await this.invoiceModel
-      .find({ invoiceSeries: series })
+      .find(scopeFilter(query, { invoiceSeries: series }))
       .select({ invoiceNo: 1 })
       .lean()
       .exec();
@@ -65,4 +71,3 @@ export function calculateInvoiceTotals(
     totalPayable: subtotal + taxAmount,
   };
 }
-

@@ -6,5 +6,6 @@ export class CreateItineraryDto {
   @IsString() @MinLength(2) destination!: string;
   @IsOptional() @IsArray() days?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() images?: string[];
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }
-

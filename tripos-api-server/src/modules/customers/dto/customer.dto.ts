@@ -8,4 +8,6 @@ export class CreateCustomerDto {
   @IsOptional() @IsString() source?: string;
   @IsOptional() @IsString() city?: string;
   @IsOptional() @IsString() country?: string;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }

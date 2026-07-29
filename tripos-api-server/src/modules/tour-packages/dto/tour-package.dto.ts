@@ -1,4 +1,10 @@
-import { IsArray, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateTourPackageDto {
   @IsString() @MinLength(2) title!: string;
@@ -10,4 +16,6 @@ export class CreateTourPackageDto {
   @IsOptional() @IsArray() inclusions?: string[];
   @IsOptional() @IsArray() exclusions?: string[];
   @IsOptional() @IsArray() itinerary?: Array<Record<string, unknown>>;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }

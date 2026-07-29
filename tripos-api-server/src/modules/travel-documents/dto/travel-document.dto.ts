@@ -8,4 +8,6 @@ export class CreateTravelDocumentDto {
   @IsOptional() @IsString() expiryDate?: string;
   @IsOptional() @IsString() fileUrl?: string;
   @IsOptional() @IsString() notes?: string;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }

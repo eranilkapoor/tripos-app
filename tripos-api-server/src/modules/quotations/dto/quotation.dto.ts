@@ -1,4 +1,11 @@
-import { IsArray, IsNumber, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateQuotationDto {
   @IsOptional() @IsString() leadId?: string;
@@ -8,5 +15,6 @@ export class CreateQuotationDto {
   @IsOptional() @IsNumber() travellers?: number;
   @IsOptional() @IsArray() services?: Array<Record<string, unknown>>;
   @IsOptional() @IsObject() pricing?: Record<string, number>;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }
-

@@ -8,4 +8,6 @@ export class CreateVoucherDto {
   @IsOptional() @IsString() issueDate?: string;
   @IsOptional() @IsString() confirmationNumber?: string;
   @IsOptional() @IsArray() lineItems?: Array<Record<string, unknown>>;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }

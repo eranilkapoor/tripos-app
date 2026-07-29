@@ -9,5 +9,6 @@ export class CreateBookingDto {
   @IsOptional() @IsArray() passengers?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() services?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() documents?: Array<Record<string, unknown>>;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }
-

@@ -1,4 +1,10 @@
-import { IsNumber, IsObject, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreatePaymentDto {
   @IsOptional() @IsString() bookingId?: string;
@@ -9,5 +15,6 @@ export class CreatePaymentDto {
   @IsOptional() @IsString() partyName?: string;
   @IsOptional() @IsString() dueDate?: string;
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }
-

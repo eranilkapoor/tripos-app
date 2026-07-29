@@ -1,4 +1,10 @@
-import { IsArray, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateB2BAgentDto {
   @IsString() @MinLength(2) agencyName!: string;
@@ -8,5 +14,6 @@ export class CreateB2BAgentDto {
   @IsOptional() @IsString() market?: string;
   @IsOptional() @IsNumber() creditLimit?: number;
   @IsOptional() @IsArray() kycDocuments?: Array<Record<string, unknown>>;
+  @IsOptional() @IsString() organizationId?: string;
+  @IsOptional() @IsString() branchId?: string;
 }
-

@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { SessionAuthGuard } from '../../common/guards/session-auth.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TenantsModule } from '../tenants/tenants.module';
 import { AuthController } from './controllers/auth.controller';
@@ -15,7 +17,7 @@ import { AuthService } from './services/auth.service';
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, { provide: APP_GUARD, useClass: SessionAuthGuard }],
   exports: [AuthService],
 })
 export class AuthModule {}

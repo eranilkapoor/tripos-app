@@ -6,6 +6,7 @@ import { CreateRecordDto } from "./create-record.dto";
 import { TriposRecord } from "./tripos-record.schema";
 import { CreateInvoiceDto } from "./create-invoice.dto";
 import { InvoicesService } from "../finance/services/invoices.service";
+import { CrmListQueryDto } from "../../common/dto/crm-list-query.dto";
 
 @Injectable()
 export class TriposService {
@@ -178,11 +179,11 @@ export class TriposService {
   }
 
   async invoices() {
-    return this.invoicesService.list();
+    return this.invoicesService.list(new CrmListQueryDto());
   }
 
   async nextInvoiceNumber(series: string) {
-    return this.invoicesService.nextInvoiceNumber(series);
+    return this.invoicesService.nextInvoiceNumber(series, new CrmListQueryDto());
   }
 
   async createInvoice(dto: CreateInvoiceDto) {
