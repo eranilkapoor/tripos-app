@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "TripOS",
+    "slug": "tripos-mobile-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.webnza.tripos"
+    },
+    "android": {
+      "package": "com.webnza.tripos"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
+
