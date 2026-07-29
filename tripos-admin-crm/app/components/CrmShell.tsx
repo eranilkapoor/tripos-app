@@ -1,261 +1,247 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import type { ApiRecord, CrmModule, ModuleField } from "./crmTypes";
+import { apiBaseUrl, getRecordId, normalizeRecords, recordToRow, statusClass, toPayload } from "./crmUtils";
 
-type Module = {
-  id: string;
-  title: string;
-  group: string;
-  metric: string;
-  trend: string;
-  description: string;
-  columns: string[];
-  rows: string[][];
-  actions: string[];
-};
-
-const modules: Module[] = [
-  {
-    id: "dashboard",
-    title: "Command Center",
-    group: "Overview",
-    metric: "INR 42.8L",
-    trend: "+18% month revenue",
-    description: "Executive view of leads, quotations, bookings, operations, receivables, and gross profit.",
-    columns: ["Signal", "Today", "Owner", "Status"],
-    rows: [
-      ["New travel enquiries", "38", "Sales", "Healthy"],
-      ["Quotes awaiting approval", "14", "Sales", "Watch"],
-      ["Trips in operation", "22", "Operations", "Active"],
-      ["Supplier confirmations pending", "7", "Ops Desk", "Risk"],
-    ],
-    actions: ["Refresh KPIs", "Open Hot Leads", "View Operations"],
-  },
-  {
-    id: "leads",
-    title: "CRM Leads",
-    group: "Sales",
-    metric: "428",
-    trend: "82 hot leads",
-    description: "Capture website, WhatsApp, phone, referral, campaign, and B2B agent enquiries in one sales pipeline.",
-    columns: ["Lead", "Destination", "Source", "Stage", "Owner", "Next Follow-up"],
-    rows: [
-      ["Sharma Family", "Dubai", "Website", "Requirement", "Ritika", "Today 4:30 PM"],
-      ["Mehta Group", "Singapore", "B2B Agent", "Quotation Sent", "Aman", "Tomorrow"],
-      ["Corporate Offsite", "Goa", "LinkedIn", "New", "Unassigned", "Today"],
-      ["Nair Honeymoon", "Bali", "WhatsApp", "Negotiation", "Sara", "01 Aug"],
-    ],
-    actions: ["Create Lead", "Assign", "Schedule Follow-up", "Convert to Quote"],
-  },
-  {
-    id: "quotations",
-    title: "Quotation Builder",
-    group: "Sales",
-    metric: "96",
-    trend: "INR 18.2L open value",
-    description: "Build hotel, transfer, activity, visa, flight, markup, discount, tax, and final customer pricing.",
-    columns: ["Quote", "Customer", "Destination", "Internal Cost", "Selling Price", "Status"],
-    rows: [
-      ["Q-1029", "Sharma Family", "Dubai", "INR 1,00,000", "INR 1,29,500", "Sent"],
-      ["Q-1030", "Mehta Group", "Singapore", "INR 7,20,000", "INR 8,64,000", "Draft"],
-      ["Q-1031", "Nair Honeymoon", "Bali", "INR 1,56,000", "INR 1,92,000", "Negotiation"],
-    ],
-    actions: ["Create Quote", "Calculate Price", "Generate PDF", "Send WhatsApp"],
-  },
-  {
-    id: "itineraries",
-    title: "Itinerary Builder",
-    group: "Sales",
-    metric: "64",
-    trend: "12 templates ready",
-    description: "Create day-wise itineraries with hotels, activities, transfers, meals, notes, images, and shareable links.",
-    columns: ["Itinerary", "Days", "Destination", "Primary Theme", "Owner", "Status"],
-    rows: [
-      ["Dubai Family 5N", "6", "Dubai", "Family leisure", "Ritika", "Ready"],
-      ["Singapore MICE 3N", "4", "Singapore", "Corporate", "Aman", "Draft"],
-      ["Bali Honeymoon 6N", "7", "Bali", "Luxury", "Sara", "Ready"],
-    ],
-    actions: ["Add Day", "Duplicate Template", "Attach Media", "Publish Link"],
-  },
-  {
-    id: "bookings",
-    title: "Bookings",
-    group: "Operations",
-    metric: "125",
-    trend: "22 upcoming this week",
-    description: "Convert accepted quotations into bookings, passengers, documents, vouchers, payments, and operations tasks.",
-    columns: ["Booking", "Customer", "Travel Dates", "Destination", "Payment", "Status"],
-    rows: [
-      ["BKG-2081", "Sharma Family", "25 Dec - 30 Dec", "Dubai", "Advance Paid", "Confirmed"],
-      ["BKG-2082", "Mehta Group", "12 Aug - 15 Aug", "Singapore", "Pending", "Part Confirmed"],
-      ["BKG-2083", "Kapoor Couple", "08 Sep - 14 Sep", "Europe", "Paid", "Documents"],
-    ],
-    actions: ["Create Booking", "Add Passenger", "Generate Voucher", "Request Payment"],
-  },
-  {
-    id: "operations",
-    title: "DMC Operations",
-    group: "Operations",
-    metric: "47",
-    trend: "7 supplier risks",
-    description: "Manage hotel confirmations, airport transfers, activity tickets, drivers, guides, issues, and trip monitoring.",
-    columns: ["Operation", "Customer", "Service", "Supplier", "Due", "Status"],
-    rows: [
-      ["OPS-551", "Sharma Family", "Airport Pickup", "DXB Prime Cars", "25 Dec 08:30", "Assigned"],
-      ["OPS-552", "Sharma Family", "Burj Khalifa", "Dubai Tickets Co", "26 Dec", "Confirmed"],
-      ["OPS-553", "Mehta Group", "Hotel Rooms", "Marina Bay Hotel", "Today", "Pending"],
-    ],
-    actions: ["Assign Driver", "Confirm Supplier", "Open Issue", "Share Voucher"],
-  },
-  {
-    id: "b2b",
-    title: "B2B Agents",
-    group: "Partners",
-    metric: "86",
-    trend: "INR 8.5L receivable",
-    description: "Manage agent KYC, enquiries, credit limits, commission, pricing, bookings, invoices, and vouchers inside admin CRM.",
-    columns: ["Agent", "Market", "Credit Limit", "Receivable", "Commission", "Status"],
-    rows: [
-      ["Skyline Travels", "Delhi", "INR 10L", "INR 2.4L", "INR 84K", "Active"],
-      ["Pearl Holidays", "Mumbai", "INR 5L", "INR 76K", "INR 31K", "KYC Review"],
-      ["Gulf Desk", "Dubai", "INR 20L", "INR 5.1L", "INR 1.2L", "Active"],
-    ],
-    actions: ["Approve KYC", "Set Credit", "Create Agent Quote", "Issue Invoice"],
-  },
-  {
-    id: "suppliers",
-    title: "Suppliers",
-    group: "Inventory",
-    metric: "312",
-    trend: "41 active contracts",
-    description: "Maintain hotels, transport, drivers, guides, activity providers, visa consultants, contracts, rates, and payables.",
-    columns: ["Supplier", "Type", "Destination", "Rate Validity", "Payable", "Rating"],
-    rows: [
-      ["Hotel ABC", "Hotel", "Dubai", "01 Oct - 31 Dec", "INR 1.8L", "4.6"],
-      ["DXB Prime Cars", "Transport", "Dubai", "Annual", "INR 72K", "4.8"],
-      ["Island Trails", "Activities", "Bali", "Seasonal", "INR 44K", "4.5"],
-    ],
-    actions: ["Add Supplier", "Upload Contract", "Update Rate", "Request Confirmation"],
-  },
-  {
-    id: "finance",
-    title: "Travel Finance",
-    group: "Business",
-    metric: "INR 12.4L",
-    trend: "29% gross margin",
-    description: "Track customer receivables, supplier payables, agent commissions, refunds, taxes, expenses, and booking profit.",
-    columns: ["Booking", "Selling Price", "Supplier Cost", "Commission", "Net Profit", "Status"],
-    rows: [
-      ["BKG-2081", "INR 1,29,500", "INR 1,00,000", "INR 0", "INR 25,000", "Healthy"],
-      ["BKG-2082", "INR 8,64,000", "INR 7,20,000", "INR 48,000", "INR 91,000", "Watch"],
-      ["BKG-2083", "INR 5,20,000", "INR 4,30,000", "INR 0", "INR 74,000", "Healthy"],
-    ],
-    actions: ["Record Payment", "Approve Refund", "Export Ledger", "Profit Report"],
-  },
-  {
-    id: "invoices",
-    title: "Invoice Builder",
-    group: "Finance",
-    metric: "Multi-tax",
-    trend: "Country-aware invoices",
-    description: "Generate travel invoices with provider/customer details, dynamic line items, country tax rules, currency, numbering, totals, and API persistence.",
-    columns: ["Invoice", "Customer", "Country", "Tax", "Total", "Status"],
-    rows: [["TRV-0001", "Sharma Family", "India", "GST 18%", "₹129,500", "Draft"]],
-    actions: ["Generate Number", "Save Invoice", "Print Preview", "Lock Invoice"],
-  },
-  {
-    id: "marketing",
-    title: "Marketing ROI",
-    group: "Growth",
-    metric: "3.9x",
-    trend: "Google best channel",
-    description: "Track campaigns, lead sources, quotations, bookings, revenue, WhatsApp broadcasts, and acquisition ROI.",
-    columns: ["Campaign", "Channel", "Leads", "Quotes", "Bookings", "ROI"],
-    rows: [
-      ["Dubai December", "Google Ads", "100", "20", "5", "5.0x"],
-      ["Bali Honeymoon", "Instagram", "80", "18", "4", "4.1x"],
-      ["Agent Network", "B2B", "62", "28", "9", "6.4x"],
-    ],
-    actions: ["Create Campaign", "Import Leads", "WhatsApp Broadcast", "ROI Report"],
-  },
+const modules: CrmModule[] = [
+  { id: "dashboard", title: "Command Center", group: "Overview", description: "Live operating view across sales, bookings, operations, partners, suppliers, documents, support, and finance.", columns: ["Signal", "Value", "Owner", "Status"], rowMap: [], fields: [] },
+  { id: "leads", title: "Leads", group: "Sales", endpoint: "leads", description: "Capture B2C, B2B, corporate, campaign, phone, WhatsApp, referral, and website enquiries.", columns: ["Customer", "Destination", "Source", "Stage", "Owner", "Phone"], rowMap: ["customerName", "requirement.destination", "source", "stage", "assignedTo", "phone"], stageEndpoint: true, statusOptions: ["new", "assigned", "contacted", "requirement_collected", "quotation_prepared", "quotation_sent", "negotiation", "won", "lost"], fields: [
+    { key: "customerName", label: "Customer", required: true },
+    { key: "phone", label: "Phone" },
+    { key: "email", label: "Email", type: "email" },
+    { key: "source", label: "Source", required: true, placeholder: "Website, WhatsApp, Agent" },
+    { key: "channel", label: "Channel", type: "select", options: ["b2c", "b2b", "corporate"] },
+    { key: "requirement.destination", label: "Destination" },
+    { key: "requirement.travelDate", label: "Travel Date", type: "date" },
+    { key: "requirement.adults", label: "Adults", type: "number" },
+    { key: "assignedTo", label: "Owner" },
+  ] },
+  { id: "customers", title: "Customers", group: "Sales", endpoint: "customers", description: "Customer master for B2C travellers, repeat customers, families, and corporate contacts.", columns: ["Customer", "Phone", "Email", "Type", "City", "Status"], rowMap: ["name", "phone", "email", "customerType", "city", "status"], statusOptions: ["active", "inactive", "blocked"], fields: [
+    { key: "name", label: "Customer", required: true },
+    { key: "phone", label: "Phone" },
+    { key: "email", label: "Email", type: "email" },
+    { key: "customerType", label: "Type", type: "select", options: ["b2c", "corporate", "family", "repeat"] },
+    { key: "source", label: "Source" },
+    { key: "city", label: "City" },
+    { key: "country", label: "Country" },
+  ] },
+  { id: "quotations", title: "Quotations", group: "Sales", endpoint: "quotations", description: "Build customer pricing with travel dates, travellers, service costs, markup, discount, and status tracking.", columns: ["Customer", "Destination", "Travel Dates", "Travellers", "Total", "Status"], rowMap: ["customerName", "destination", "travelDates", "travellers", "sellingPrice", "status"], statusOptions: ["draft", "sent", "accepted", "rejected", "expired"], fields: [
+    { key: "customerName", label: "Customer", required: true },
+    { key: "destination", label: "Destination", required: true },
+    { key: "travelDates", label: "Travel Dates" },
+    { key: "travellers", label: "Travellers", type: "number" },
+    { key: "pricing.baseCost", label: "Base Cost", type: "number" },
+    { key: "pricing.markup", label: "Markup", type: "number" },
+    { key: "pricing.discount", label: "Discount", type: "number" },
+  ] },
+  { id: "itineraries", title: "Itineraries", group: "Sales", endpoint: "itineraries", description: "Create and maintain day-wise travel plans, templates, themes, and customer-ready itinerary content.", columns: ["Itinerary", "Destination", "Days", "Theme", "Status"], rowMap: ["title", "destination", "durationDays", "theme", "status"], statusOptions: ["draft", "ready", "shared", "archived"], fields: [
+    { key: "title", label: "Itinerary", required: true },
+    { key: "destination", label: "Destination", required: true },
+    { key: "durationDays", label: "Days", type: "number" },
+    { key: "theme", label: "Theme" },
+  ] },
+  { id: "bookings", title: "Bookings", group: "Operations", endpoint: "bookings", description: "Confirmed travel files with passengers, services, documents, payments, vouchers, and trip status.", columns: ["Customer", "Destination", "Travel Dates", "Passengers", "Services", "Status"], rowMap: ["customerName", "destination", "travelDates", "passengers", "services", "status"], statusOptions: ["draft", "pending_payment", "confirmed", "partially_confirmed", "cancelled", "completed"], fields: [
+    { key: "customerName", label: "Customer", required: true },
+    { key: "destination", label: "Destination", required: true },
+    { key: "travelDates", label: "Travel Dates" },
+    { key: "quotationId", label: "Quotation ID" },
+    { key: "leadId", label: "Lead ID" },
+  ] },
+  { id: "operations", title: "Operations", group: "Operations", endpoint: "operations", description: "DMC execution tasks for hotels, transfers, visas, tickets, guides, confirmations, and supplier follow-ups.", columns: ["Task", "Booking", "Service", "Owner", "Due", "Status"], rowMap: ["title", "bookingCode", "serviceType", "owner", "dueDate", "status"], statusOptions: ["pending", "assigned", "confirmed", "in_progress", "blocked", "completed"], fields: [
+    { key: "title", label: "Task", required: true },
+    { key: "bookingCode", label: "Booking Code" },
+    { key: "serviceType", label: "Service", required: true },
+    { key: "owner", label: "Owner" },
+    { key: "dueDate", label: "Due Date", type: "date" },
+    { key: "priority", label: "Priority", type: "select", options: ["low", "medium", "high", "urgent"] },
+  ] },
+  { id: "suppliers", title: "Suppliers", group: "Inventory", endpoint: "suppliers", description: "Hotels, transporters, activity vendors, guides, DMC partners, contracts, credit limits, ratings, and payables.", columns: ["Supplier", "Type", "Destination", "Credit Limit", "Rating", "Status"], rowMap: ["name", "type", "destination", "creditLimit", "rating", "status"], statusOptions: ["active", "inactive", "blacklisted"], fields: [
+    { key: "name", label: "Supplier", required: true },
+    { key: "type", label: "Type", required: true },
+    { key: "destination", label: "Destination" },
+    { key: "creditLimit", label: "Credit Limit", type: "number" },
+    { key: "rating", label: "Rating", type: "number" },
+  ] },
+  { id: "b2b-agents", title: "B2B Agents", group: "Partners", endpoint: "b2b-agents", description: "Agent onboarding, KYC status, market, credit limit, commission, receivables, and partner activity.", columns: ["Agency", "Contact", "Market", "Credit Limit", "Commission", "Status"], rowMap: ["agencyName", "contactName", "market", "creditLimit", "commissionRate", "status"], statusOptions: ["pending_kyc", "active", "on_hold", "blocked"], fields: [
+    { key: "agencyName", label: "Agency", required: true },
+    { key: "contactName", label: "Contact", required: true },
+    { key: "email", label: "Email", type: "email" },
+    { key: "phone", label: "Phone" },
+    { key: "market", label: "Market" },
+    { key: "creditLimit", label: "Credit Limit", type: "number" },
+    { key: "commissionRate", label: "Commission %", type: "number" },
+  ] },
+  { id: "payments", title: "Payments", group: "Finance", endpoint: "payments", description: "Receivables, payables, agent collections, supplier dues, refunds, due dates, and payment status.", columns: ["Type", "Party", "Amount", "Currency", "Due", "Status"], rowMap: ["type", "partyName", "amount", "currencyCode", "dueDate", "status"], statusOptions: ["pending", "partial", "paid", "overdue", "cancelled"], fields: [
+    { key: "type", label: "Type", required: true, type: "select", options: ["receivable", "payable", "refund", "commission"] },
+    { key: "partyName", label: "Party" },
+    { key: "amount", label: "Amount", required: true, type: "number" },
+    { key: "currencyCode", label: "Currency" },
+    { key: "bookingId", label: "Booking ID" },
+    { key: "dueDate", label: "Due Date", type: "date" },
+  ] },
+  { id: "destinations", title: "Destinations", group: "Inventory", endpoint: "destinations", description: "Destination master with country, region, season, highlights, and visa requirement notes.", columns: ["Destination", "Country", "Region", "Season", "Highlights", "Status"], rowMap: ["name", "country", "region", "bestSeason", "highlights", "status"], statusOptions: ["active", "inactive"], fields: [
+    { key: "name", label: "Destination", required: true },
+    { key: "country", label: "Country", required: true },
+    { key: "region", label: "Region" },
+    { key: "bestSeason", label: "Best Season" },
+    { key: "highlights", label: "Highlights", type: "tags" },
+    { key: "visaRequirement", label: "Visa Requirement", type: "textarea" },
+  ] },
+  { id: "tour-packages", title: "Tour Packages", group: "Inventory", endpoint: "tour-packages", description: "Reusable products and packages for B2C customers, B2B agents, campaigns, and quick quotations.", columns: ["Package", "Destination", "Category", "Days", "Base Price", "Status"], rowMap: ["title", "destination", "category", "durationDays", "basePrice", "status"], statusOptions: ["draft", "active", "inactive", "archived"], fields: [
+    { key: "title", label: "Package", required: true },
+    { key: "destination", label: "Destination", required: true },
+    { key: "category", label: "Category" },
+    { key: "durationDays", label: "Days", type: "number" },
+    { key: "basePrice", label: "Base Price", type: "number" },
+    { key: "currency", label: "Currency" },
+    { key: "inclusions", label: "Inclusions", type: "tags" },
+  ] },
+  { id: "travel-documents", title: "Travel Documents", group: "Operations", endpoint: "travel-documents", description: "Passport, visa, insurance, ticket, and customer document workflow for each booking.", columns: ["Customer", "Booking", "Document", "Number", "Expiry", "Status"], rowMap: ["customerName", "bookingId", "documentType", "documentNumber", "expiryDate", "status"], statusOptions: ["pending", "received", "verified", "expired", "rejected"], fields: [
+    { key: "customerName", label: "Customer", required: true },
+    { key: "bookingId", label: "Booking ID" },
+    { key: "documentType", label: "Document Type", required: true },
+    { key: "documentNumber", label: "Document Number" },
+    { key: "expiryDate", label: "Expiry", type: "date" },
+    { key: "fileUrl", label: "File URL" },
+  ] },
+  { id: "vouchers", title: "Vouchers", group: "Operations", endpoint: "vouchers", description: "Hotel, transfer, activity, visa, guide, and customer vouchers issued from booking files.", columns: ["Booking", "Customer", "Type", "Supplier", "Confirmation", "Status"], rowMap: ["bookingId", "customerName", "voucherType", "supplierName", "confirmationNumber", "status"], statusOptions: ["draft", "issued", "sent", "cancelled"], fields: [
+    { key: "bookingId", label: "Booking ID", required: true },
+    { key: "customerName", label: "Customer", required: true },
+    { key: "voucherType", label: "Voucher Type", required: true },
+    { key: "supplierName", label: "Supplier" },
+    { key: "issueDate", label: "Issue Date", type: "date" },
+    { key: "confirmationNumber", label: "Confirmation No" },
+  ] },
+  { id: "support-tickets", title: "Support Tickets", group: "Support", endpoint: "support-tickets", description: "Customer, agent, supplier, and operations issue tracking with SLA-friendly statuses.", columns: ["Subject", "Customer", "Booking", "Channel", "Priority", "Status"], rowMap: ["subject", "customerName", "bookingId", "channel", "priority", "status"], statusOptions: ["open", "in_progress", "waiting_customer", "resolved", "closed"], fields: [
+    { key: "subject", label: "Subject", required: true },
+    { key: "customerName", label: "Customer", required: true },
+    { key: "bookingId", label: "Booking ID" },
+    { key: "channel", label: "Channel" },
+    { key: "priority", label: "Priority", type: "select", options: ["low", "medium", "high", "urgent"] },
+    { key: "description", label: "Description", type: "textarea" },
+  ] },
+  { id: "campaigns", title: "Campaigns", group: "Growth", endpoint: "campaigns", description: "Marketing ROI tracking for lead source, campaign spend, quotations, bookings, revenue, and status.", columns: ["Campaign", "Channel", "Leads", "Quotes", "Bookings", "Revenue"], rowMap: ["name", "channel", "leads", "quotations", "bookings", "revenue"], statusOptions: ["draft", "active", "paused", "completed", "archived"], fields: [
+    { key: "name", label: "Campaign", required: true },
+    { key: "channel", label: "Channel", required: true },
+    { key: "source", label: "Source" },
+    { key: "spend", label: "Spend", type: "number" },
+    { key: "leads", label: "Leads", type: "number" },
+    { key: "quotations", label: "Quotes", type: "number" },
+    { key: "bookings", label: "Bookings", type: "number" },
+    { key: "revenue", label: "Revenue", type: "number" },
+  ] },
+  { id: "invoices", title: "Invoice Builder", group: "Finance", endpoint: "finance/invoices", description: "Country-aware invoice utility with provider, customer, tax rules, dynamic line items, and API persistence.", columns: ["Invoice", "Customer", "Country", "Tax", "Total", "Status"], rowMap: ["invoiceNo", "customer.companyName", "countryCode", "taxLabel", "totalPayable", "status"], fields: [] },
 ];
 
 const navGroups = [
-  { title: "Control", items: ["dashboard", "leads", "quotations", "itineraries"] },
-  { title: "Execution", items: ["bookings", "operations", "suppliers"] },
-  { title: "Business", items: ["b2b", "finance", "invoices", "marketing"] },
+  { title: "Control", items: ["dashboard", "leads", "customers", "quotations", "itineraries"] },
+  { title: "Execution", items: ["bookings", "operations", "travel-documents", "vouchers", "support-tickets"] },
+  { title: "Inventory", items: ["destinations", "tour-packages", "suppliers"] },
+  { title: "Business", items: ["b2b-agents", "payments", "invoices", "campaigns"] },
 ];
 
-const kpis = [
-  ["New Leads", "38", "+12 today"],
-  ["Open Quotes", "INR 18.2L", "14 awaiting approval"],
-  ["Trips Active", "22", "7 start this week"],
-  ["Gross Profit", "INR 12.4L", "29% margin"],
-];
-
-type ApiRecord = {
-  id: string;
-  moduleKey: string;
-  title: string;
-  status: string;
-  priority: string;
-  payload: Record<string, unknown>;
+const countryPresets = {
+  IN: { country: "India", currencyCode: "INR", currencySymbol: "INR", taxLabel: "GST", taxRate: 18 },
+  AE: { country: "United Arab Emirates", currencyCode: "AED", currencySymbol: "AED", taxLabel: "VAT", taxRate: 5 },
+  GB: { country: "United Kingdom", currencyCode: "GBP", currencySymbol: "GBP", taxLabel: "VAT", taxRate: 20 },
+  EU: { country: "European Union", currencyCode: "EUR", currencySymbol: "EUR", taxLabel: "VAT", taxRate: 21 },
+  US: { country: "United States", currencyCode: "USD", currencySymbol: "USD", taxLabel: "Sales Tax", taxRate: 0 },
 };
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+type CountryCode = keyof typeof countryPresets;
 
-export function CrmShell() {
-  const [selectedId, setSelectedId] = useState("dashboard");
+export default function CrmShell() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const pathModule = pathname.split("/").filter(Boolean)[0];
+  const initialModule = modules.some((item) => item.id === pathModule) ? pathModule : "dashboard";
+  const [selectedId, setSelectedId] = useState(initialModule);
+  const [records, setRecords] = useState<ApiRecord[]>([]);
+  const [dashboard, setDashboard] = useState<Record<string, unknown> | null>(null);
   const [query, setQuery] = useState("");
-  const [toast, setToast] = useState("TripOS workspace ready.");
-  const [apiRows, setApiRows] = useState<string[][]>([]);
-  const [isLoadingRows, setIsLoadingRows] = useState(false);
-  const selected = modules.find((module) => module.id === selectedId) ?? modules[0];
-  const moduleApiKey = selectedId === "b2b" ? "b2b-agents" : selectedId;
+  const [toast, setToast] = useState("TripOS CRM connected to production APIs.");
+  const [isLoading, setIsLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
+  const selected = modules.find((item) => item.id === selectedId) ?? modules[0];
+
   useEffect(() => {
-    let cancelled = false;
-    async function loadRecords() {
-      setIsLoadingRows(true);
-      try {
-        const response = await fetch(`${apiBaseUrl}/tripos/records/${moduleApiKey}`);
-        if (!response.ok) throw new Error("API unavailable");
-        const records = (await response.json()) as ApiRecord[];
-        if (!cancelled) {
-          setApiRows(records.map((record) => recordToRow(record, selected)));
-          setToast(`Loaded ${records.length} ${selected.title} records from TripOS API.`);
-        }
-      } catch {
-        if (!cancelled) {
-          setApiRows([]);
-          setToast("Using local demo rows. Start API server for DB-backed records.");
-        }
-      } finally {
-        if (!cancelled) setIsLoadingRows(false);
+    if (pathModule && modules.some((item) => item.id === pathModule)) setSelectedId(pathModule);
+  }, [pathModule]);
+
+  useEffect(() => {
+    void loadModule(selected);
+  }, [selectedId]);
+
+  async function loadModule(module: CrmModule) {
+    setIsLoading(true);
+    setSelectedRecord(null);
+    try {
+      if (module.id === "dashboard") {
+        const response = await fetch(`${apiBaseUrl}/tripos/dashboard`, { cache: "no-store" });
+        if (!response.ok) throw new Error("Dashboard API unavailable");
+        setDashboard((await response.json()) as Record<string, unknown>);
+        setRecords([]);
+      } else if (module.endpoint) {
+        const response = await fetch(`${apiBaseUrl}/${module.endpoint}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`${module.title} API unavailable`);
+        setRecords(normalizeRecords(await response.json()));
       }
+      setToast(`${module.title} refreshed from TripOS API.`);
+    } catch (error) {
+      setRecords([]);
+      setToast(error instanceof Error ? error.message : "API unavailable.");
+    } finally {
+      setIsLoading(false);
     }
-    void loadRecords();
-    return () => {
-      cancelled = true;
-    };
-  }, [moduleApiKey, selected]);
-  const activeRows = apiRows.length ? apiRows : selected.rows;
-  const filteredRows = useMemo(
-    () =>
-      activeRows.filter((row) =>
-        row.join(" ").toLowerCase().includes(query.toLowerCase()),
-      ),
-    [activeRows, query],
-  );
+  }
+
+  function selectModule(id: string) {
+    setSelectedId(id);
+    router.push(id === "dashboard" ? "/" : `/${id}`);
+  }
+
+  async function createRecord(values: Record<string, string>) {
+    if (!selected.endpoint) return;
+    const response = await fetch(`${apiBaseUrl}/${selected.endpoint}`, {
+      body: JSON.stringify(toPayload(selected.fields, values)),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    if (!response.ok) throw new Error(`Could not create ${selected.title}`);
+    setModalOpen(false);
+    await loadModule(selected);
+  }
+
+  async function updateStatus(record: ApiRecord, status: string) {
+    const id = getRecordId(record);
+    if (!id || !selected.endpoint) return;
+    const path = selected.stageEndpoint ? `${selected.endpoint}/${id}/stage` : `${selected.endpoint}/${id}/status`;
+    const body = selected.stageEndpoint ? { stage: status } : { status };
+    const response = await fetch(`${apiBaseUrl}/${path}`, {
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+      method: "PATCH",
+    });
+    if (!response.ok) {
+      setToast(`Could not update ${selected.title} status.`);
+      return;
+    }
+    await loadModule(selected);
+  }
+
+  const rows = useMemo(() => records.map((record) => ({ record, row: recordToRow(record, selected) })), [records, selected]);
+  const filteredRows = rows.filter(({ row }) => row.join(" ").toLowerCase().includes(query.toLowerCase()));
+  const metrics = buildMetrics(records, dashboard);
 
   return (
     <div className="admin-shell">
       <aside className="sidebar">
-        <button className="brand" onClick={() => setSelectedId("dashboard")} type="button">
+        <button className="brand" onClick={() => selectModule("dashboard")} type="button">
           <span className="brand-mark">T</span>
-          <span>
-            <strong>TripOS</strong>
-            <small>Travel Operating System</small>
-          </span>
+          <span><strong>TripOS</strong><small>Travel Operating System</small></span>
         </button>
         <nav aria-label="TripOS modules">
           {navGroups.map((group) => (
@@ -264,17 +250,7 @@ export function CrmShell() {
               {group.items.map((id) => {
                 const module = modules.find((item) => item.id === id);
                 if (!module) return null;
-                return (
-                  <button
-                    className={selectedId === id ? "selected" : ""}
-                    key={id}
-                    onClick={() => setSelectedId(id)}
-                    type="button"
-                  >
-                    <span>{module.title}</span>
-                    <em>{module.metric}</em>
-                  </button>
-                );
+                return <button className={selectedId === id ? "selected" : ""} key={id} onClick={() => selectModule(id)} type="button"><span>{module.title}</span><em>{module.group}</em></button>;
               })}
             </section>
           ))}
@@ -283,121 +259,127 @@ export function CrmShell() {
 
       <main className="workspace">
         <header className="topbar">
-          <div>
-            <span className="eyebrow">Webnza Demo Tenant / Delhi Branch</span>
-            <h1>{selected.title}</h1>
-          </div>
+          <div><span className="eyebrow">Webnza Demo Tenant / Delhi Branch</span><h1>{selected.title}</h1></div>
           <div className="top-actions">
-            <input
-              aria-label="Search records"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search records"
-              value={query}
-            />
-            <button onClick={() => setToast(`${selected.title}: action queued`)} type="button">
-              Sync
-            </button>
+            <input aria-label="Search records" onChange={(event) => setQuery(event.target.value)} placeholder="Search live records" value={query} />
+            <button onClick={() => void loadModule(selected)} type="button">Refresh</button>
+            {selected.fields.length ? <button onClick={() => setModalOpen(true)} type="button">Create</button> : null}
           </div>
         </header>
 
         <section className="hero-panel">
-          <div>
-            <span className="eyebrow">{selected.group}</span>
-            <h2>{selected.metric}</h2>
-            <p>{selected.description}</p>
-          </div>
-          <strong>{selected.trend}</strong>
+          <div><span className="eyebrow">{selected.group}</span><h2>{selected.id === "dashboard" ? "Live Control" : `${records.length} Records`}</h2><p>{selected.description}</p></div>
+          <strong>{isLoading ? "Syncing" : "API-backed"}</strong>
         </section>
 
         <section className="kpi-grid" aria-label="TripOS metrics">
-          {kpis.map(([label, value, helper]) => (
-            <article className="metric-card" key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-              <p>{helper}</p>
-            </article>
-          ))}
+          {metrics.map(([label, value, helper]) => <article className="metric-card" key={label}><span>{label}</span><strong>{value}</strong><p>{helper}</p></article>)}
         </section>
 
-        <section className="action-bar" aria-label={`${selected.title} actions`}>
-          {selected.actions.map((action) => (
-            <button
-              key={action}
-              onClick={() => setToast(`${action} is ready for ${selected.title}.`)}
-              type="button"
-            >
-              {action}
-            </button>
-          ))}
-        </section>
-
-        {selectedId === "invoices" ? <InvoiceBuilder /> : null}
-
-        {selectedId !== "invoices" ? <section className="table-card">
-          <div className="table-head">
-            <div>
-              <span className="eyebrow">{selected.title}</span>
-              <h2>Live Work Queue</h2>
-            </div>
-            <strong>{isLoadingRows ? "Loading" : `${filteredRows.length} records`}</strong>
-          </div>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  {selected.columns.map((column) => (
-                    <th key={column}>{column}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredRows.map((row) => (
-                  <tr key={row.join("-")}>
-                    {row.map((cell, index) => (
-                      <td key={`${cell}-${index}`}>{renderCell(cell)}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section> : null}
+        {selected.id === "invoices" ? <InvoiceBuilder onSaved={() => void loadModule(selected)} /> : null}
+        {selected.id === "dashboard" ? <DashboardPanel dashboard={dashboard} /> : <RecordTable columns={selected.columns} filteredRows={filteredRows} module={selected} onSelect={setSelectedRecord} onStatus={updateStatus} />}
 
         <section className="quick-grid">
-          <article>
-            <span className="eyebrow">Lead to Booking</span>
-            <strong>New &gt; Quote &gt; Payment &gt; Booking &gt; Operations</strong>
-            <p>Primary MVP workflow for travel agencies and DMC teams.</p>
-          </article>
-          <article>
-            <span className="eyebrow">B2B Inside CRM</span>
-            <strong>Agent roles, KYC, credit, quotes, commissions</strong>
-            <p>Partners use restricted CRM views until a separate portal is justified.</p>
-          </article>
-          <article>
-            <span className="eyebrow">AI Ready</span>
-            <strong>Itinerary and quotation assistant hooks</strong>
-            <p>Central AI service can later draft trips from destination, budget, and dates.</p>
-          </article>
+          <article><span className="eyebrow">Production Data</span><strong>Direct module APIs</strong><p>CRM records now load from dedicated TripOS endpoints instead of generic demo records.</p></article>
+          <article><span className="eyebrow">B2B + Operations</span><strong>Inside admin CRM</strong><p>Agents, supplier ops, vouchers, payments, documents, and tickets stay in one back-office workspace.</p></article>
+          <article><span className="eyebrow">Next Sync</span><strong>Mobile customer flows</strong><p>The same APIs can power B2C trip status, vouchers, documents, support, and payments in the app.</p></article>
         </section>
 
+        {selectedRecord ? <DetailPanel module={selected} record={selectedRecord} onClose={() => setSelectedRecord(null)} /> : null}
+        {modalOpen ? <RecordForm module={selected} onClose={() => setModalOpen(false)} onSubmit={createRecord} /> : null}
         <div className="toast" role="status">{toast}</div>
       </main>
     </div>
   );
 }
 
-const countryPresets = {
-  IN: { country: "India", currencyCode: "INR", currencySymbol: "₹", taxLabel: "GST", taxRate: 18 },
-  AE: { country: "United Arab Emirates", currencyCode: "AED", currencySymbol: "د.إ", taxLabel: "VAT", taxRate: 5 },
-  GB: { country: "United Kingdom", currencyCode: "GBP", currencySymbol: "£", taxLabel: "VAT", taxRate: 20 },
-  EU: { country: "European Union", currencyCode: "EUR", currencySymbol: "€", taxLabel: "VAT", taxRate: 21 },
-  US: { country: "United States", currencyCode: "USD", currencySymbol: "$", taxLabel: "Sales Tax", taxRate: 0 },
-};
+function RecordTable({ columns, filteredRows, module, onSelect, onStatus }: { columns: string[]; filteredRows: { record: ApiRecord; row: string[] }[]; module: CrmModule; onSelect: (record: ApiRecord) => void; onStatus: (record: ApiRecord, status: string) => Promise<void>; }) {
+  return (
+    <section className="table-card">
+      <div className="table-head"><div><span className="eyebrow">{module.title}</span><h2>Live Work Queue</h2></div><strong>{filteredRows.length} records</strong></div>
+      <div className="table-wrap">
+        <table>
+          <thead><tr>{columns.map((column) => <th key={column}>{column}</th>)}<th>Action</th></tr></thead>
+          <tbody>
+            {filteredRows.map(({ record, row }) => (
+              <tr key={getRecordId(record) || row.join("-")} onClick={() => onSelect(record)}>
+                {row.map((cell, index) => <td key={`${cell}-${index}`}>{index === row.length - 1 ? renderCell(cell) : cell}</td>)}
+                <td onClick={(event) => event.stopPropagation()}>{module.statusOptions ? <select value={String(record.stage ?? record.status ?? "")} onChange={(event) => void onStatus(record, event.target.value)}>{module.statusOptions.map((status) => <option key={status} value={status}>{status}</option>)}</select> : <button type="button" onClick={() => onSelect(record)}>Open</button>}</td>
+              </tr>
+            ))}
+            {!filteredRows.length ? <tr><td colSpan={columns.length + 1}>No API records found for this module.</td></tr> : null}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
 
-type CountryCode = keyof typeof countryPresets;
+function DashboardPanel({ dashboard }: { dashboard: Record<string, unknown> | null }) {
+  const modulesPayload = dashboard?.modules;
+  const items = Array.isArray(modulesPayload) ? modulesPayload.slice(0, 8) as Record<string, unknown>[] : [];
+  return (
+    <section className="table-card">
+      <div className="table-head"><div><span className="eyebrow">Dashboard</span><h2>Backend Module Readiness</h2></div><strong>{items.length || "Live"}</strong></div>
+      <div className="module-grid">
+        {modules.filter((item) => item.id !== "dashboard").map((item) => <article key={item.id}><strong>{item.title}</strong><span>{item.endpoint ? `/${item.endpoint}` : "workspace"}</span><p>{item.description}</p></article>)}
+      </div>
+    </section>
+  );
+}
 
-function InvoiceBuilder() {
+function DetailPanel({ module, onClose, record }: { module: CrmModule; onClose: () => void; record: ApiRecord }) {
+  return (
+    <aside className="detail-panel">
+      <button onClick={onClose} type="button">Close</button>
+      <span className="eyebrow">{module.title}</span>
+      <h2>{String(record[module.rowMap[0]] ?? record.title ?? record.name ?? getRecordId(record))}</h2>
+      {module.rowMap.map((path, index) => <div className="detail-row" key={path}><span>{module.columns[index]}</span><strong>{String(path.split(".").reduce<unknown>((value, key) => value && typeof value === "object" ? (value as Record<string, unknown>)[key] : undefined, record) ?? "-")}</strong></div>)}
+    </aside>
+  );
+}
+
+function RecordForm({ module, onClose, onSubmit }: { module: CrmModule; onClose: () => void; onSubmit: (values: Record<string, string>) => Promise<void>; }) {
+  const [values, setValues] = useState<Record<string, string>>(() => Object.fromEntries(module.fields.map((field) => [field.key, field.options?.[0] ?? ""])));
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  async function submit() {
+    setSaving(true);
+    setError("");
+    try {
+      await onSubmit(values);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+  return (
+    <div className="modal-backdrop-layer" role="presentation">
+      <section className="record-modal" role="dialog" aria-modal="true">
+        <div className="record-modal-head"><div><span className="eyebrow">{module.group}</span><h3>Create {module.title}</h3></div><button onClick={onClose} type="button">Close</button></div>
+        <div className="record-form-grid">
+          {module.fields.map((field) => <FormField field={field} key={field.key} onChange={(value) => setValues((current) => ({ ...current, [field.key]: value }))} value={values[field.key] ?? ""} />)}
+        </div>
+        {error ? <div className="form-error">{error}</div> : null}
+        <div className="record-modal-actions"><button onClick={onClose} type="button">Cancel</button><button disabled={saving || module.fields.some((field) => field.required && !values[field.key]?.trim())} onClick={() => void submit()} type="button">{saving ? "Saving" : "Save"}</button></div>
+      </section>
+    </div>
+  );
+}
+
+function FormField({ field, onChange, value }: { field: ModuleField; onChange: (value: string) => void; value: string }) {
+  return (
+    <label className={field.type === "textarea" ? "formrow wide" : "formrow"}>
+      <span>{field.label}{field.required ? " *" : ""}</span>
+      {field.type === "select" ? <select onChange={(event) => onChange(event.target.value)} value={value}>{field.options?.map((option) => <option key={option} value={option}>{option}</option>)}</select> : null}
+      {field.type === "textarea" ? <textarea onChange={(event) => onChange(event.target.value)} placeholder={field.placeholder} value={value} /> : null}
+      {!field.type || ["text", "number", "email", "date", "tags"].includes(field.type) ? <input onChange={(event) => onChange(event.target.value)} placeholder={field.placeholder ?? (field.type === "tags" ? "Comma separated" : "")} type={field.type === "tags" ? "text" : field.type ?? "text"} value={value} /> : null}
+    </label>
+  );
+}
+
+function InvoiceBuilder({ onSaved }: { onSaved: () => void }) {
   const [countryCode, setCountryCode] = useState<CountryCode>("IN");
   const [series, setSeries] = useState("TRV-");
   const [invoiceNo, setInvoiceNo] = useState("0001");
@@ -405,75 +387,38 @@ function InvoiceBuilder() {
   const [providerName, setProviderName] = useState("Webnza Travels");
   const [providerTaxNo, setProviderTaxNo] = useState("GSTIN-TRIPOS-DEMO");
   const [customerName, setCustomerName] = useState("Sharma Family");
-  const [customerTaxNo, setCustomerTaxNo] = useState("");
-  const [entries, setEntries] = useState([
-    { dateProvided: invoiceDate, description: "Dubai hotel, transfers, and activities package", qty: 1, qtyType: "package", rate: 100000, total: 100000 },
-  ]);
-  const [status, setStatus] = useState("Ready to create invoice.");
+  const [entries, setEntries] = useState([{ dateProvided: invoiceDate, description: "Dubai travel package", qty: 1, qtyType: "package", rate: 100000, total: 100000 }]);
+  const [status, setStatus] = useState("Ready.");
   const preset = countryPresets[countryCode];
   const subtotal = entries.reduce((sum, entry) => sum + Number(entry.total || 0), 0);
   const taxAmount = subtotal * (preset.taxRate / 100);
   const totalPayable = subtotal + taxAmount;
-
   function updateEntry(index: number, field: keyof typeof entries[number], value: string) {
-    setEntries((current) =>
-      current.map((entry, entryIndex) => {
-        if (entryIndex !== index) return entry;
-        const next = { ...entry, [field]: field === "description" || field === "qtyType" || field === "dateProvided" ? value : Number(value) };
-        if (field === "qty" || field === "rate") {
-          next.total = Number(next.qty || 0) * Number(next.rate || 0);
-        }
-        if (field === "total") {
-          next.rate = Number(next.qty || 1) ? Number(next.total || 0) / Number(next.qty || 1) : 0;
-        }
-        return next;
-      }),
-    );
+    setEntries((current) => current.map((entry, entryIndex) => {
+      if (entryIndex !== index) return entry;
+      const next = { ...entry, [field]: ["description", "qtyType", "dateProvided"].includes(field) ? value : Number(value) };
+      if (field === "qty" || field === "rate") next.total = Number(next.qty || 0) * Number(next.rate || 0);
+      return next;
+    }));
   }
-
   async function generateNumber() {
     const response = await fetch(`${apiBaseUrl}/finance/invoices/next-number/${encodeURIComponent(series)}`);
     const result = (await response.json()) as { invoiceNo?: string };
     setInvoiceNo(result.invoiceNo ?? "0001");
-    setStatus("Invoice number generated from backend history.");
   }
-
   async function saveInvoice() {
     const response = await fetch(`${apiBaseUrl}/finance/invoices`, {
-      body: JSON.stringify({
-        invoiceSeries: series,
-        invoiceNo,
-        invoiceDate,
-        countryCode,
-        currencyCode: preset.currencyCode,
-        currencySymbol: preset.currencySymbol,
-        taxLabel: preset.taxLabel,
-        taxRate: preset.taxRate,
-        provider: { companyName: providerName, taxNo: providerTaxNo },
-        customer: { companyName: customerName, taxNo: customerTaxNo },
-        entries,
-        status: "draft",
-      }),
+      body: JSON.stringify({ invoiceSeries: series, invoiceNo, invoiceDate, countryCode, currencyCode: preset.currencyCode, currencySymbol: preset.currencySymbol, taxLabel: preset.taxLabel, taxRate: preset.taxRate, provider: { companyName: providerName, taxNo: providerTaxNo }, customer: { companyName: customerName }, entries, status: "draft" }),
       headers: { "Content-Type": "application/json" },
       method: "POST",
     });
-    if (!response.ok) {
-      setStatus("Invoice save failed. Check API server.");
-      return;
-    }
-    setStatus("Invoice saved to TripOS API and Finance records.");
+    setStatus(response.ok ? "Invoice saved." : "Invoice save failed.");
+    if (response.ok) onSaved();
   }
-
   return (
     <section className="invoice-builder">
       <div className="invoice-form-panel">
-        <div className="table-head">
-          <div>
-            <span className="eyebrow">Travel Invoice Utility</span>
-            <h2>Country, tax, currency, and line-item invoice builder</h2>
-          </div>
-          <button onClick={generateNumber} type="button">Generate Number</button>
-        </div>
+        <div className="table-head"><div><span className="eyebrow">Invoice Utility</span><h2>Country-aware travel invoice</h2></div><button onClick={generateNumber} type="button">Generate Number</button></div>
         <div className="invoice-form-grid">
           <label>Country<select value={countryCode} onChange={(event) => setCountryCode(event.target.value as CountryCode)}>{Object.entries(countryPresets).map(([code, item]) => <option key={code} value={code}>{item.country}</option>)}</select></label>
           <label>Series<input value={series} onChange={(event) => setSeries(event.target.value)} /></label>
@@ -482,65 +427,21 @@ function InvoiceBuilder() {
           <label>Provider<input value={providerName} onChange={(event) => setProviderName(event.target.value)} /></label>
           <label>Provider Tax No<input value={providerTaxNo} onChange={(event) => setProviderTaxNo(event.target.value)} /></label>
           <label>Customer<input value={customerName} onChange={(event) => setCustomerName(event.target.value)} /></label>
-          <label>Customer Tax No<input value={customerTaxNo} onChange={(event) => setCustomerTaxNo(event.target.value)} /></label>
         </div>
-        <div className="table-wrap invoice-lines">
-          <table>
-            <thead><tr><th>Date</th><th>Description</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead>
-            <tbody>{entries.map((entry, index) => <tr key={index}>
-              <td><input type="date" value={entry.dateProvided} onChange={(event) => updateEntry(index, "dateProvided", event.target.value)} /></td>
-              <td><input value={entry.description} onChange={(event) => updateEntry(index, "description", event.target.value)} /></td>
-              <td><input type="number" value={entry.qty} onChange={(event) => updateEntry(index, "qty", event.target.value)} /></td>
-              <td><input value={entry.qtyType} onChange={(event) => updateEntry(index, "qtyType", event.target.value)} /></td>
-              <td><input type="number" value={entry.rate} onChange={(event) => updateEntry(index, "rate", event.target.value)} /></td>
-              <td><input type="number" value={entry.total} onChange={(event) => updateEntry(index, "total", event.target.value)} /></td>
-            </tr>)}</tbody>
-          </table>
-        </div>
-        <div className="action-bar">
-          <button onClick={() => setEntries([...entries, { dateProvided: invoiceDate, description: "Additional service", qty: 1, qtyType: "unit", rate: 0, total: 0 }])} type="button">Add Line</button>
-          <button onClick={saveInvoice} type="button">Save Invoice</button>
-          <span>{status}</span>
-        </div>
+        <div className="table-wrap invoice-lines"><table><thead><tr><th>Date</th><th>Description</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Total</th></tr></thead><tbody>{entries.map((entry, index) => <tr key={index}><td><input type="date" value={entry.dateProvided} onChange={(event) => updateEntry(index, "dateProvided", event.target.value)} /></td><td><input value={entry.description} onChange={(event) => updateEntry(index, "description", event.target.value)} /></td><td><input type="number" value={entry.qty} onChange={(event) => updateEntry(index, "qty", event.target.value)} /></td><td><input value={entry.qtyType} onChange={(event) => updateEntry(index, "qtyType", event.target.value)} /></td><td><input type="number" value={entry.rate} onChange={(event) => updateEntry(index, "rate", event.target.value)} /></td><td><input type="number" value={entry.total} onChange={(event) => updateEntry(index, "total", event.target.value)} /></td></tr>)}</tbody></table></div>
+        <div className="action-bar"><button onClick={() => setEntries([...entries, { dateProvided: invoiceDate, description: "Additional service", qty: 1, qtyType: "unit", rate: 0, total: 0 }])} type="button">Add Line</button><button onClick={saveInvoice} type="button">Save Invoice</button><span>{status}</span></div>
       </div>
-      <aside className="invoice-preview">
-        <span className="eyebrow">{preset.country} / {preset.currencyCode}</span>
-        <h2>{series}{invoiceNo}</h2>
-        <p>{providerName} to {customerName}</p>
-        <dl>
-          <div><dt>Subtotal</dt><dd>{preset.currencySymbol}{subtotal.toFixed(2)}</dd></div>
-          <div><dt>{preset.taxLabel} {preset.taxRate}%</dt><dd>{preset.currencySymbol}{taxAmount.toFixed(2)}</dd></div>
-          <div><dt>Total Payable</dt><dd>{preset.currencySymbol}{totalPayable.toFixed(2)}</dd></div>
-        </dl>
-      </aside>
+      <aside className="invoice-preview"><span className="eyebrow">{preset.country}</span><h2>{series}{invoiceNo}</h2><p>{providerName} to {customerName}</p><dl><div><dt>Subtotal</dt><dd>{preset.currencySymbol} {subtotal.toFixed(2)}</dd></div><div><dt>{preset.taxLabel} {preset.taxRate}%</dt><dd>{preset.currencySymbol} {taxAmount.toFixed(2)}</dd></div><div><dt>Total</dt><dd>{preset.currencySymbol} {totalPayable.toFixed(2)}</dd></div></dl></aside>
     </section>
   );
 }
 
-function recordToRow(record: ApiRecord, module: Module) {
-  return module.columns.map((column, index) => {
-    if (index === 0) return record.title;
-    const key = column
-      .toLowerCase()
-      .replace(/[^a-z0-9]+(.)/g, (_, character: string) => character.toUpperCase());
-    const value = record.payload[key] ?? record.payload[column] ?? record.payload[column.toLowerCase()];
-    if (value !== undefined && value !== null) return String(value);
-    if (column.toLowerCase() === "status") return record.status;
-    if (column.toLowerCase() === "owner") return String(record.payload.owner ?? "Team");
-    return "-";
-  });
+function buildMetrics(records: ApiRecord[], dashboard: Record<string, unknown> | null): [string, string, string][] {
+  const dashboardTotal = typeof dashboard?.totalRecords === "number" ? String(dashboard.totalRecords) : "Live";
+  return [["Records", String(records.length || dashboardTotal), "Current module"], ["API", "Dedicated", "No generic records"], ["Tenant", "Demo Org", "Branch scoped"], ["Status", "Ready", "Mongo-backed"]];
 }
 
 function renderCell(value: string) {
-  const normalized = value.toLowerCase();
-  if (["healthy", "active", "confirmed", "ready", "paid", "assigned"].includes(normalized)) {
-    return <span className="badge good">{value}</span>;
-  }
-  if (["watch", "pending", "draft", "sent", "documents", "kyc review", "part confirmed"].includes(normalized)) {
-    return <span className="badge warn">{value}</span>;
-  }
-  if (["risk"].includes(normalized)) {
-    return <span className="badge danger">{value}</span>;
-  }
-  return value;
+  const klass = statusClass(value);
+  return klass === "neutral" ? value : <span className={`badge ${klass}`}>{value}</span>;
 }

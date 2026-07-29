@@ -18,6 +18,7 @@ import { TourPackagesModule } from "./modules/tour-packages/tour-packages.module
 import { TravelDocumentsModule } from "./modules/travel-documents/travel-documents.module";
 import { VouchersModule } from "./modules/vouchers/vouchers.module";
 import { SupportTicketsModule } from "./modules/support-tickets/support-tickets.module";
+import { CampaignsModule } from "./modules/campaigns/campaigns.module";
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { SupportTicketsModule } from "./modules/support-tickets/support-tickets.
     TravelDocumentsModule,
     VouchersModule,
     SupportTicketsModule,
+    CampaignsModule,
     TriposModule,
   ],
 })

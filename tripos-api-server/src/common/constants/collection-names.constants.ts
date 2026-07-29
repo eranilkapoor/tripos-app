@@ -16,4 +16,5 @@ export const COLLECTION_NAMES = {
   TRAVEL_DOCUMENT: 'tripos_travel_documents',
   VOUCHER: 'tripos_vouchers',
   SUPPORT_TICKET: 'tripos_support_tickets',
+  CAMPAIGN: 'tripos_campaigns',
 } as const;

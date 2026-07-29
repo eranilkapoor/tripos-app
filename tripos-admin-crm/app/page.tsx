@@ -1,6 +1,1 @@
-import { CrmShell } from "./components/CrmShell";
-
-export default function Home() {
-  return <CrmShell />;
-}
-
+export { default } from "./components/CrmShell";
