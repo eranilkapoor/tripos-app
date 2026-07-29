@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { RbacGuard } from '../../common/guards/rbac.guard';
 import { SessionAuthGuard } from '../../common/guards/session-auth.guard';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TenantsModule } from '../tenants/tenants.module';
@@ -17,7 +18,11 @@ import { AuthService } from './services/auth.service';
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, { provide: APP_GUARD, useClass: SessionAuthGuard }],
+  providers: [
+    AuthService,
+    { provide: APP_GUARD, useClass: SessionAuthGuard },
+    { provide: APP_GUARD, useClass: RbacGuard },
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

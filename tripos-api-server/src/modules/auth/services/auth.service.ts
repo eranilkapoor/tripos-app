@@ -1,6 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { randomBytes, scryptSync, timingSafeEqual, createHash } from 'node:crypto';
+import {
+  randomBytes,
+  scryptSync,
+  timingSafeEqual,
+  createHash,
+} from 'node:crypto';
 import { Model } from 'mongoose';
 import { LoginDto, RegisterCrmUserDto } from '../dto/auth.dto';
 import { CrmUser } from '../schemas/crm-user.schema';
@@ -11,13 +20,23 @@ import { TenantsService } from '../../tenants/services/tenants.service';
 export class AuthService {
   constructor(
     @InjectModel(CrmUser.name) private readonly userModel: Model<CrmUser>,
-    @InjectModel(UserSession.name) private readonly sessionModel: Model<UserSession>,
+    @InjectModel(UserSession.name)
+    private readonly sessionModel: Model<UserSession>,
     private readonly tenantsService: TenantsService,
   ) {}
 
-  async register(dto: RegisterCrmUserDto) {
+  async register(
+    dto: RegisterCrmUserDto,
+    actor?: { tenantId?: unknown; role?: string },
+  ) {
+    const tenantId =
+      actor?.role === 'platform_admin'
+        ? dto.tenantId
+        : String(actor?.tenantId ?? '');
+    if (!tenantId) throw new ForbiddenException('Tenant context is required');
     const user = await this.userModel.create({
       ...dto,
+      tenantId,
       email: dto.email.toLowerCase(),
       branchId: dto.branchId ?? 'main',
       role: dto.role ?? 'tenant_admin',
@@ -28,10 +47,19 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     await this.ensureDemoAdmin();
-    const user = await this.userModel.findOne({ email: dto.email.toLowerCase(), status: 'active' }).lean().exec();
-    if (!user || !verifyPassword(dto.password, user.passwordHash)) throw new UnauthorizedException('Invalid email or password');
+    const user = await this.userModel
+      .findOne({ email: dto.email.toLowerCase(), status: 'active' })
+      .lean()
+      .exec();
+    if (!user || !verifyPassword(dto.password, user.passwordHash))
+      throw new UnauthorizedException('Invalid email or password');
     const tenant = await this.tenantsService.findOne(String(user.tenantId));
-    if (dto.tenantCode && String((tenant as { code?: string }).code).toUpperCase() !== dto.tenantCode.toUpperCase()) throw new UnauthorizedException('Tenant does not match user');
+    if (
+      dto.tenantCode &&
+      String((tenant as { code?: string }).code).toUpperCase() !==
+        dto.tenantCode.toUpperCase()
+    )
+      throw new UnauthorizedException('Tenant does not match user');
     const branchId = dto.branchId ?? user.branchId;
     const token = randomBytes(32).toString('hex');
     await this.sessionModel.create({
@@ -45,21 +73,69 @@ export class AuthService {
   }
 
   async me(token: string) {
-    const session = await this.sessionModel.findOne({ tokenHash: hashToken(token), revokedAt: { $exists: false }, expiresAt: { $gt: new Date() } }).lean().exec();
+    const session = await this.sessionModel
+      .findOne({
+        tokenHash: hashToken(token),
+        revokedAt: { $exists: false },
+        expiresAt: { $gt: new Date() },
+      })
+      .lean()
+      .exec();
     if (!session) throw new UnauthorizedException('Session expired');
     const user = await this.userModel.findById(session.userId).lean().exec();
     if (!user) throw new UnauthorizedException('User not found');
     const tenant = await this.tenantsService.findOne(String(session.tenantId));
-    return { user: sanitizeUser({ ...user, branchId: session.branchId }), tenant };
+    return {
+      user: sanitizeUser({ ...user, branchId: session.branchId }),
+      tenant,
+    };
+  }
+
+  async refresh(token: string) {
+    const session = await this.sessionModel
+      .findOne({
+        tokenHash: hashToken(token),
+        revokedAt: { $exists: false },
+        expiresAt: { $gt: new Date() },
+      })
+      .lean()
+      .exec();
+    if (!session) throw new UnauthorizedException('Session expired');
+    const user = await this.userModel.findById(session.userId).lean().exec();
+    if (!user || user.status !== 'active')
+      throw new UnauthorizedException('User not found');
+    const tenant = await this.tenantsService.findOne(String(session.tenantId));
+    const nextToken = randomBytes(32).toString('hex');
+    await Promise.all([
+      this.sessionModel
+        .updateOne({ tokenHash: hashToken(token) }, { revokedAt: new Date() })
+        .exec(),
+      this.sessionModel.create({
+        tokenHash: hashToken(nextToken),
+        userId: session.userId,
+        tenantId: session.tenantId,
+        branchId: session.branchId,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 12),
+      }),
+    ]);
+    return {
+      token: nextToken,
+      user: sanitizeUser({ ...user, branchId: session.branchId }),
+      tenant,
+    };
   }
 
   async logout(token: string) {
-    await this.sessionModel.updateOne({ tokenHash: hashToken(token) }, { revokedAt: new Date() }).exec();
+    await this.sessionModel
+      .updateOne({ tokenHash: hashToken(token) }, { revokedAt: new Date() })
+      .exec();
     return { success: true };
   }
 
   private async ensureDemoAdmin() {
-    const existing = await this.userModel.findOne({ email: 'admin@tripos.test' }).exec();
+    const existing = await this.userModel
+      .findOne({ email: 'admin@tripos.test' })
+      .exec();
     if (existing) return;
     const tenant = await this.tenantsService.ensureDemoTenant();
     await this.userModel.create({
