@@ -29,3 +29,9 @@ export type ApiRecord = Record<string, unknown> & {
   status?: string;
   stage?: string;
 };
+
+export type CrmSession = {
+  token: string;
+  user: Record<string, unknown>;
+  tenant: Record<string, unknown>;
+};

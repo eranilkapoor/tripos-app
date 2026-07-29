@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { ApiRecord, CrmModule, ModuleField } from "./crmTypes";
-import { apiBaseUrl, getRecordId, normalizeRecords, recordToRow, statusClass, toPayload } from "./crmUtils";
+import type { ApiRecord, CrmModule, CrmSession, ModuleField } from "./crmTypes";
+import { apiBaseUrl, getRecordId, normalizeRecords, recordToRow, sessionHeaders, statusClass, toPayload } from "./crmUtils";
 
 const modules: CrmModule[] = [
   { id: "dashboard", title: "Command Center", group: "Overview", description: "Live operating view across sales, bookings, operations, partners, suppliers, documents, support, and finance.", columns: ["Signal", "Value", "Owner", "Status"], rowMap: [], fields: [] },
@@ -165,7 +165,32 @@ export default function CrmShell() {
   const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
+  const [session, setSession] = useState<CrmSession | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const selected = modules.find((item) => item.id === selectedId) ?? modules[0];
+
+  useEffect(() => {
+    const raw = window.localStorage.getItem("tripos-crm-session");
+    if (!raw) {
+      setAuthReady(true);
+      return;
+    }
+    try {
+      const stored = JSON.parse(raw) as CrmSession;
+      setSession(stored);
+      void fetch(`${apiBaseUrl}/auth/me`, { headers: sessionHeaders(stored.token, stored.user) })
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error("Session expired")))
+        .then((nextSession) => setSession({ ...stored, ...nextSession }))
+        .catch(() => {
+          window.localStorage.removeItem("tripos-crm-session");
+          setSession(null);
+        })
+        .finally(() => setAuthReady(true));
+    } catch {
+      window.localStorage.removeItem("tripos-crm-session");
+      setAuthReady(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (pathModule && modules.some((item) => item.id === pathModule)) setSelectedId(pathModule);
@@ -173,24 +198,24 @@ export default function CrmShell() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      void loadModule(selected, query);
+      if (session) void loadModule(selected, query);
     }, 250);
     return () => window.clearTimeout(timeout);
-  }, [selectedId, query]);
+  }, [selectedId, query, session]);
 
   async function loadModule(module: CrmModule, search = query) {
     setIsLoading(true);
     setSelectedRecord(null);
     try {
       if (module.id === "dashboard") {
-        const response = await fetch(`${apiBaseUrl}/tripos/dashboard`, { cache: "no-store" });
+        const response = await fetch(`${apiBaseUrl}/tripos/dashboard`, { cache: "no-store", headers: sessionHeaders(session?.token, session?.user) });
         if (!response.ok) throw new Error("Dashboard API unavailable");
         setDashboard((await response.json()) as Record<string, unknown>);
         setRecords([]);
       } else if (module.endpoint) {
         const params = new URLSearchParams({ limit: "100" });
         if (search.trim()) params.set("search", search.trim());
-        const response = await fetch(`${apiBaseUrl}/${module.endpoint}?${params.toString()}`, { cache: "no-store" });
+        const response = await fetch(`${apiBaseUrl}/${module.endpoint}?${params.toString()}`, { cache: "no-store", headers: sessionHeaders(session?.token, session?.user) });
         if (!response.ok) throw new Error(`${module.title} API unavailable`);
         setRecords(normalizeRecords(await response.json()));
       }
@@ -212,7 +237,7 @@ export default function CrmShell() {
     if (!selected.endpoint) return;
     const response = await fetch(`${apiBaseUrl}/${selected.endpoint}`, {
       body: JSON.stringify(toPayload(selected.fields, values)),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...sessionHeaders(session?.token, session?.user) },
       method: "POST",
     });
     if (!response.ok) throw new Error(`Could not create ${selected.title}`);
@@ -227,7 +252,7 @@ export default function CrmShell() {
     const body = selected.stageEndpoint ? { stage: status } : { status };
     const response = await fetch(`${apiBaseUrl}/${path}`, {
       body: JSON.stringify(body),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...sessionHeaders(session?.token, session?.user) },
       method: "PATCH",
     });
     if (!response.ok) {
@@ -237,9 +262,22 @@ export default function CrmShell() {
     await loadModule(selected);
   }
 
+  async function logout() {
+    if (session?.token) {
+      await fetch(`${apiBaseUrl}/auth/logout`, { headers: sessionHeaders(session.token, session.user), method: "POST" }).catch(() => undefined);
+    }
+    window.localStorage.removeItem("tripos-crm-session");
+    setSession(null);
+    setRecords([]);
+    setToast("Logged out.");
+  }
+
   const rows = useMemo(() => records.map((record) => ({ record, row: recordToRow(record, selected) })), [records, selected]);
   const filteredRows = rows.filter(({ row }) => row.join(" ").toLowerCase().includes(query.toLowerCase()));
   const metrics = buildMetrics(records, dashboard);
+
+  if (!authReady) return <div className="auth-screen"><section className="auth-card"><h1>TripOS</h1><p>Loading secure workspace...</p></section></div>;
+  if (!session) return <LoginScreen onLogin={(nextSession) => { window.localStorage.setItem("tripos-crm-session", JSON.stringify(nextSession)); setSession(nextSession); setToast("Logged in."); }} />;
 
   return (
     <div className="admin-shell">
@@ -264,11 +302,12 @@ export default function CrmShell() {
 
       <main className="workspace">
         <header className="topbar">
-          <div><span className="eyebrow">Webnza Demo Tenant / Delhi Branch</span><h1>{selected.title}</h1></div>
+          <div><span className="eyebrow">{String(session.tenant.name ?? "Tenant")} / {String(session.user.branchId ?? "Branch")}</span><h1>{selected.title}</h1></div>
           <div className="top-actions">
             <input aria-label="Search records" onChange={(event) => setQuery(event.target.value)} placeholder="Search live records" value={query} />
             <button onClick={() => void loadModule(selected, query)} type="button">Refresh</button>
             {selected.fields.length ? <button onClick={() => setModalOpen(true)} type="button">Create</button> : null}
+            <button onClick={() => void logout()} type="button">Logout</button>
           </div>
         </header>
 
@@ -317,6 +356,49 @@ function RecordTable({ columns, filteredRows, module, onSelect, onStatus }: { co
         </table>
       </div>
     </section>
+  );
+}
+
+function LoginScreen({ onLogin }: { onLogin: (session: CrmSession) => void }) {
+  const [email, setEmail] = useState("admin@tripos.test");
+  const [password, setPassword] = useState("TripOS@123");
+  const [tenantCode, setTenantCode] = useState("WEBNZA");
+  const [branchId, setBranchId] = useState("delhi");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function login() {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch(`${apiBaseUrl}/auth/login`, {
+        body: JSON.stringify({ email, password, tenantCode, branchId }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+      });
+      if (!response.ok) throw new Error("Invalid login or API unavailable");
+      onLogin((await response.json()) as CrmSession);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="auth-screen">
+      <section className="auth-card">
+        <span className="brand-mark">T</span>
+        <h1>TripOS Admin CRM</h1>
+        <p>Multi-tenant travel CRM for agencies, DMC teams, branches, operations, finance, and B2B agents.</p>
+        <label>Email<input value={email} onChange={(event) => setEmail(event.target.value)} /></label>
+        <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>
+        <label>Tenant Code<input value={tenantCode} onChange={(event) => setTenantCode(event.target.value)} /></label>
+        <label>Branch<input value={branchId} onChange={(event) => setBranchId(event.target.value)} /></label>
+        {error ? <div className="form-error">{error}</div> : null}
+        <button disabled={loading} onClick={() => void login()} type="button">{loading ? "Signing in" : "Login"}</button>
+      </section>
+    </div>
   );
 }
 

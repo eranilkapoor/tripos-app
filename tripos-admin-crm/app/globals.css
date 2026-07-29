@@ -46,6 +46,67 @@ button {
   min-height: 100vh;
 }
 
+.auth-screen {
+  align-items: center;
+  background: radial-gradient(circle at top left, #d9f3ee, transparent 32%), var(--bg);
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 22px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 12px;
+  max-width: 430px;
+  padding: 22px;
+  width: 100%;
+}
+
+.auth-card .brand-mark {
+  background: var(--brand);
+  color: #fff;
+}
+
+.auth-card h1 {
+  color: var(--brand-dark);
+}
+
+.auth-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.auth-card label {
+  color: var(--muted);
+  display: grid;
+  font-size: 11px;
+  font-weight: 900;
+  gap: 6px;
+  text-transform: uppercase;
+}
+
+.auth-card input {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+.auth-card button {
+  background: var(--brand);
+  border: 1px solid var(--brand-dark);
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 900;
+  min-height: 42px;
+}
+
 .sidebar {
   background: linear-gradient(180deg, var(--brand-dark), var(--brand));
   color: #fff;

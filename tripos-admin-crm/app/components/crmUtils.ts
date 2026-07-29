@@ -68,3 +68,11 @@ export function statusClass(value: string) {
   if (["cancelled", "lost", "blocked", "rejected", "expired", "urgent"].includes(normalized)) return "danger";
   return "neutral";
 }
+
+export function sessionHeaders(token?: string, user?: Record<string, unknown>) {
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  if (user?.tenantId) headers["x-tenant-id"] = String(user.tenantId);
+  if (user?.branchId) headers["x-branch-id"] = String(user.branchId);
+  return headers;
+}
