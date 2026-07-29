@@ -482,6 +482,29 @@ td button:hover {
   color: var(--danger) !important;
 }
 
+.icon-action {
+  min-width: 38px;
+  padding: 8px 10px !important;
+  position: relative;
+}
+
+.notification-action span {
+  align-items: center;
+  background: var(--accent);
+  border: 2px solid var(--surface);
+  border-radius: 999px;
+  color: #fff;
+  display: grid;
+  font-size: 10px;
+  font-weight: 950;
+  height: 19px;
+  min-width: 19px;
+  padding: 0 4px;
+  position: absolute;
+  right: -6px;
+  top: -7px;
+}
+
 .profile-chip {
   align-items: center;
   border-left: 1px solid var(--line);
@@ -525,39 +548,50 @@ td button:hover {
 
 .theme-switcher {
   border: 0;
-  display: grid;
-  gap: 3px;
+  display: block;
   margin: 0;
   padding: 0;
 }
 
 .theme-switcher legend {
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 900;
+  height: 1px;
+  overflow: hidden;
   padding: 0;
-  text-transform: uppercase;
+  position: absolute;
+  width: 1px;
 }
 
 .theme-radio-group {
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
   display: flex;
   gap: 2px;
+  padding: 3px;
 }
 
 .theme-radio-group label {
   align-items: center;
+  border: 1px solid transparent;
   border-radius: 999px;
   color: var(--muted);
   display: inline-flex;
-  font-size: 11px;
+  font-size: 0;
   font-weight: 900;
-  min-height: 28px;
-  padding: 5px 8px;
+  height: 30px;
+  justify-content: center;
+  padding: 0;
+  width: 30px;
 }
 
 .theme-radio-group label.selected {
   background: var(--brand-soft);
+  border-color: var(--brand);
   color: var(--brand);
+}
+
+.theme-radio-group svg {
+  font-size: 13px;
 }
 
 .theme-radio-group input {
@@ -565,6 +599,52 @@ td button:hover {
   opacity: 0;
   position: absolute;
   width: 1px;
+}
+
+.workspace-switcher {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+}
+
+.workspace-switcher label {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  display: inline-flex;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 8px 0 11px;
+}
+
+.workspace-switcher label > span {
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.workspace-switcher svg {
+  color: var(--brand);
+}
+
+.workspace-switcher select {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 30px;
+  padding: 4px 26px 4px 8px;
 }
 
 .workspace {

@@ -15,6 +15,7 @@ export const COLLECTION_NAMES = {
   TRAVEL_DOCUMENT: 'travel_documents',
   VOUCHER: 'vouchers',
   SUPPORT_TICKET: 'support_tickets',
+  NOTIFICATION: 'notifications',
   CAMPAIGN: 'campaigns',
   TENANT: 'tenants',
   CRM_USER: 'crm_users',

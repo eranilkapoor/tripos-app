@@ -9,10 +9,16 @@ import {
   faArrowRotateRight,
   faChevronLeft,
   faChevronRight,
+  faBell,
+  faBuilding,
+  faCodeBranch,
+  faDesktop,
   faFolderOpen,
+  faMoon,
   faPlus,
   faRightFromBracket,
   faSearch,
+  faSun,
   faSort,
   faSortDown,
   faSortUp,
@@ -497,6 +503,42 @@ const modules: CrmModule[] = [
     ],
   },
   {
+    id: "notifications",
+    title: "Notifications",
+    group: "Control",
+    endpoint: "notifications",
+    description:
+      "Tenant and branch alerts for sales, operations, finance, support, customers, and agents.",
+    columns: ["Title", "Type", "Priority", "Audience", "Module", "Status"],
+    rowMap: ["title", "type", "priority", "audience", "module", "status"],
+    statusOptions: ["unread", "read", "archived"],
+    fields: [
+      { key: "title", label: "Title", required: true },
+      { key: "message", label: "Message", type: "textarea" },
+      {
+        key: "type",
+        label: "Type",
+        type: "select",
+        options: ["system", "sales", "operations", "finance", "support"],
+      },
+      {
+        key: "priority",
+        label: "Priority",
+        type: "select",
+        options: ["low", "medium", "high", "urgent"],
+      },
+      {
+        key: "audience",
+        label: "Audience",
+        type: "select",
+        options: ["tenant", "branch", "user", "agent", "customer"],
+      },
+      { key: "module", label: "Module" },
+      { key: "recordId", label: "Record ID" },
+      { key: "assignedTo", label: "Assigned To" },
+    ],
+  },
+  {
     id: "campaigns",
     title: "Campaigns",
     group: "Growth",
@@ -672,7 +714,14 @@ const modules: CrmModule[] = [
 const navGroups = [
   {
     title: "Control",
-    items: ["dashboard", "leads", "customers", "quotations", "itineraries"],
+    items: [
+      "dashboard",
+      "notifications",
+      "leads",
+      "customers",
+      "quotations",
+      "itineraries",
+    ],
   },
   {
     title: "Execution",
@@ -757,6 +806,15 @@ const crmThemes: { id: CrmTheme; label: string }[] = [
   { id: "light", label: "Light" },
   { id: "dark", label: "Dark" },
 ];
+
+const themeIcons = {
+  system: faDesktop,
+  light: faSun,
+  dark: faMoon,
+};
+
+const tenantOptions = ["WEBNZA", "TRIPOS", "DMC"];
+const branchOptions = ["delhi", "mumbai", "dubai", "remote"];
 
 export default function CrmShell() {
   const router = useRouter();
@@ -950,6 +1008,26 @@ export default function CrmShell() {
   );
   const metrics = buildMetrics(records, dashboard);
   const isModuleLoading = isLoading && loadingModuleId === selected.id;
+  const notificationCount = buildNotificationCount(dashboard, records);
+
+  function updateWorkspace(field: "tenantCode" | "branchId", value: string) {
+    if (!session) return;
+    const nextSession: CrmSession = {
+      ...session,
+      tenant:
+        field === "tenantCode"
+          ? { ...session.tenant, code: value }
+          : session.tenant,
+      user: { ...session.user, [field]: value },
+    };
+    setSession(nextSession);
+    window.localStorage.setItem(
+      "tripos-crm-session",
+      JSON.stringify(nextSession),
+    );
+    setToast("Workspace context updated.");
+    window.setTimeout(() => void loadModule(selected, query), 0);
+  }
 
   if (!authReady)
     return (
@@ -1022,12 +1100,18 @@ export default function CrmShell() {
           <div className="topbar-title">
             <span className="eyebrow">TripOS Admin CRM</span>
             <strong>{selected.title}</strong>
-            <small>
-              {String(session.tenant.name ?? "Tenant")} /{" "}
-              {String(session.user.branchId ?? "Branch")}
-            </small>
+            <small>{String(session.tenant.name ?? "Tenant Workspace")}</small>
           </div>
           <div className="top-actions">
+            <button
+              aria-label={`${notificationCount} notifications`}
+              className="icon-action notification-action"
+              title="Notifications"
+              type="button"
+            >
+              <FontAwesomeIcon aria-hidden icon={faBell} />
+              <span>{notificationCount}</span>
+            </button>
             <ThemeSwitcher onChange={changeTheme} selectedTheme={theme} />
             <div className="profile-chip">
               <span>{String(session.user.name ?? "Admin").slice(0, 1)}</span>
@@ -1059,6 +1143,46 @@ export default function CrmShell() {
               <p>{selected.description}</p>
             </div>
             <strong>{isLoading ? "Syncing" : "API-backed"}</strong>
+          </section>
+
+          <section
+            className="workspace-switcher"
+            aria-label="Workspace context"
+          >
+            <label>
+              <FontAwesomeIcon aria-hidden icon={faBuilding} />
+              <span>Tenant</span>
+              <select
+                onChange={(event) =>
+                  updateWorkspace("tenantCode", event.target.value)
+                }
+                value={String(
+                  session.tenant.code ?? session.user.tenantCode ?? "WEBNZA",
+                )}
+              >
+                {tenantOptions.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <FontAwesomeIcon aria-hidden icon={faCodeBranch} />
+              <span>Branch</span>
+              <select
+                onChange={(event) =>
+                  updateWorkspace("branchId", event.target.value)
+                }
+                value={String(session.user.branchId ?? "delhi")}
+              >
+                {branchOptions.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </label>
           </section>
 
           <section className="kpi-grid" aria-label="TripOS metrics">
@@ -1156,12 +1280,14 @@ function ThemeSwitcher({
           <label
             className={selectedTheme === item.id ? "selected" : ""}
             key={item.id}
+            title={`${item.label} theme`}
           >
             <input
               checked={selectedTheme === item.id}
               onChange={() => onChange(item.id)}
               type="radio"
             />
+            <FontAwesomeIcon aria-hidden icon={themeIcons[item.id]} />
             <span>{item.label}</span>
           </label>
         ))}
@@ -1449,8 +1575,6 @@ function LoginScreen({
 }) {
   const [email, setEmail] = useState("admin@tripos.test");
   const [password, setPassword] = useState("TripOS@123");
-  const [tenantCode, setTenantCode] = useState("WEBNZA");
-  const [branchId, setBranchId] = useState("delhi");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -1459,7 +1583,12 @@ function LoginScreen({
     setError("");
     try {
       const response = await fetch(`${apiBaseUrl}/auth/login`, {
-        body: JSON.stringify({ email, password, tenantCode, branchId }),
+        body: JSON.stringify({
+          email,
+          password,
+          tenantCode: "WEBNZA",
+          branchId: "delhi",
+        }),
         headers: { "Content-Type": "application/json" },
         method: "POST",
       });
@@ -1481,8 +1610,8 @@ function LoginScreen({
         </div>
         <h1>TripOS Admin CRM</h1>
         <p>
-          Multi-tenant travel command center for agencies, DMC teams, branches,
-          operations, finance, and B2B agents.
+          Secure travel operations workspace for CRM, sales, finance, suppliers,
+          and branch teams.
         </p>
         <label>
           Email
@@ -1497,20 +1626,6 @@ function LoginScreen({
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-        <label>
-          Tenant Code
-          <input
-            value={tenantCode}
-            onChange={(event) => setTenantCode(event.target.value)}
-          />
-        </label>
-        <label>
-          Branch
-          <input
-            value={branchId}
-            onChange={(event) => setBranchId(event.target.value)}
           />
         </label>
         {error ? <div className="form-error">{error}</div> : null}
@@ -2031,6 +2146,29 @@ function buildMetrics(
     ["Tenant", "Demo Org", "Branch scoped"],
     ["Status", "Ready", "Mongo-backed"],
   ];
+}
+
+function buildNotificationCount(
+  dashboard: Record<string, unknown> | null,
+  records: ApiRecord[],
+) {
+  const explicitCount = dashboard?.notificationsCount ?? dashboard?.alertsCount;
+  if (typeof explicitCount === "number") return explicitCount;
+
+  return records.filter((record) => {
+    const status = String(
+      record.status ?? record.stage ?? record.priority ?? "",
+    ).toLowerCase();
+    return [
+      "urgent",
+      "overdue",
+      "pending",
+      "blocked",
+      "failed",
+      "due",
+      "high",
+    ].some((signal) => status.includes(signal));
+  }).length;
 }
 
 function renderCell(value: string) {
