@@ -12,11 +12,12 @@ Tenant -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Bookings -
 
 ## Must Have
 
-- Tenant onboarding
-- User invitation
-- Roles and permissions
-- Lead management
-- Customer profiles
+- Tenant onboarding - backend tenant model completed
+- User login/logout - completed for CRM session foundation
+- User invitation - pending
+- Roles and permissions - role field exists; enforcement pending
+- Lead management - completed API and CRM surface
+- Customer profiles - completed API and CRM surface
 - Tasks and follow-ups
 - Sales pipeline
 - Quotation builder
@@ -48,7 +49,7 @@ Tenant -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Bookings -
 - Complete accounting replacement
 - Dedicated supplier portal
 - Full B2B agent wallet
-- Native mobile apps
+- Full native mobile production release
 - Kubernetes
 - Kafka
 - Multi-database tenancy
@@ -70,3 +71,19 @@ Tenant -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Bookings -
 13. Create basic operations tasks.
 14. Show sales, payment, and operations dashboard.
 
+## Current Build Notes
+
+Built:
+
+- Admin CRM login/logout with demo CRM admin.
+- Dedicated APIs for core travel CRM, operations, finance, support, and marketing modules.
+- Multi-tenant tenant/branch data model with storage and sync policy fields.
+- Mobile app scaffold exists and is now promoted into the MVP track for customer and B2B agent views.
+
+Remaining before production:
+
+- Enforce authenticated tenant/branch scoping across all module queries.
+- Add RBAC guards and permission checks.
+- Add password reset, invitations, refresh/session rotation, and audit logging.
+- Replace mobile static data with authenticated API-backed customer/agent dashboards.
+- Add upload/download for documents, vouchers, tickets, receipts, and supplier contracts.

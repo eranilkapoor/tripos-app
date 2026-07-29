@@ -11,6 +11,13 @@
 - Rate-limit authentication, public forms, and AI endpoints.
 - Scan dependencies in CI.
 
+Current repo status:
+
+- CRM login/logout/session restore is implemented.
+- CRM users, sessions, tenants, branches, storage mode, and sync policy are Mongo-backed.
+- Admin CRM sends bearer token plus tenant and branch headers.
+- Route protection, RBAC guards, refresh token rotation, password reset, and audit logs are still pending.
+
 ## Authorization Model
 
 Use layered authorization:
@@ -34,6 +41,17 @@ Rules:
 - Object storage paths must include tenant identifiers.
 - Audit logs must record tenant, actor, action, entity, and IP/device context.
 
+TripOS tenant storage modes:
+
+- `tripos_cloud`: standard SaaS storage in TripOS-managed MongoDB.
+- `customer_managed`: tenant stores data in its own system; TripOS needs connector APIs and delayed sync.
+- `hybrid_sync`: TripOS stores operational cache and syncs back to customer-owned storage.
+
+Next implementation step:
+
+- Add a request context resolver that validates the bearer session and exposes `tenantId`, `branchId`, `role`, and `permissions`.
+- Apply this context to every module service so list/create/update operations cannot cross tenants or branches.
+
 ## Sensitive Data
 
 Sensitive travel documents may include passports, visas, tickets, invoices, payment receipts, and identity documents.
@@ -46,4 +64,3 @@ Controls:
 - Redaction in logs.
 - Encryption at rest.
 - Retention policies per tenant.
-

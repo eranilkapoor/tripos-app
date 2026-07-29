@@ -32,73 +32,96 @@
 
 ### Auth
 
-- `POST /auth/login`
-- `POST /auth/logout`
-- `POST /auth/refresh`
-- `POST /auth/password/forgot`
-- `POST /auth/password/reset`
-- `GET /auth/me`
+- `POST /auth/login` - implemented
+- `POST /auth/logout` - implemented
+- `GET /auth/me` - implemented
+- `POST /auth/register-crm-user` - implemented for CRM bootstrap/admin use
+- `POST /auth/refresh` - pending
+- `POST /auth/password/forgot` - pending
+- `POST /auth/password/reset` - pending
 
 ### Organizations
 
-- `POST /organizations`
-- `GET /organizations/current`
-- `PATCH /organizations/current`
+- `POST /tenants` - implemented
+- `GET /tenants` - implemented
+- `GET /tenants/:id` - implemented
+- `GET /organizations/current` - pending alias
+- `PATCH /organizations/current` - pending
 - `POST /organizations/invitations`
 - `GET /organizations/users`
 - `PATCH /organizations/users/:id`
 
-### CRM
+### Implemented Travel CRM Modules
 
-- `POST /crm/leads`
-- `GET /crm/leads`
-- `GET /crm/leads/:id`
-- `PATCH /crm/leads/:id`
-- `POST /crm/leads/:id/assign`
+- `POST /leads`
+- `GET /leads`
+- `GET /leads/:id`
+- `PATCH /leads/:id/assign`
+- `PATCH /leads/:id/stage`
+- `POST /customers`
+- `GET /customers`
+- `GET /customers/:id`
+- `PATCH /customers/:id/status`
+- `POST /quotations`
+- `GET /quotations`
+- `GET /quotations/:id`
+- `PATCH /quotations/:id/status`
+- `POST /itineraries`
+- `GET /itineraries`
+- `GET /itineraries/:id`
+- `PATCH /itineraries/:id/status`
+- `POST /bookings`
+- `GET /bookings`
+- `GET /bookings/:id`
+- `PATCH /bookings/:id/status`
+- `POST /suppliers`
+- `GET /suppliers`
+- `POST /operations`
+- `GET /operations`
+- `POST /b2b-agents`
+- `GET /b2b-agents`
+- `POST /payments`
+- `GET /payments`
+- `GET /payments/summary`
+- `POST /destinations`
+- `GET /destinations`
+- `POST /tour-packages`
+- `GET /tour-packages`
+- `POST /travel-documents`
+- `GET /travel-documents`
+- `POST /vouchers`
+- `GET /vouchers`
+- `POST /support-tickets`
+- `GET /support-tickets`
+- `POST /campaigns`
+- `GET /campaigns`
+- `POST /finance/invoices`
+- `GET /finance/invoices`
+- `GET /finance/invoices/next-number/:series`
+
+All main list endpoints support `page`, `limit`, `search`, and `status` where applicable.
+
+### Pending Deep Workflow Endpoints
+
 - `POST /crm/leads/:id/tasks`
 - `POST /crm/leads/:id/notes`
 - `POST /crm/leads/:id/activities`
 - `POST /crm/leads/:id/convert-to-customer`
-- `GET /crm/customers`
-- `GET /crm/customers/:id`
-
-### Quotations
-
-- `POST /sales/quotations`
-- `GET /sales/quotations`
-- `GET /sales/quotations/:id`
-- `PATCH /sales/quotations/:id`
 - `POST /sales/quotations/:id/calculate`
 - `POST /sales/quotations/:id/send`
 - `POST /sales/quotations/:id/accept`
 - `POST /sales/quotations/:id/pdf`
-
-### Itineraries
-
-- `POST /itineraries`
-- `GET /itineraries/:id`
-- `PATCH /itineraries/:id`
 - `POST /itineraries/:id/days`
 - `PATCH /itineraries/:id/days/:dayId`
 - `POST /itineraries/:id/items`
 - `PATCH /itineraries/:id/items/:itemId`
-
-### Bookings
-
 - `POST /bookings/from-quotation/:quotationId`
-- `GET /bookings`
-- `GET /bookings/:id`
-- `PATCH /bookings/:id/status`
 - `POST /bookings/:id/passengers`
 - `POST /bookings/:id/payments`
 - `POST /bookings/:id/vouchers`
-
-### Finance
-
 - `GET /finance/receivables`
 - `GET /finance/payables`
 - `GET /finance/bookings/:bookingId/profitability`
-- `POST /finance/payments`
 - `POST /finance/refunds`
 
 ### AI
@@ -106,4 +129,3 @@
 - `POST /ai/itinerary-drafts`
 - `POST /ai/quotation-assist`
 - `POST /ai/sales-reply`
-
