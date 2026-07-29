@@ -13,6 +13,11 @@ import {
   faBuilding,
   faCodeBranch,
   faDesktop,
+  faDownload,
+  faFileExcel,
+  faFileImport,
+  faFilePdf,
+  faFileWord,
   faFolderOpen,
   faMoon,
   faPlus,
@@ -980,6 +985,37 @@ export default function CrmShell() {
     await loadModule(selected);
   }
 
+  async function importRecords(file: File) {
+    if (!selected.endpoint) return;
+    try {
+      const text = await file.text();
+      const importedRecords = file.name.toLowerCase().endsWith(".json")
+        ? (JSON.parse(text) as Record<string, unknown>[])
+        : csvToRecords(text, selected.columns, selected.rowMap);
+      if (!Array.isArray(importedRecords) || !importedRecords.length)
+        throw new Error("No importable records found.");
+      for (const record of importedRecords) {
+        const response = await fetch(
+          `${apiBaseUrl}/${selected.createEndpoint ?? selected.endpoint}`,
+          {
+            body: JSON.stringify(record),
+            headers: {
+              "Content-Type": "application/json",
+              ...sessionHeaders(session?.token, session?.user),
+            },
+            method: "POST",
+          },
+        );
+        if (!response.ok)
+          throw new Error(`Import failed for ${selected.title}`);
+      }
+      setToast(`${importedRecords.length} ${selected.title} records imported.`);
+      await loadModule(selected);
+    } catch (error) {
+      setToast(error instanceof Error ? error.message : "Import failed.");
+    }
+  }
+
   async function logout() {
     if (session?.token) {
       await fetch(`${apiBaseUrl}/auth/logout`, {
@@ -1103,6 +1139,50 @@ export default function CrmShell() {
             <small>{String(session.tenant.name ?? "Tenant Workspace")}</small>
           </div>
           <div className="top-actions">
+            <div className="header-workspace" aria-label="Workspace context">
+              <label>
+                <FontAwesomeIcon aria-hidden icon={faBuilding} />
+                <select
+                  aria-label="Tenant"
+                  onChange={(event) =>
+                    updateWorkspace("tenantCode", event.target.value)
+                  }
+                  value={String(
+                    session.tenant.code ?? session.user.tenantCode ?? "WEBNZA",
+                  )}
+                >
+                  {tenantOptions.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <FontAwesomeIcon aria-hidden icon={faCodeBranch} />
+                <select
+                  aria-label="Branch"
+                  onChange={(event) =>
+                    updateWorkspace("branchId", event.target.value)
+                  }
+                  value={String(session.user.branchId ?? "delhi")}
+                >
+                  {branchOptions.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <ThemeSwitcher onChange={changeTheme} selectedTheme={theme} />
+            <div className="profile-chip">
+              <span>{String(session.user.name ?? "Admin").slice(0, 1)}</span>
+              <div>
+                <strong>{String(session.user.name ?? "TripOS Admin")}</strong>
+                <small>{String(session.user.role ?? "tenant_admin")}</small>
+              </div>
+            </div>
             <button
               aria-label={`${notificationCount} notifications`}
               className="icon-action notification-action"
@@ -1112,14 +1192,6 @@ export default function CrmShell() {
               <FontAwesomeIcon aria-hidden icon={faBell} />
               <span>{notificationCount}</span>
             </button>
-            <ThemeSwitcher onChange={changeTheme} selectedTheme={theme} />
-            <div className="profile-chip">
-              <span>{String(session.user.name ?? "Admin").slice(0, 1)}</span>
-              <div>
-                <strong>{String(session.user.name ?? "TripOS Admin")}</strong>
-                <small>{String(session.user.role ?? "tenant_admin")}</small>
-              </div>
-            </div>
             <button
               className="logout-action"
               onClick={() => void logout()}
@@ -1145,46 +1217,6 @@ export default function CrmShell() {
             <strong>{isLoading ? "Syncing" : "API-backed"}</strong>
           </section>
 
-          <section
-            className="workspace-switcher"
-            aria-label="Workspace context"
-          >
-            <label>
-              <FontAwesomeIcon aria-hidden icon={faBuilding} />
-              <span>Tenant</span>
-              <select
-                onChange={(event) =>
-                  updateWorkspace("tenantCode", event.target.value)
-                }
-                value={String(
-                  session.tenant.code ?? session.user.tenantCode ?? "WEBNZA",
-                )}
-              >
-                {tenantOptions.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <FontAwesomeIcon aria-hidden icon={faCodeBranch} />
-              <span>Branch</span>
-              <select
-                onChange={(event) =>
-                  updateWorkspace("branchId", event.target.value)
-                }
-                value={String(session.user.branchId ?? "delhi")}
-              >
-                {branchOptions.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </section>
-
           <section className="kpi-grid" aria-label="TripOS metrics">
             {metrics.map(([label, value, helper]) => (
               <article className="metric-card" key={label}>
@@ -1207,6 +1239,15 @@ export default function CrmShell() {
               isLoading={isModuleLoading}
               module={selected}
               onCreate={() => setModalOpen(true)}
+              onExport={(format) =>
+                exportRecords(
+                  selected.title,
+                  selected.columns,
+                  filteredRows,
+                  format,
+                )
+              }
+              onImport={(file) => void importRecords(file)}
               onRefresh={() => void loadModule(selected, query)}
               onSelect={setSelectedRecord}
               onStatus={updateStatus}
@@ -1302,6 +1343,8 @@ function RecordTable({
   isLoading,
   module,
   onCreate,
+  onExport,
+  onImport,
   onRefresh,
   onSelect,
   onStatus,
@@ -1313,6 +1356,8 @@ function RecordTable({
   isLoading: boolean;
   module: CrmModule;
   onCreate: () => void;
+  onExport: (format: "csv" | "json") => void;
+  onImport: (file: File) => void;
   onRefresh: () => void;
   onSelect: (record: ApiRecord) => void;
   onStatus: (record: ApiRecord, status: string) => Promise<void>;
@@ -1409,6 +1454,37 @@ function RecordTable({
               <span>Create</span>
             </button>
           ) : null}
+          {module.fields.length ? (
+            <label className="table-tool-button import-button">
+              <FontAwesomeIcon aria-hidden icon={faFileImport} />
+              <span>Import</span>
+              <input
+                accept=".csv,.json"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) onImport(file);
+                  event.currentTarget.value = "";
+                }}
+                type="file"
+              />
+            </label>
+          ) : null}
+          <button
+            className="table-tool-button"
+            onClick={() => onExport("csv")}
+            type="button"
+          >
+            <FontAwesomeIcon aria-hidden icon={faDownload} />
+            <span>CSV</span>
+          </button>
+          <button
+            className="table-tool-button"
+            onClick={() => onExport("json")}
+            type="button"
+          >
+            <FontAwesomeIcon aria-hidden icon={faDownload} />
+            <span>JSON</span>
+          </button>
           <strong>{total} records</strong>
         </div>
       </div>
@@ -1670,6 +1746,103 @@ function DashboardPanel({
   );
 }
 
+function exportRecords(
+  title: string,
+  columns: string[],
+  rows: { record: ApiRecord; row: string[] }[],
+  format: "csv" | "json",
+) {
+  const safeName = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  if (format === "json") {
+    downloadBlob(
+      `${safeName}.json`,
+      JSON.stringify(
+        rows.map(({ record }) => record),
+        null,
+        2,
+      ),
+      "application/json",
+    );
+    return;
+  }
+  const csv = [
+    columns.map(csvEscape).join(","),
+    ...rows.map(({ row }) => row.map(csvEscape).join(",")),
+  ].join("\n");
+  downloadBlob(`${safeName}.csv`, csv, "text/csv");
+}
+
+function csvToRecords(csv: string, columns: string[], rowMap: string[]) {
+  const lines = csv
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const [, ...body] = lines;
+  return body.map((line) => {
+    const values = parseCsvLine(line);
+    return values.reduce<Record<string, unknown>>((record, value, index) => {
+      const key = rowMap[index] ?? columns[index];
+      if (!key) return record;
+      setNestedValue(record, key, value);
+      return record;
+    }, {});
+  });
+}
+
+function parseCsvLine(line: string) {
+  const values: string[] = [];
+  let current = "";
+  let quoted = false;
+  for (const char of line) {
+    if (char === '"') {
+      quoted = !quoted;
+      continue;
+    }
+    if (char === "," && !quoted) {
+      values.push(current);
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  values.push(current);
+  return values;
+}
+
+function setNestedValue(
+  target: Record<string, unknown>,
+  path: string,
+  value: unknown,
+) {
+  const parts = path.split(".");
+  let cursor = target;
+  parts.forEach((part, index) => {
+    if (index === parts.length - 1) {
+      cursor[part] = value;
+      return;
+    }
+    const next = cursor[part];
+    if (!next || typeof next !== "object") cursor[part] = {};
+    cursor = cursor[part] as Record<string, unknown>;
+  });
+}
+
+function csvEscape(value: string) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+function downloadBlob(fileName: string, content: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function DetailPanel({
   module,
   onClose,
@@ -1867,6 +2040,23 @@ function InvoiceBuilder({ onSaved }: { onSaved: () => void }) {
   );
   const taxAmount = subtotal * (preset.taxRate / 100);
   const totalPayable = subtotal + taxAmount;
+  const invoiceFileName = `${series}${invoiceNo}`.replace(/[^a-z0-9-]/gi, "-");
+  const invoiceHtml = buildInvoiceDocument({
+    country: preset.country,
+    currencySymbol: preset.currencySymbol,
+    customerName,
+    entries,
+    invoiceDate,
+    invoiceNo,
+    providerName,
+    providerTaxNo,
+    series,
+    subtotal,
+    taxAmount,
+    taxLabel: preset.taxLabel,
+    taxRate: preset.taxRate,
+    totalPayable,
+  });
   function updateEntry(
     index: number,
     field: keyof (typeof entries)[number],
@@ -1915,6 +2105,27 @@ function InvoiceBuilder({ onSaved }: { onSaved: () => void }) {
     });
     setStatus(response.ok ? "Invoice saved." : "Invoice save failed.");
     if (response.ok) onSaved();
+  }
+  function downloadInvoice(format: "pdf" | "doc" | "xls") {
+    if (format === "pdf") {
+      const printWindow = window.open("", "_blank", "width=920,height=720");
+      if (!printWindow) {
+        setStatus("Allow popups to export PDF.");
+        return;
+      }
+      printWindow.document.write(invoiceHtml);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      setStatus("PDF export opened.");
+      return;
+    }
+    downloadBlob(
+      format === "doc" ? `${invoiceFileName}.doc` : `${invoiceFileName}.xls`,
+      invoiceHtml,
+      format === "doc" ? "application/msword" : "application/vnd.ms-excel",
+    );
+    setStatus(`${format.toUpperCase()} downloaded.`);
   }
   return (
     <section className="invoice-builder">
@@ -2082,11 +2293,26 @@ function InvoiceBuilder({ onSaved }: { onSaved: () => void }) {
           <button onClick={saveInvoice} type="button">
             Save Invoice
           </button>
+          <button onClick={() => downloadInvoice("pdf")} type="button">
+            <FontAwesomeIcon aria-hidden icon={faFilePdf} />
+            PDF
+          </button>
+          <button onClick={() => downloadInvoice("doc")} type="button">
+            <FontAwesomeIcon aria-hidden icon={faFileWord} />
+            DOC
+          </button>
+          <button onClick={() => downloadInvoice("xls")} type="button">
+            <FontAwesomeIcon aria-hidden icon={faFileExcel} />
+            Excel
+          </button>
           <span>{status}</span>
         </div>
       </div>
       <aside className="invoice-preview">
-        <span className="eyebrow">{preset.country}</span>
+        <div className="invoice-preview-head">
+          <span className="eyebrow">{preset.country}</span>
+          <strong>Draft Invoice</strong>
+        </div>
         <h2>
           {series}
           {invoiceNo}
@@ -2094,6 +2320,16 @@ function InvoiceBuilder({ onSaved }: { onSaved: () => void }) {
         <p>
           {providerName} to {customerName}
         </p>
+        <div className="invoice-summary-list">
+          {entries.map((entry, index) => (
+            <div key={`${entry.description}-${index}`}>
+              <span>{entry.description}</span>
+              <strong>
+                {preset.currencySymbol} {Number(entry.total || 0).toFixed(2)}
+              </strong>
+            </div>
+          ))}
+        </div>
         <dl>
           <div>
             <dt>Subtotal</dt>
@@ -2119,6 +2355,101 @@ function InvoiceBuilder({ onSaved }: { onSaved: () => void }) {
       </aside>
     </section>
   );
+}
+
+function buildInvoiceDocument({
+  country,
+  currencySymbol,
+  customerName,
+  entries,
+  invoiceDate,
+  invoiceNo,
+  providerName,
+  providerTaxNo,
+  series,
+  subtotal,
+  taxAmount,
+  taxLabel,
+  taxRate,
+  totalPayable,
+}: {
+  country: string;
+  currencySymbol: string;
+  customerName: string;
+  entries: {
+    dateProvided: string;
+    description: string;
+    qty: number;
+    qtyType: string;
+    rate: number;
+    total: number;
+  }[];
+  invoiceDate: string;
+  invoiceNo: string;
+  providerName: string;
+  providerTaxNo: string;
+  series: string;
+  subtotal: number;
+  taxAmount: number;
+  taxLabel: string;
+  taxRate: number;
+  totalPayable: number;
+}) {
+  const rows = entries
+    .map(
+      (entry) => `
+        <tr>
+          <td>${entry.dateProvided}</td>
+          <td>${entry.description}</td>
+          <td>${entry.qty}</td>
+          <td>${entry.qtyType}</td>
+          <td>${currencySymbol} ${Number(entry.rate || 0).toFixed(2)}</td>
+          <td>${currencySymbol} ${Number(entry.total || 0).toFixed(2)}</td>
+        </tr>`,
+    )
+    .join("");
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>${series}${invoiceNo}</title>
+    <style>
+      body { color: #132321; font-family: Arial, sans-serif; margin: 32px; }
+      header { border-bottom: 2px solid #0f766e; display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; }
+      h1 { color: #0f766e; margin: 0; }
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border: 1px solid #bdcfca; padding: 10px; text-align: left; }
+      th { background: #e9f4f1; }
+      .totals { margin-left: auto; margin-top: 18px; width: 320px; }
+      .totals div { display: flex; justify-content: space-between; padding: 8px 0; }
+      .grand { border-top: 2px solid #0f766e; color: #0f766e; font-size: 18px; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>${series}${invoiceNo}</h1>
+        <p>${country} / ${invoiceDate}</p>
+      </div>
+      <div>
+        <strong>${providerName}</strong>
+        <p>${providerTaxNo}</p>
+      </div>
+    </header>
+    <p><strong>Bill To:</strong> ${customerName}</p>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Description</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Total</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <section class="totals">
+      <div><span>Subtotal</span><strong>${currencySymbol} ${subtotal.toFixed(2)}</strong></div>
+      <div><span>${taxLabel} ${taxRate}%</span><strong>${currencySymbol} ${taxAmount.toFixed(2)}</strong></div>
+      <div class="grand"><span>Total</span><strong>${currencySymbol} ${totalPayable.toFixed(2)}</strong></div>
+    </section>
+  </body>
+</html>`;
 }
 
 function buildMetrics(

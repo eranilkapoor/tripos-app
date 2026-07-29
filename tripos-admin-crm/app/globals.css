@@ -205,6 +205,7 @@ p {
 .invoice-form-grid select,
 .invoice-lines input,
 .top-actions input,
+.header-workspace select,
 td select,
 td button {
   background: var(--surface);
@@ -505,6 +506,35 @@ td button:hover {
   top: -7px;
 }
 
+.header-workspace {
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+}
+
+.header-workspace label {
+  align-items: center;
+  color: var(--brand);
+  display: inline-flex;
+  gap: 6px;
+  min-height: 30px;
+  padding-left: 9px;
+}
+
+.header-workspace select {
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 950;
+  min-height: 30px;
+  padding: 4px 22px 4px 2px;
+}
+
 .profile-chip {
   align-items: center;
   border-left: 1px solid var(--line);
@@ -599,52 +629,6 @@ td button:hover {
   opacity: 0;
   position: absolute;
   width: 1px;
-}
-
-.workspace-switcher {
-  align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  box-shadow: var(--shadow-soft);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-  padding: 12px;
-}
-
-.workspace-switcher label {
-  align-items: center;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--muted);
-  display: inline-flex;
-  gap: 8px;
-  min-height: 40px;
-  padding: 0 8px 0 11px;
-}
-
-.workspace-switcher label > span {
-  font-size: 11px;
-  font-weight: 950;
-  text-transform: uppercase;
-}
-
-.workspace-switcher svg {
-  color: var(--brand);
-}
-
-.workspace-switcher select {
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 6px;
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 900;
-  min-height: 30px;
-  padding: 4px 26px 4px 8px;
 }
 
 .workspace {
@@ -759,9 +743,18 @@ td button:hover {
 }
 
 .table-tool-button {
+  align-items: center;
   background: var(--surface);
   border: 1px solid var(--line-strong);
+  border-radius: 8px;
   color: var(--brand);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 12px;
+  text-transform: uppercase;
 }
 
 .table-tool-button:hover:not(:disabled) {
@@ -773,6 +766,17 @@ td button:hover {
 .table-tool-button:disabled {
   cursor: progress;
   opacity: 0.66;
+}
+
+.import-button {
+  cursor: pointer;
+}
+
+.import-button input {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
 }
 
 .table-search {
@@ -1200,10 +1204,61 @@ tbody tr:nth-child(even) {
   padding: 18px;
 }
 
+.invoice-preview-head {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.invoice-preview-head strong {
+  background: var(--brand-soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--brand);
+  font-size: 11px;
+  padding: 5px 9px;
+  text-transform: uppercase;
+}
+
 .invoice-preview h2 {
   color: var(--brand);
   font-size: 30px;
   margin: 4px 0 8px;
+}
+
+.invoice-summary-list {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 0;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.invoice-summary-list div {
+  align-items: center;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.invoice-summary-list div:last-child {
+  border-bottom: 0;
+}
+
+.invoice-summary-list span {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.invoice-summary-list strong {
+  color: var(--brand);
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .invoice-preview p {

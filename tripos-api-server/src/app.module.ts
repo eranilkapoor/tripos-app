@@ -19,6 +19,7 @@ import { TravelDocumentsModule } from './modules/travel-documents/travel-documen
 import { VouchersModule } from './modules/vouchers/vouchers.module';
 import { SupportTicketsModule } from './modules/support-tickets/support-tickets.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { BatchJobsModule } from './modules/batch-jobs/batch-jobs.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -67,6 +68,7 @@ import { AppStateModule } from './app-state.module';
     VouchersModule,
     SupportTicketsModule,
     NotificationsModule,
+    BatchJobsModule,
     CampaignsModule,
     TenantsModule,
     AuthModule,
