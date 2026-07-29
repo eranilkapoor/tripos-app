@@ -3,8 +3,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   scopeFilter,
+  updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
 import { buildDocumentTemplate } from '../../../common/utils/document-template.util';
 import { CreateInvoiceDto } from '../dto/invoice.dto';
@@ -56,6 +58,48 @@ export class InvoicesService {
       message: 'TripOS invoice saved.',
       invoice,
     };
+  }
+
+  async findOne(id: string, query: CrmListQueryDto) {
+    return findScopedCrmRecord(
+      this.invoiceModel,
+      id,
+      query,
+      'Invoice not found',
+    );
+  }
+
+  async update(
+    id: string,
+    dto: Partial<CreateInvoiceDto>,
+    query: CrmListQueryDto,
+  ) {
+    const update =
+      dto.entries || dto.taxRate !== undefined
+        ? {
+            ...dto,
+            totals: calculateInvoiceTotals(
+              dto.entries ?? [],
+              Number(dto.taxRate ?? 0),
+            ),
+          }
+        : dto;
+    return updateScopedCrmRecord(
+      this.invoiceModel,
+      id,
+      query,
+      update,
+      'Invoice not found',
+    );
+  }
+
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(
+      this.invoiceModel,
+      id,
+      query,
+      'Invoice not found',
+    );
   }
 
   async document(id: string, query: CrmListQueryDto) {

@@ -30,7 +30,7 @@ Completed in the repo:
 - Monorepo structure uses product-specific app boundaries for API, CRM, mobile, public website, packages, scripts, and documentation.
 - MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, tenants, auth, finance invoices, and audit logs.
 - Admin CRM connected to dedicated production APIs with bearer session handling.
-- CRM list pagination, status filtering, server-side search, tenant/branch scoping, detail scoping, and status mutation scoping.
+- CRM list pagination, status filtering, server-side search, tenant/branch-scoped create/detail/update/delete, and status mutation scoping.
 - Tenant, branch, CRM user, login, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only tenant management.
 - Basic audit logging for authenticated mutations and sensitive finance/payment/document/tenant reads, with scoped list and CSV export APIs.
 - Local/log provider configuration for email, SMS, WhatsApp, payments, maps, AI, monitoring, and local/S3-style file storage.
@@ -79,7 +79,7 @@ Completed in the repo:
 | Priority | Status  | Task                                                                                                                                                                               |
 | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | P0       | Done    | Protect CRM routes with bearer auth by default.                                                                                                                                    |
-| P0       | Done    | Enforce tenant/branch scope for list, create, detail, and status mutation paths.                                                                                                   |
+| P0       | Done    | Enforce tenant/branch scope for create, list, detail, update, delete, and status mutation paths.                                                                                   |
 | P0       | Done    | Add RBAC decorators/guard and platform-only tenant management.                                                                                                                     |
 | P0       | Done    | Add refresh-session rotation.                                                                                                                                                      |
 | P0       | Done    | Add basic backend audit logging.                                                                                                                                                   |

@@ -80,6 +80,24 @@ export async function updateScopedCrmRecord<T>(
   return item;
 }
 
+export async function deleteScopedCrmRecord<T>(
+  model: Model<T>,
+  id: string,
+  query: CrmListQueryDto,
+  notFoundMessage: string,
+) {
+  const item = await model
+    .findOneAndDelete(
+      scopeFilter(query, { _id: id }) as unknown as Parameters<
+        Model<T>['findOneAndDelete']
+      >[0],
+    )
+    .lean()
+    .exec();
+  if (!item) throw new NotFoundException(notFoundMessage);
+  return { deleted: true, id };
+}
+
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

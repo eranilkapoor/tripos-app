@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -52,6 +53,22 @@ export class OperationsService {
       'Operation task not found',
     );
   }
+  update(
+    id: string,
+    dto: Partial<CreateOperationTaskDto>,
+    query: CrmListQueryDto,
+  ) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      {
+        ...dto,
+        ...(dto.dueAt ? { dueAt: new Date(dto.dueAt) } : {}),
+      },
+      'Operation task not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     return updateScopedCrmRecord(
       this.model,
@@ -67,6 +84,14 @@ export class OperationsService {
           },
         },
       },
+      'Operation task not found',
+    );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(
+      this.model,
+      id,
+      query,
       'Operation task not found',
     );
   }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -10,7 +11,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import {
   AssignLeadDto,
   AddLeadActivityDto,
@@ -26,8 +30,8 @@ export class LeadsController {
   constructor(private readonly leadsService: LeadsService) {}
 
   @Post()
-  create(@Body() dto: CreateLeadDto) {
-    return this.leadsService.create(dto);
+  create(@Body() dto: CreateLeadDto, @Req() request: Request) {
+    return this.leadsService.create(tenantScopedBody(dto, request));
   }
 
   @Get()
@@ -42,6 +46,16 @@ export class LeadsController {
     @Req() request: Request,
   ) {
     return this.leadsService.findOne(id, tenantScopedQuery(query, request));
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateLeadDto>,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.update(id, dto, tenantScopedQuery(query, request));
   }
 
   @Patch(':id/assign')
@@ -103,5 +117,14 @@ export class LeadsController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.remove(id, tenantScopedQuery(query, request));
   }
 }

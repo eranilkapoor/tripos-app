@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -30,12 +31,33 @@ export class DestinationsService {
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Destination not found');
   }
+  update(
+    id: string,
+    dto: Partial<CreateDestinationDto>,
+    query: CrmListQueryDto,
+  ) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Destination not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     return updateScopedCrmRecord(
       this.model,
       id,
       query,
       { status: dto.status },
+      'Destination not found',
+    );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(
+      this.model,
+      id,
+      query,
       'Destination not found',
     );
   }

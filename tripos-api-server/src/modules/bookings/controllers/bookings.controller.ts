@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -12,7 +13,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import {
   AddBookingPassengerDto,
   AddBookingPaymentScheduleDto,
@@ -26,8 +30,8 @@ import { BookingsService } from '../services/bookings.service';
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly service: BookingsService) {}
-  @Post() create(@Body() dto: CreateBookingDto) {
-    return this.service.create(dto);
+  @Post() create(@Body() dto: CreateBookingDto, @Req() request: Request) {
+    return this.service.create(tenantScopedBody(dto, request));
   }
   @Post('from-quotation/:quotationId')
   convertFromQuotation(
@@ -53,6 +57,15 @@ export class BookingsController {
   ) {
     return this.service.findOne(id, tenantScopedQuery(query, request));
   }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateBookingDto>,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.update(id, dto, tenantScopedQuery(query, request));
+  }
   @Patch(':id/status') updateStatus(
     @Param('id') id: string,
     @Body() dto: StatusUpdateDto,
@@ -64,6 +77,14 @@ export class BookingsController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.remove(id, tenantScopedQuery(query, request));
   }
   @Post(':id/passengers')
   addPassenger(

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   scopeFilter,
@@ -46,6 +47,15 @@ export class PaymentsService {
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Payment not found');
   }
+  update(id: string, dto: Partial<CreatePaymentDto>, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Payment not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     const update: Record<string, unknown> = { status: dto.status };
     if (dto.status === 'paid') update.paidAt = new Date().toISOString();
@@ -56,5 +66,8 @@ export class PaymentsService {
       update,
       'Payment not found',
     );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(this.model, id, query, 'Payment not found');
   }
 }

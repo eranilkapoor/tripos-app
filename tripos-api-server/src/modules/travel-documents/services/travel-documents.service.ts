@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -36,12 +37,33 @@ export class TravelDocumentsService {
       'Travel document not found',
     );
   }
+  update(
+    id: string,
+    dto: Partial<CreateTravelDocumentDto>,
+    query: CrmListQueryDto,
+  ) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Travel document not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     return updateScopedCrmRecord(
       this.model,
       id,
       query,
       { status: dto.status },
+      'Travel document not found',
+    );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(
+      this.model,
+      id,
+      query,
       'Travel document not found',
     );
   }

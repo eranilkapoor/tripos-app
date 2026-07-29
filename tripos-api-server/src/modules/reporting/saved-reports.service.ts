@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -37,6 +38,27 @@ export class SavedReportsService {
 
   list(query: CrmListQueryDto) {
     return listCrmRecords(this.model, query, ['name', 'reportType']);
+  }
+
+  findOne(id: string, query: CrmListQueryDto) {
+    return findScopedCrmRecord(this.model, id, query, 'Saved report not found');
+  }
+
+  update(
+    id: string,
+    dto: Partial<CreateSavedReportDto>,
+    query: CrmListQueryDto,
+  ) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      {
+        ...dto,
+        ...(dto.schedule ? { nextRunAt: calculateNextRun(dto.schedule, new Date()) } : {}),
+      },
+      'Saved report not found',
+    );
   }
 
   async run(id: string, dto: RunSavedReportDto, query: CrmListQueryDto) {
@@ -157,6 +179,10 @@ export class SavedReportsService {
       { status: dto.status },
       'Saved report not found',
     );
+  }
+
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(this.model, id, query, 'Saved report not found');
   }
 
   private resolveReport(reportType: string, query: CrmListQueryDto) {

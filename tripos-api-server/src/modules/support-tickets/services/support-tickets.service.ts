@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -37,12 +38,33 @@ export class SupportTicketsService {
       'Support ticket not found',
     );
   }
+  update(
+    id: string,
+    dto: Partial<CreateSupportTicketDto>,
+    query: CrmListQueryDto,
+  ) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Support ticket not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     return updateScopedCrmRecord(
       this.model,
       id,
       query,
       { status: dto.status },
+      'Support ticket not found',
+    );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(
+      this.model,
+      id,
+      query,
       'Support ticket not found',
     );
   }

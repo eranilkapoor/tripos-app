@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -45,6 +46,15 @@ export class BookingsService {
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Booking not found');
   }
+  update(id: string, dto: Partial<CreateBookingDto>, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Booking not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     return updateScopedCrmRecord(
       this.model,
@@ -53,6 +63,9 @@ export class BookingsService {
       { status: dto.status },
       'Booking not found',
     );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(this.model, id, query, 'Booking not found');
   }
 
   async convertFromQuotation(

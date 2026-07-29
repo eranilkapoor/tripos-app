@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -43,6 +44,25 @@ export class SavedReportsController {
     return this.service.list(tenantScopedQuery(query, request));
   }
 
+  @Get(':id')
+  findOne(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.findOne(id, tenantScopedQuery(query, request));
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateSavedReportDto>,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.update(id, dto, tenantScopedQuery(query, request));
+  }
+
   @Post('run-due')
   runDue(
     @Body() dto: RunDueSavedReportsDto,
@@ -74,5 +94,14 @@ export class SavedReportsController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.remove(id, tenantScopedQuery(query, request));
   }
 }

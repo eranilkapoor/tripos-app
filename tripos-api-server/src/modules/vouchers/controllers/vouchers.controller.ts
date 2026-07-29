@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -11,7 +12,10 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CreateVoucherDto } from '../dto/voucher.dto';
 import { VouchersService } from '../services/vouchers.service';
@@ -20,8 +24,8 @@ import { VouchersService } from '../services/vouchers.service';
 @Controller('vouchers')
 export class VouchersController {
   constructor(private readonly service: VouchersService) {}
-  @Post() create(@Body() dto: CreateVoucherDto) {
-    return this.service.create(dto);
+  @Post() create(@Body() dto: CreateVoucherDto, @Req() request: Request) {
+    return this.service.create(tenantScopedBody(dto, request));
   }
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
@@ -33,6 +37,15 @@ export class VouchersController {
     @Req() request: Request,
   ) {
     return this.service.findOne(id, tenantScopedQuery(query, request));
+  }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateVoucherDto>,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.update(id, dto, tenantScopedQuery(query, request));
   }
   @Post(':id/pdf')
   document(
@@ -53,5 +66,13 @@ export class VouchersController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.remove(id, tenantScopedQuery(query, request));
   }
 }

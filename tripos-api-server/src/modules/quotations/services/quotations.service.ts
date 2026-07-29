@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -38,6 +39,23 @@ export class QuotationsService {
 
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Quotation not found');
+  }
+
+  update(id: string, dto: Partial<CreateQuotationDto>, query: CrmListQueryDto) {
+    const update =
+      dto.pricing || dto.services
+        ? {
+            ...dto,
+            pricing: calculatePricing(dto.pricing ?? {}, dto.services ?? []),
+          }
+        : dto;
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      update,
+      'Quotation not found',
+    );
   }
 
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
@@ -112,6 +130,10 @@ export class QuotationsService {
       ],
       totals: (quotation as { pricing?: Record<string, unknown> }).pricing,
     });
+  }
+
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(this.model, id, query, 'Quotation not found');
   }
 }
 

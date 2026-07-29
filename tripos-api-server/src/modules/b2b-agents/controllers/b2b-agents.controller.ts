@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -11,7 +12,10 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
   AddB2BAgentCommissionDto,
@@ -27,8 +31,8 @@ import { B2BAgentsService } from '../services/b2b-agents.service';
 @Controller('b2b-agents')
 export class B2BAgentsController {
   constructor(private readonly service: B2BAgentsService) {}
-  @Post() create(@Body() dto: CreateB2BAgentDto) {
-    return this.service.create(dto);
+  @Post() create(@Body() dto: CreateB2BAgentDto, @Req() request: Request) {
+    return this.service.create(tenantScopedBody(dto, request));
   }
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
@@ -41,6 +45,15 @@ export class B2BAgentsController {
   ) {
     return this.service.findOne(id, tenantScopedQuery(query, request));
   }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateB2BAgentDto>,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.update(id, dto, tenantScopedQuery(query, request));
+  }
   @Patch(':id/status') updateStatus(
     @Param('id') id: string,
     @Body() dto: StatusUpdateDto,
@@ -52,6 +65,14 @@ export class B2BAgentsController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.remove(id, tenantScopedQuery(query, request));
   }
 
   @Post(':id/kyc-documents')

@@ -10,6 +10,10 @@ import {
 } from '../dto/leads.dto';
 import { Lead, LeadActivity } from '../schemas/leads.schema';
 import { scopeFilter } from '../../../common/utils/crm-list.util';
+import {
+  deleteScopedCrmRecord,
+  updateScopedCrmRecord,
+} from '../../../common/utils/crm-list.util';
 
 @Injectable()
 export class LeadsService {
@@ -102,6 +106,38 @@ export class LeadsService {
     return lead;
   }
 
+  async update(
+    id: string,
+    dto: Partial<CreateLeadDto>,
+    query: LeadListQueryDto,
+  ) {
+    const update = {
+      ...dto,
+      ...(dto.requirement ? { requirement: dto.requirement } : {}),
+      ...(dto.channel || dto.phone || dto.email || dto.requirement
+        ? {
+            temperature: scoreTemperature({ ...dto } as CreateLeadDto),
+            score: scoreLead({ ...dto } as CreateLeadDto),
+          }
+        : {}),
+    };
+    const lead = await updateScopedCrmRecord(
+      this.leadModel,
+      id,
+      query,
+      update,
+      'Lead not found',
+    );
+    await this.activityModel.create({
+      organizationId: query.organizationId ?? 'demo-org',
+      leadId: id,
+      type: 'lead_updated',
+      subject: 'Lead updated',
+      metadata: { fields: Object.keys(dto) },
+    });
+    return lead;
+  }
+
   async updateStage(
     id: string,
     dto: UpdateLeadStageDto,
@@ -131,6 +167,10 @@ export class LeadsService {
       .sort({ createdAt: -1 })
       .lean()
       .exec();
+  }
+
+  remove(id: string, query: LeadListQueryDto) {
+    return deleteScopedCrmRecord(this.leadModel, id, query, 'Lead not found');
   }
 
   async addActivity(

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -12,7 +13,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import {
   CreateItineraryDto,
   UpsertItineraryDayDto,
@@ -24,8 +28,8 @@ import { ItinerariesService } from '../services/itineraries.service';
 @Controller('itineraries')
 export class ItinerariesController {
   constructor(private readonly service: ItinerariesService) {}
-  @Post() create(@Body() dto: CreateItineraryDto) {
-    return this.service.create(dto);
+  @Post() create(@Body() dto: CreateItineraryDto, @Req() request: Request) {
+    return this.service.create(tenantScopedBody(dto, request));
   }
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
@@ -37,6 +41,15 @@ export class ItinerariesController {
     @Req() request: Request,
   ) {
     return this.service.findOne(id, tenantScopedQuery(query, request));
+  }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateItineraryDto>,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.update(id, dto, tenantScopedQuery(query, request));
   }
   @Post(':id/pdf')
   document(
@@ -57,6 +70,14 @@ export class ItinerariesController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.remove(id, tenantScopedQuery(query, request));
   }
 
   @Post(':id/days')

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -25,6 +26,15 @@ export class CampaignsService {
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Campaign not found');
   }
+  update(id: string, dto: Partial<CreateCampaignDto>, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Campaign not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     return updateScopedCrmRecord(
       this.model,
@@ -33,5 +43,8 @@ export class CampaignsService {
       { status: dto.status },
       'Campaign not found',
     );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(this.model, id, query, 'Campaign not found');
   }
 }

@@ -17,3 +17,17 @@ export function tenantScopedQuery<T extends CrmListQueryDto>(
     branchId: String(request.user?.branchId ?? query.branchId ?? ''),
   } as T;
 }
+
+export function tenantScopedBody<T extends object>(
+  body: T,
+  request: AuthenticatedRequest,
+) {
+  const current = body as Record<string, unknown>;
+  return {
+    ...body,
+    organizationId: String(
+      request.user?.tenantId ?? current.organizationId ?? 'demo-org',
+    ),
+    branchId: String(request.user?.branchId ?? current.branchId ?? ''),
+  } as T;
+}

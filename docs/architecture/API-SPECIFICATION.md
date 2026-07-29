@@ -103,7 +103,7 @@
 - `GET /finance/invoices/next-number/:series`
 - `POST /finance/invoices/:id/pdf`
 
-All main list endpoints support `page`, `limit`, `search`, and `status` where applicable.
+All main list endpoints support `page`, `limit`, `search`, and `status` where applicable. Tenant-scoped domain modules expose enterprise CRUD with `POST /module`, `GET /module`, `GET /module/:id`, `PATCH /module/:id`, `PATCH /module/:id/status` where status applies, and `DELETE /module/:id`.
 
 ### Deep Workflow Endpoints
 

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
+  deleteScopedCrmRecord,
   findScopedCrmRecord,
   listCrmRecords,
   updateScopedCrmRecord,
@@ -36,6 +37,15 @@ export class SuppliersService {
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Supplier not found');
   }
+  update(id: string, dto: Partial<CreateSupplierDto>, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      dto,
+      'Supplier not found',
+    );
+  }
   updateStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
     return updateScopedCrmRecord(
       this.model,
@@ -44,6 +54,9 @@ export class SuppliersService {
       { status: dto.status },
       'Supplier not found',
     );
+  }
+  remove(id: string, query: CrmListQueryDto) {
+    return deleteScopedCrmRecord(this.model, id, query, 'Supplier not found');
   }
 
   addContract(id: string, dto: AddSupplierContractDto, query: CrmListQueryDto) {

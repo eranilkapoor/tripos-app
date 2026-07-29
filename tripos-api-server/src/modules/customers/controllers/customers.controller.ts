@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -12,7 +13,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import { CreateCustomerDto } from '../dto/customer.dto';
 import { CustomersService } from '../services/customers.service';
 
@@ -20,8 +24,8 @@ import { CustomersService } from '../services/customers.service';
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly service: CustomersService) {}
-  @Post() create(@Body() dto: CreateCustomerDto) {
-    return this.service.create(dto);
+  @Post() create(@Body() dto: CreateCustomerDto, @Req() request: Request) {
+    return this.service.create(tenantScopedBody(dto, request));
   }
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
@@ -34,6 +38,15 @@ export class CustomersController {
   ) {
     return this.service.findOne(id, tenantScopedQuery(query, request));
   }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateCustomerDto>,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.update(id, dto, tenantScopedQuery(query, request));
+  }
   @Patch(':id/status') updateStatus(
     @Param('id') id: string,
     @Body() dto: StatusUpdateDto,
@@ -45,5 +58,13 @@ export class CustomersController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.remove(id, tenantScopedQuery(query, request));
   }
 }

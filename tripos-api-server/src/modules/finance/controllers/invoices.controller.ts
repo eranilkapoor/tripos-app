@@ -1,8 +1,21 @@
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import {
+  tenantScopedBody,
+  tenantScopedQuery,
+} from '../../../common/utils/tenant-scope.util';
 import { CreateInvoiceDto } from '../dto/invoice.dto';
 import { InvoicesService } from '../services/invoices.service';
 
@@ -29,8 +42,31 @@ export class InvoicesController {
   }
 
   @Post()
-  create(@Body() dto: CreateInvoiceDto) {
-    return this.invoicesService.create(dto);
+  create(@Body() dto: CreateInvoiceDto, @Req() request: Request) {
+    return this.invoicesService.create(tenantScopedBody(dto, request));
+  }
+
+  @Get(':id')
+  findOne(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.invoicesService.findOne(id, tenantScopedQuery(query, request));
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateInvoiceDto>,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.invoicesService.update(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
   }
 
   @Post(':id/pdf')
@@ -40,5 +76,14 @@ export class InvoicesController {
     @Req() request: Request,
   ) {
     return this.invoicesService.document(id, tenantScopedQuery(query, request));
+  }
+
+  @Delete(':id')
+  remove(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.invoicesService.remove(id, tenantScopedQuery(query, request));
   }
 }
