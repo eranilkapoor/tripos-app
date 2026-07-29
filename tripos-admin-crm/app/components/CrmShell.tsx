@@ -1145,8 +1145,11 @@ export default function CrmShell() {
       <section className="right-sec">
         <header className="topbar">
           <div className="topbar-title">
-            <span className="eyebrow">TripOS Admin CRM</span>
-            <strong>{selected.title}</strong>
+            <nav className="breadcrumb" aria-label="Current location">
+              <span>TripOS Admin CRM</span>
+              <span>{selected.group}</span>
+              <strong>{selected.title}</strong>
+            </nav>
             <small>{String(session.tenant.name ?? "Tenant Workspace")}</small>
           </div>
           <div className="top-actions">
@@ -1201,6 +1204,7 @@ export default function CrmShell() {
             <button
               aria-label={`${notificationCount} notifications`}
               className="icon-action notification-action"
+              onClick={() => selectModule("notifications")}
               title="Notifications"
               type="button"
             >
@@ -1223,9 +1227,7 @@ export default function CrmShell() {
             <div>
               <span className="eyebrow">{selected.group}</span>
               <h2>
-                {selected.id === "dashboard"
-                  ? "Live Control"
-                  : `${filteredRows.length} Records`}
+                {selected.id === "dashboard" ? "Live Control" : "Workspace"}
               </h2>
               <p>{selected.description}</p>
             </div>
@@ -1383,8 +1385,10 @@ function RecordTable({
   const [pageSize, setPageSize] = useState(10);
   const [sortColumn, setSortColumn] = useState(0);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
   useEffect(() => {
     setCurrentPage(1);
+    setSelectedRows([]);
   }, [module.id, query, pageSize]);
 
   const sortedRows = useMemo(() => {
@@ -1413,6 +1417,12 @@ function RecordTable({
     (safePage - 1) * pageSize,
     safePage * pageSize,
   );
+  const pageRowIds = pageRows.map(
+    ({ record, row }) => getRecordId(record) || row.join("-"),
+  );
+  const allPageSelected =
+    pageRowIds.length > 0 &&
+    pageRowIds.every((id) => selectedRows.includes(id));
   const pageNumbers = Array.from(
     { length: totalPages },
     (_, index) => index + 1,
@@ -1433,6 +1443,22 @@ function RecordTable({
     setCurrentPage(1);
   }
 
+  function toggleRow(id: string) {
+    setSelectedRows((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id],
+    );
+  }
+
+  function togglePageRows() {
+    setSelectedRows((current) =>
+      allPageSelected
+        ? current.filter((id) => !pageRowIds.includes(id))
+        : Array.from(new Set([...current, ...pageRowIds])),
+    );
+  }
+
   return (
     <section className="table-card listmanager">
       <div className="table-head">
@@ -1449,6 +1475,24 @@ function RecordTable({
               placeholder={`Search ${module.title.toLowerCase()}`}
               value={query}
             />
+          </label>
+          <label className="download-select">
+            <FontAwesomeIcon aria-hidden icon={faDownload} />
+            <select
+              aria-label={`Download ${module.title}`}
+              defaultValue=""
+              onChange={(event) => {
+                const value = event.target.value as "csv" | "json" | "";
+                if (value) onExport(value);
+                event.currentTarget.value = "";
+              }}
+            >
+              <option value="" disabled>
+                Download
+              </option>
+              <option value="csv">CSV File</option>
+              <option value="json">JSON File</option>
+            </select>
           </label>
           <button
             className="table-tool-button"
@@ -1484,29 +1528,21 @@ function RecordTable({
               />
             </label>
           ) : null}
-          <button
-            className="table-tool-button"
-            onClick={() => onExport("csv")}
-            type="button"
-          >
-            <FontAwesomeIcon aria-hidden icon={faDownload} />
-            <span>CSV</span>
-          </button>
-          <button
-            className="table-tool-button"
-            onClick={() => onExport("json")}
-            type="button"
-          >
-            <FontAwesomeIcon aria-hidden icon={faDownload} />
-            <span>JSON</span>
-          </button>
-          <strong>{total} records</strong>
         </div>
       </div>
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
+              <th className="select-col">
+                <input
+                  aria-label="Select page rows"
+                  checked={allPageSelected}
+                  onChange={togglePageRows}
+                  type="checkbox"
+                />
+              </th>
+              <th className="serial-col">S.No.</th>
               {columns.map((column, index) => (
                 <th key={column}>
                   <button
@@ -1534,47 +1570,54 @@ function RecordTable({
           <tbody>
             {isLoading && pageRows.length === 0 ? (
               <tr>
-                <td className="empty-row" colSpan={columns.length + 1}>
+                <td className="empty-row" colSpan={columns.length + 3}>
                   Loading {module.title.toLowerCase()}...
                 </td>
               </tr>
             ) : null}
-            {pageRows.map(({ record, row }) => (
-              <tr
-                key={getRecordId(record) || row.join("-")}
-                onClick={() => onSelect(record)}
-              >
-                {row.map((cell, index) => (
-                  <td key={`${cell}-${index}`}>
-                    {index === row.length - 1 ? renderCell(cell) : cell}
+            {pageRows.map(({ record, row }, rowIndex) => {
+              const rowId = getRecordId(record) || row.join("-");
+              return (
+                <tr key={rowId} onClick={() => onSelect(record)}>
+                  <td onClick={(event) => event.stopPropagation()}>
+                    <input
+                      aria-label={`Select row ${(safePage - 1) * pageSize + rowIndex + 1}`}
+                      checked={selectedRows.includes(rowId)}
+                      onChange={() => toggleRow(rowId)}
+                      type="checkbox"
+                    />
                   </td>
-                ))}
-                <td onClick={(event) => event.stopPropagation()}>
-                  {module.statusOptions ? (
-                    <select
-                      value={String(record.stage ?? record.status ?? "")}
-                      onChange={(event) =>
-                        void onStatus(record, event.target.value)
-                      }
-                    >
-                      {module.statusOptions.map((status) => (
-                        <option key={status} value={status}>
-                          {optionLabel(status, "status")}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <button type="button" onClick={() => onSelect(record)}>
-                      <FontAwesomeIcon aria-hidden icon={faFolderOpen} />
-                      <span>Open</span>
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  <td>{(safePage - 1) * pageSize + rowIndex + 1}</td>
+                  {row.map((cell, index) => (
+                    <td key={`${cell}-${index}`}>{renderCell(cell)}</td>
+                  ))}
+                  <td onClick={(event) => event.stopPropagation()}>
+                    {module.statusOptions ? (
+                      <select
+                        value={String(record.stage ?? record.status ?? "")}
+                        onChange={(event) =>
+                          void onStatus(record, event.target.value)
+                        }
+                      >
+                        {module.statusOptions.map((status) => (
+                          <option key={status} value={status}>
+                            {optionLabel(status, "status")}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <button type="button" onClick={() => onSelect(record)}>
+                        <FontAwesomeIcon aria-hidden icon={faFolderOpen} />
+                        <span>Open</span>
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
             {!isLoading && !total ? (
               <tr>
-                <td className="empty-row" colSpan={columns.length + 1}>
+                <td className="empty-row" colSpan={columns.length + 3}>
                   No API records found for this module.
                 </td>
               </tr>

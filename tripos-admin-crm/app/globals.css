@@ -443,14 +443,28 @@ td button {
   min-width: 220px;
 }
 
-.topbar-title .eyebrow {
-  margin-bottom: 0;
+.breadcrumb {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
 }
 
-.topbar-title strong {
+.breadcrumb span,
+.breadcrumb strong {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.breadcrumb span::after {
+  color: var(--line-strong);
+  content: "/";
+  margin-left: 7px;
+}
+
+.breadcrumb strong {
   color: var(--ink);
-  font-size: 18px;
-  line-height: 1.15;
 }
 
 .topbar-title small {
@@ -773,6 +787,30 @@ td button:hover {
   white-space: nowrap;
 }
 
+.download-select {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--brand);
+  display: inline-flex;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 8px 0 12px;
+}
+
+.download-select select {
+  background: transparent;
+  border: 0;
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 900;
+  min-height: 36px;
+  min-width: 116px;
+  outline: 0;
+  text-transform: uppercase;
+}
+
 .table-tool-button span {
   display: inline-block;
   min-width: 44px;
@@ -849,6 +887,19 @@ td {
   font-size: 13px;
   padding: 11px;
   text-align: left;
+}
+
+.select-col,
+.serial-col {
+  text-align: center;
+  width: 54px;
+}
+
+.select-col input,
+td input[type="checkbox"] {
+  accent-color: var(--brand);
+  height: 16px;
+  width: 16px;
 }
 
 th {
