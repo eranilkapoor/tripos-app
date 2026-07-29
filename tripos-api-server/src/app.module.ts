@@ -27,6 +27,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
 import { AiAssistantModule } from './modules/ai/ai-assistant.module';
 import { TenantContextMiddleware } from './common/middleware/tenant-context.middleware';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { TenantContextMiddleware } from './common/middleware/tenant-context.midd
     AiAssistantModule,
     TriposModule,
   ],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

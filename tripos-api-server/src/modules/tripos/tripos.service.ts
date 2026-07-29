@@ -7,6 +7,7 @@ import { TriposRecord } from "./tripos-record.schema";
 import { CreateInvoiceDto } from "./create-invoice.dto";
 import { InvoicesService } from "../finance/services/invoices.service";
 import { CrmListQueryDto } from "../../common/dto/crm-list-query.dto";
+import { AppService } from "../../app.service";
 
 @Injectable()
 export class TriposService {
@@ -16,12 +17,15 @@ export class TriposService {
     @InjectModel(TriposRecord.name)
     private readonly recordModel: Model<TriposRecord>,
     private readonly invoicesService: InvoicesService,
+    private readonly appService: AppService,
   ) {}
 
   health() {
+    const isShuttingDown = this.appService.isShuttingDown();
+
     return {
       service: "tripos-api-server",
-      status: "ok",
+      status: isShuttingDown ? "shutting_down" : "ok",
       version: "0.1.0",
       timestamp: new Date().toISOString(),
     };

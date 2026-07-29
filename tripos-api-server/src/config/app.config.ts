@@ -2,6 +2,7 @@ export default () => ({
   env: process.env.NODE_ENV || 'development',
   host: process.env.HOST || 'localhost',
   port: parseInt(process.env.PORT || '4000', 10),
+  shutdownDrainMs: parseInt(process.env.SHUTDOWN_DRAIN_MS || '5000', 10),
   api: {
     prefix: process.env.API_PREFIX || 'api',
     version: process.env.API_VERSION || 'v1',
