@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { CreateRecordDto } from "./create-record.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { CreateDemoLeadDto } from "./create-demo-lead.dto";
 import { TriposService } from "./tripos.service";
@@ -21,6 +22,21 @@ export class TriposController {
   @Get("modules")
   modules() {
     return this.triposService.modules();
+  }
+
+  @Get("records")
+  records() {
+    return this.triposService.records();
+  }
+
+  @Get("records/:moduleKey")
+  recordsByModule(@Param("moduleKey") moduleKey: string) {
+    return this.triposService.records(moduleKey);
+  }
+
+  @Post("records")
+  createRecord(@Body() dto: CreateRecordDto) {
+    return this.triposService.createRecord(dto);
   }
 
   @Get("leads")
@@ -63,4 +79,3 @@ export class TriposController {
     return this.triposService.createDemoLead(dto);
   }
 }
-

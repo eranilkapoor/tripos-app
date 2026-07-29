@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Module = {
   id: string;
@@ -182,17 +182,58 @@ const kpis = [
   ["Gross Profit", "INR 12.4L", "29% margin"],
 ];
 
+type ApiRecord = {
+  id: string;
+  moduleKey: string;
+  title: string;
+  status: string;
+  priority: string;
+  payload: Record<string, unknown>;
+};
+
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+
 export function CrmShell() {
   const [selectedId, setSelectedId] = useState("dashboard");
   const [query, setQuery] = useState("");
   const [toast, setToast] = useState("TripOS workspace ready.");
+  const [apiRows, setApiRows] = useState<string[][]>([]);
+  const [isLoadingRows, setIsLoadingRows] = useState(false);
   const selected = modules.find((module) => module.id === selectedId) ?? modules[0];
+  const moduleApiKey = selectedId === "b2b" ? "b2b-agents" : selectedId;
+  useEffect(() => {
+    let cancelled = false;
+    async function loadRecords() {
+      setIsLoadingRows(true);
+      try {
+        const response = await fetch(`${apiBaseUrl}/tripos/records/${moduleApiKey}`);
+        if (!response.ok) throw new Error("API unavailable");
+        const records = (await response.json()) as ApiRecord[];
+        if (!cancelled) {
+          setApiRows(records.map((record) => recordToRow(record, selected)));
+          setToast(`Loaded ${records.length} ${selected.title} records from TripOS API.`);
+        }
+      } catch {
+        if (!cancelled) {
+          setApiRows([]);
+          setToast("Using local demo rows. Start API server for DB-backed records.");
+        }
+      } finally {
+        if (!cancelled) setIsLoadingRows(false);
+      }
+    }
+    void loadRecords();
+    return () => {
+      cancelled = true;
+    };
+  }, [moduleApiKey, selected]);
+  const activeRows = apiRows.length ? apiRows : selected.rows;
   const filteredRows = useMemo(
     () =>
-      selected.rows.filter((row) =>
+      activeRows.filter((row) =>
         row.join(" ").toLowerCase().includes(query.toLowerCase()),
       ),
-    [query, selected],
+    [activeRows, query],
   );
 
   return (
@@ -285,7 +326,7 @@ export function CrmShell() {
               <span className="eyebrow">{selected.title}</span>
               <h2>Live Work Queue</h2>
             </div>
-            <strong>{filteredRows.length} records</strong>
+            <strong>{isLoadingRows ? "Loading" : `${filteredRows.length} records`}</strong>
           </div>
           <div className="table-wrap">
             <table>
@@ -331,6 +372,20 @@ export function CrmShell() {
       </main>
     </div>
   );
+}
+
+function recordToRow(record: ApiRecord, module: Module) {
+  return module.columns.map((column, index) => {
+    if (index === 0) return record.title;
+    const key = column
+      .toLowerCase()
+      .replace(/[^a-z0-9]+(.)/g, (_, character: string) => character.toUpperCase());
+    const value = record.payload[key] ?? record.payload[column] ?? record.payload[column.toLowerCase()];
+    if (value !== undefined && value !== null) return String(value);
+    if (column.toLowerCase() === "status") return record.status;
+    if (column.toLowerCase() === "owner") return String(record.payload.owner ?? "Team");
+    return "-";
+  });
 }
 
 function renderCell(value: string) {

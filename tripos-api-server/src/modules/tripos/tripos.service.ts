@@ -1,9 +1,18 @@
 import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
 import { CreateDemoLeadDto } from "./create-demo-lead.dto";
+import { CreateRecordDto } from "./create-record.dto";
+import { TriposRecord } from "./tripos-record.schema";
 
 @Injectable()
 export class TriposService {
   private readonly demoLeads: Array<CreateDemoLeadDto & { id: string; source: string; stage: string }> = [];
+
+  constructor(
+    @InjectModel(TriposRecord.name)
+    private readonly recordModel: Model<TriposRecord>,
+  ) {}
 
   health() {
     return {
@@ -48,46 +57,46 @@ export class TriposService {
   }
 
   leads() {
-    return [
+    return this.records("leads").then((records) => records.length ? records : [
       { id: "lead-1", customer: "Sharma Family", destination: "Dubai", source: "Website", stage: "Requirement", owner: "Ritika" },
       { id: "lead-2", customer: "Mehta Group", destination: "Singapore", source: "B2B Agent", stage: "Quotation Sent", owner: "Aman" },
       { id: "lead-3", customer: "Corporate Offsite", destination: "Goa", source: "LinkedIn", stage: "New", owner: "Unassigned" },
-    ];
+    ]);
   }
 
   quotations() {
-    return [
+    return this.records("quotations").then((records) => records.length ? records : [
       { id: "Q-1029", customer: "Sharma Family", destination: "Dubai", internalCost: 100000, sellingPrice: 129500, status: "Sent" },
       { id: "Q-1030", customer: "Mehta Group", destination: "Singapore", internalCost: 720000, sellingPrice: 864000, status: "Draft" },
-    ];
+    ]);
   }
 
   bookings() {
-    return [
+    return this.records("bookings").then((records) => records.length ? records : [
       { id: "BKG-2081", customer: "Sharma Family", destination: "Dubai", travelDates: "25 Dec - 30 Dec", status: "Confirmed" },
       { id: "BKG-2082", customer: "Mehta Group", destination: "Singapore", travelDates: "12 Aug - 15 Aug", status: "Part Confirmed" },
-    ];
+    ]);
   }
 
   operations() {
-    return [
+    return this.records("operations").then((records) => records.length ? records : [
       { id: "OPS-551", customer: "Sharma Family", service: "Airport Pickup", supplier: "DXB Prime Cars", status: "Assigned" },
       { id: "OPS-552", customer: "Sharma Family", service: "Burj Khalifa", supplier: "Dubai Tickets Co", status: "Confirmed" },
-    ];
+    ]);
   }
 
   b2bAgents() {
-    return [
+    return this.records("b2b-agents").then((records) => records.length ? records : [
       { id: "agent-1", name: "Skyline Travels", market: "Delhi", creditLimit: 1000000, receivable: 240000, status: "Active" },
       { id: "agent-2", name: "Pearl Holidays", market: "Mumbai", creditLimit: 500000, receivable: 76000, status: "KYC Review" },
-    ];
+    ]);
   }
 
   suppliers() {
-    return [
+    return this.records("suppliers").then((records) => records.length ? records : [
       { id: "supplier-1", name: "Hotel ABC", type: "Hotel", destination: "Dubai", rating: 4.6 },
       { id: "supplier-2", name: "DXB Prime Cars", type: "Transport", destination: "Dubai", rating: 4.8 },
-    ];
+    ]);
   }
 
   finance() {
@@ -111,10 +120,57 @@ export class TriposService {
       stage: "New",
     };
     this.demoLeads.push(lead);
+    void this.createRecord({
+      moduleKey: "leads",
+      title: dto.companyName,
+      status: "new",
+      priority: "high",
+      payload: {
+        contactName: dto.contactName,
+        email: dto.email,
+        phone: dto.phone,
+        businessType: dto.businessType,
+        monthlyBookings: dto.monthlyBookings,
+        source: "public-website",
+      },
+    });
     return {
       message: "Demo lead captured in TripOS CRM.",
       lead,
     };
   }
-}
 
+  async records(moduleKey?: string) {
+    const query = moduleKey ? { moduleKey } : {};
+    const records = await this.recordModel.find(query).sort({ updatedAt: -1 }).lean().exec();
+    return records.map((record) => ({
+      id: String(record._id),
+      moduleKey: record.moduleKey,
+      title: record.title,
+      status: record.status,
+      priority: record.priority,
+      payload: record.payload,
+    }));
+  }
+
+  async createRecord(dto: CreateRecordDto) {
+    const record = await this.recordModel.create({
+      moduleKey: dto.moduleKey,
+      title: dto.title,
+      status: dto.status ?? "open",
+      priority: dto.priority ?? "medium",
+      payload: dto.payload ?? {},
+    });
+    return {
+      message: "TripOS record created.",
+      record: {
+        id: String(record._id),
+        moduleKey: record.moduleKey,
+        title: record.title,
+        status: record.status,
+        priority: record.priority,
+        payload: record.payload,
+      },
+    };
+  }
+}

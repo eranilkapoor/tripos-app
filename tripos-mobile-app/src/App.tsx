@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "./theme/colors";
 
@@ -12,7 +13,26 @@ const itinerary = [
 
 const documents = ["Hotel Voucher", "Transfer Voucher", "Activity Tickets", "Payment Receipt"];
 
+const apiBaseUrl = "http://localhost:4000/api/v1";
+
 export default function App() {
+  const [apiStatus, setApiStatus] = useState("Checking API...");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${apiBaseUrl}/tripos/health`)
+      .then((response) => response.json())
+      .then((result: { status?: string }) => {
+        if (!cancelled) setApiStatus(result.status === "ok" ? "API connected" : "Offline mode");
+      })
+      .catch(() => {
+        if (!cancelled) setApiStatus("Offline mode");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
@@ -24,6 +44,7 @@ export default function App() {
           <View>
             <Text style={styles.eyebrow}>TripOS Customer</Text>
             <Text style={styles.title}>Dubai Family Holiday</Text>
+            <Text style={styles.apiStatus}>{apiStatus}</Text>
           </View>
         </View>
 
@@ -129,6 +150,12 @@ const styles = StyleSheet.create({
     color: colors.brandDark,
     fontSize: 24,
     fontWeight: "900",
+  },
+  apiStatus: {
+    color: colors.muted,
+    fontSize: 12,
+    fontWeight: "800",
+    marginTop: 2,
   },
   heroCard: {
     backgroundColor: colors.surface,
@@ -264,4 +291,3 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 });
-

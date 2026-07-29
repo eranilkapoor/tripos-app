@@ -91,6 +91,18 @@ Useful endpoints:
 - `POST /api/v1/tripos/demo-leads`
 - `GET /api/docs`
 
+Database:
+
+- TripOS uses its own MongoDB database named `tripos`.
+- Keep credentials in `tripos-api-server/.env.development`; this file is ignored by git.
+- Use `tripos-api-server/.env.example` as the safe template.
+
+Seed the MVP module records:
+
+```bash
+npm --prefix tripos-api-server run seed
+```
+
 ### Mobile App
 
 ```bash

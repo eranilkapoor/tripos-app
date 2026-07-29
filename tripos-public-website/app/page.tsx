@@ -17,6 +17,8 @@ const plans = [
   ["Enterprise DMC", "Multi-branch, white-label, multi-currency, API integrations, advanced analytics, and AI."],
 ];
 
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+
 export default function HomePage() {
   const [status, setStatus] = useState("Ready to capture travel SaaS demo requests.");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,7 +39,7 @@ export default function HomePage() {
     try {
       setIsSubmitting(true);
       setStatus("Sending demo request...");
-      const response = await fetch("/api/demo-request", {
+      const response = await fetch(`${apiBaseUrl}/tripos/demo-leads`, {
         body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" },
         method: "POST",
