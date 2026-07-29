@@ -101,6 +101,7 @@
 - `POST /finance/invoices`
 - `GET /finance/invoices`
 - `GET /finance/invoices/next-number/:series`
+- `POST /finance/invoices/:id/pdf`
 
 All main list endpoints support `page`, `limit`, `search`, and `status` where applicable.
 
@@ -113,15 +114,17 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 - `POST /quotations/:id/calculate` - implemented
 - `POST /quotations/:id/send` - implemented
 - `POST /quotations/:id/accept` - implemented
-- `POST /quotations/:id/pdf` - implemented as generated payload; real PDF storage pending
+- `POST /quotations/:id/pdf` - implemented as generated HTML template payload; binary renderer/storage adapter pending
 - `POST /itineraries/:id/days` - implemented
 - `PATCH /itineraries/:id/days/:dayId` - implemented
 - `POST /itineraries/:id/items` - implemented
+- `POST /itineraries/:id/pdf` - implemented as generated HTML template payload; binary renderer/storage adapter pending
 - `PATCH /itineraries/:id/items/:itemId` - not required for launch; day updates and item append are API-backed
 - `POST /bookings/from-quotation/:quotationId` - implemented
 - `POST /bookings/:id/passengers` - implemented
 - `POST /bookings/:id/payments` - implemented
 - `POST /bookings/:id/vouchers` - implemented
+- `POST /vouchers/:id/pdf` - implemented as generated HTML template payload; binary renderer/storage adapter pending
 - `GET /finance/receivables` - implemented
 - `GET /finance/payables` - implemented
 - `GET /finance/bookings/:bookingId/profitability` - implemented
@@ -137,6 +140,7 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 - `GET /reporting/finance` - implemented
 - `POST /saved-reports` - implemented
 - `GET /saved-reports` - implemented
+- `POST /saved-reports/run-due` - implemented
 - `POST /saved-reports/:id/run` - implemented
 - `PATCH /saved-reports/:id/status` - implemented
 

@@ -20,7 +20,15 @@ export class SavedReport {
   })
   status!: string;
   @Prop() lastRunAt?: Date;
+  @Prop() nextRunAt?: Date;
+  @Prop({ type: Object, default: {} }) lastRunResult!: Record<string, unknown>;
 }
 
 export const SavedReportSchema = SchemaFactory.createForClass(SavedReport);
 SavedReportSchema.index({ organizationId: 1, reportType: 1, status: 1 });
+SavedReportSchema.index({
+  organizationId: 1,
+  branchId: 1,
+  status: 1,
+  nextRunAt: 1,
+});

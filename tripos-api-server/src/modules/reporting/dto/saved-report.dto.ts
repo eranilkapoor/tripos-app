@@ -19,3 +19,8 @@ export class CreateSavedReportDto {
 export class RunSavedReportDto {
   @IsOptional() @IsObject() filters?: Record<string, unknown>;
 }
+
+export class RunDueSavedReportsDto {
+  @IsOptional() @IsString() now?: string;
+  @IsOptional() @IsString() reportType?: string;
+}

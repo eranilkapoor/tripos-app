@@ -8,6 +8,7 @@ import {
   listCrmRecords,
   updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
+import { buildDocumentTemplate } from '../../../common/utils/document-template.util';
 import { CreateVoucherDto } from '../dto/voucher.dto';
 import { Voucher } from '../schemas/voucher.schema';
 
@@ -39,5 +40,38 @@ export class VouchersService {
       { status: dto.status },
       'Voucher not found',
     );
+  }
+
+  async document(id: string, query: CrmListQueryDto) {
+    const voucher = await this.findOne(id, query);
+    return buildDocumentTemplate({
+      type: 'voucher',
+      title: `Voucher ${String((voucher as { voucherType?: string }).voucherType ?? id)}`,
+      fileName: `voucher-${id}.pdf`,
+      organizationId: (voucher as { organizationId?: string }).organizationId,
+      branchId: (voucher as { branchId?: string }).branchId,
+      sections: [
+        {
+          heading: 'Voucher',
+          rows: [
+            {
+              bookingId: (voucher as { bookingId?: string }).bookingId,
+              customer: (voucher as { customerName?: string }).customerName,
+              type: (voucher as { voucherType?: string }).voucherType,
+              supplier: (voucher as { supplierName?: string }).supplierName,
+              confirmationNumber: (voucher as { confirmationNumber?: string })
+                .confirmationNumber,
+              status: (voucher as { status?: string }).status,
+            },
+          ],
+        },
+        {
+          heading: 'Line Items',
+          rows:
+            (voucher as { lineItems?: Array<Record<string, unknown>> })
+              .lineItems ?? [],
+        },
+      ],
+    });
   }
 }

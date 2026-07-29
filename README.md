@@ -30,7 +30,7 @@ tripos-app/
     standards/       Engineering, naming, testing, review standards
 ```
 
-This intentionally follows the same top-level shape as `mentora-app`: each deployable application sits at the repository root with a product-prefixed folder name.
+Each deployable application sits at the repository root with a product-prefixed folder name.
 
 For v1, B2B agent workflows and DMC operations are modules inside `tripos-admin-crm`, protected by roles and permissions. They should not be separate deployable apps until agent or field-user self-service becomes a proven business need.
 
@@ -49,7 +49,7 @@ For v1, B2B agent workflows and DMC operations are modules inside `tripos-admin-
 
 ## Root Convention
 
-Keep environment files, Docker Compose files, and infrastructure definitions inside the application that owns them when they are introduced. The repository root should stay aligned with `mentora-app` and act mainly as an orchestration layer.
+Keep environment files, Docker Compose files, and infrastructure definitions inside the application that owns them when they are introduced. The repository root acts mainly as an orchestration layer.
 
 ## Start Here
 

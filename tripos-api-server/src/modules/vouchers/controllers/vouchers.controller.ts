@@ -34,6 +34,14 @@ export class VouchersController {
   ) {
     return this.service.findOne(id, tenantScopedQuery(query, request));
   }
+  @Post(':id/pdf')
+  document(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.document(id, tenantScopedQuery(query, request));
+  }
   @Patch(':id/status') updateStatus(
     @Param('id') id: string,
     @Body() dto: StatusUpdateDto,

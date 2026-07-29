@@ -8,6 +8,7 @@ import {
   listCrmRecords,
   updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
+import { buildDocumentTemplate } from '../../../common/utils/document-template.util';
 import {
   CreateItineraryDto,
   UpsertItineraryDayDto,
@@ -102,5 +103,32 @@ export class ItinerariesService {
       { days: nextDays },
       'Itinerary not found',
     );
+  }
+
+  async document(id: string, query: CrmListQueryDto) {
+    const itinerary = await this.findOne(id, query);
+    const days =
+      (itinerary as { days?: Array<Record<string, unknown>> }).days ?? [];
+    return buildDocumentTemplate({
+      type: 'itinerary',
+      title: `Itinerary ${String((itinerary as { title?: string }).title ?? id)}`,
+      fileName: `itinerary-${id}.pdf`,
+      organizationId: (itinerary as { organizationId?: string }).organizationId,
+      branchId: (itinerary as { branchId?: string }).branchId,
+      sections: [
+        {
+          heading: 'Trip Summary',
+          rows: [
+            {
+              title: (itinerary as { title?: string }).title,
+              destination: (itinerary as { destination?: string }).destination,
+              theme: (itinerary as { theme?: string }).theme,
+              status: (itinerary as { status?: string }).status,
+            },
+          ],
+        },
+        { heading: 'Days', rows: days },
+      ],
+    });
   }
 }

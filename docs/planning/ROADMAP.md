@@ -27,7 +27,7 @@ Status legend:
 
 Completed in the repo:
 
-- Monorepo structure aligned with Mentora-style app boundaries.
+- Monorepo structure uses product-specific app boundaries for API, CRM, mobile, public website, packages, scripts, and documentation.
 - MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, tenants, auth, finance invoices, and audit logs.
 - Admin CRM connected to dedicated production APIs with bearer session handling.
 - CRM list pagination, status filtering, server-side search, tenant/branch scoping, detail scoping, and status mutation scoping.
@@ -43,7 +43,7 @@ Completed in the repo:
 - Supplier contracts/rates/confirmations, B2B KYC/credit/commission/wallet/invoice actions, operations SLA/escalations/timeline, and saved report templates are API-backed.
 - Mobile app shell with persisted secure session storage and separate customer/agent navigation foundations.
 - Public website lead capture wired to backend public lead endpoint.
-- API TypeScript configuration synced with Mentora-style Node16 setup.
+- API TypeScript configuration uses Node16 module/moduleResolution settings for production NestJS builds.
 
 ## Module Readiness Matrix
 
@@ -55,23 +55,23 @@ Completed in the repo:
 | 4   | Audit Logs                   | Product Ready  | Product Ready    | N/A                     | Retention policies and production export review                        |
 | 5   | Leads                        | Product Ready  | Product Ready    | Agent Workflow Ready    | Follow-up tasks, duplicate merge, import/export                        |
 | 6   | Customers                    | Workflow Ready | Product Ready    | Customer Workflow Ready | Customer timeline, profile edit depth                                  |
-| 7   | Quotations                   | Workflow Ready | Product Ready    | Agent Workflow Ready    | PDF rendering/storage, send provider integration                       |
-| 8   | Itineraries                  | Workflow Ready | Product Ready    | Customer Workflow Ready | Rich day/item editor, PDF/share links                                  |
+| 7   | Quotations                   | Workflow Ready | Product Ready    | Agent Workflow Ready    | Binary PDF renderer/storage, send provider integration                 |
+| 8   | Itineraries                  | Workflow Ready | Product Ready    | Customer Workflow Ready | Rich day/item editor, binary PDF renderer/storage, share links         |
 | 9   | Bookings                     | Product Ready  | Product Ready    | Customer Workflow Ready | CRM UX polish for passenger/payment/voucher subflows                   |
 | 10  | Suppliers                    | Product Ready  | Product Ready    | N/A                     | Production supplier contract QA                                        |
 | 11  | Operations                   | Product Ready  | Product Ready    | Agent Workflow Ready    | Assignment automation QA and escalation policy sign-off                |
 | 12  | B2B Agents                   | Product Ready  | Product Ready    | Agent Workflow Ready    | KYC policy sign-off and live finance reconciliation                    |
 | 13  | Payments                     | Product Ready  | Product Ready    | Customer Workflow Ready | Gateway callbacks and bank reconciliation provider hooks               |
-| 14  | Finance Invoices             | Workflow Ready | Product Ready    | N/A                     | PDF generation, accounting export, tax validation                      |
+| 14  | Finance Invoices             | Workflow Ready | Product Ready    | N/A                     | Binary PDF renderer/storage, accounting export, tax validation         |
 | 15  | Destinations and Packages    | Workflow Ready | Product Ready    | Public Workflow Ready   | CMS depth, SEO publishing workflow                                     |
 | 16  | Travel Documents             | Workflow Ready | Product Ready    | Customer Workflow Ready | Verification UI depth and production storage credentials               |
-| 17  | Vouchers                     | Workflow Ready | Product Ready    | Customer Workflow Ready | Supplier confirmation linkage and generated PDF templates              |
+| 17  | Vouchers                     | Workflow Ready | Product Ready    | Customer Workflow Ready | Supplier confirmation linkage and binary PDF renderer/storage          |
 | 18  | Support Tickets              | Workflow Ready | Product Ready    | Customer Workflow Ready | SLA, assignment, communication provider hooks                          |
 | 19  | Campaigns and Marketing      | Workflow Ready | Product Ready    | Public Workflow Ready   | Email/WhatsApp automation providers                                    |
 | 20  | Public Website               | Workflow Ready | N/A              | Workflow Ready          | Production domain, analytics consent, SEO QA                           |
 | 21  | Mobile Customer/Agent App    | Workflow Ready | N/A              | Workflow Ready          | Release builds, offline sync, role-specific API depth                  |
 | 22  | Integrations                 | Workflow Ready | Workflow Ready   | N/A                     | Live provider credentials, callbacks, and webhook verification         |
-| 23  | Reporting and Analytics      | Product Ready  | Product Ready    | N/A                     | Scheduled export worker and dashboard QA                               |
+| 23  | Reporting and Analytics      | Product Ready  | Product Ready    | N/A                     | Dashboard QA and production delivery provider for scheduled exports     |
 | 24  | AI Travel Assistant          | Workflow Ready | Foundation       | N/A                     | Live provider gateway credentials, usage metering, prompt audit policy |
 
 ## Immediate Build-Now Backlog
@@ -83,7 +83,7 @@ Completed in the repo:
 | P0       | Done    | Add RBAC decorators/guard and platform-only tenant management.                                                                                                                     |
 | P0       | Done    | Add refresh-session rotation.                                                                                                                                                      |
 | P0       | Done    | Add basic backend audit logging.                                                                                                                                                   |
-| P0       | Done    | Sync TripOS API `tsconfig.json` with Mentora Node16 setup.                                                                                                                         |
+| P0       | Done    | Sync TripOS API `tsconfig.json` with Node16 module/moduleResolution settings for production NestJS builds.                                                                         |
 | P0       | Done    | Complete deep workflow endpoints for leads, quotations, itineraries, bookings, finance, and documents.                                                                             |
 | P0       | Done    | Add password reset and user invitation backend flows.                                                                                                                              |
 | P0       | Done    | Add file storage abstraction for passports, vouchers, tickets, contracts, receipts, and generated PDFs.                                                                            |
@@ -91,12 +91,13 @@ Completed in the repo:
 | P0       | Done    | Add audit-log list/export APIs and admin CRM audit screens.                                                                                                                        |
 | P1       | Partial | Add production provider adapters for email, WhatsApp, SMS, payments, maps, storage, and monitoring. Local/log health adapters are done; live credentials/webhooks remain external. |
 | P1       | Partial | Add backup/restore runbook, index audit, load testing, and staging smoke scripts. Runbook is documented; execution evidence remains external.                                      |
+| P1       | Done    | Add scheduled saved-report execution endpoint with next-run tracking and run result metadata.                                                                                       |
+| P1       | Done    | Add generated HTML document templates for quotations, itineraries, invoices, and vouchers as renderer-ready payloads.                                                               |
 
 ## Module Completion Focus
 
 The next code-side completion order is:
 
-1. Scheduled export worker for saved reports.
-2. Generated PDF binary rendering templates for quotations, itineraries, invoices, and vouchers.
-3. Mobile customer/agent screen depth and offline cache conflict QA.
-4. Provider credentials, production webhooks, and deployment smoke evidence.
+1. Connect generated document templates to a binary PDF renderer and storage adapter.
+2. Mobile customer/agent screen depth and offline cache conflict QA.
+3. Provider credentials, production webhooks, and deployment smoke evidence.

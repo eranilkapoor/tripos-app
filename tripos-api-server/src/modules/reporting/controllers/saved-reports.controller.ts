@@ -15,6 +15,7 @@ import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
 import {
   CreateSavedReportDto,
+  RunDueSavedReportsDto,
   RunSavedReportDto,
 } from '../dto/saved-report.dto';
 import { SavedReportsService } from '../saved-reports.service';
@@ -40,6 +41,15 @@ export class SavedReportsController {
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
     return this.service.list(tenantScopedQuery(query, request));
+  }
+
+  @Post('run-due')
+  runDue(
+    @Body() dto: RunDueSavedReportsDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.runDue(dto, tenantScopedQuery(query, request));
   }
 
   @Post(':id/run')

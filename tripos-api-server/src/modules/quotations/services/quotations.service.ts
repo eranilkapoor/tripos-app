@@ -8,6 +8,7 @@ import {
   listCrmRecords,
   updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
+import { buildDocumentTemplate } from '../../../common/utils/document-template.util';
 import { CreateQuotationDto } from '../dto/quotation.dto';
 import { Quotation } from '../schemas/quotation.schema';
 
@@ -83,12 +84,34 @@ export class QuotationsService {
 
   async pdf(id: string, query: CrmListQueryDto) {
     const quotation = await this.findOne(id, query);
-    return {
-      quotationId: id,
+    return buildDocumentTemplate({
+      type: 'quotation',
+      title: `Quotation ${String((quotation as { customerName?: string }).customerName ?? id)}`,
       fileName: `quotation-${id}.pdf`,
-      status: 'ready',
-      payload: quotation,
-    };
+      organizationId: (quotation as { organizationId?: string }).organizationId,
+      branchId: (quotation as { branchId?: string }).branchId,
+      sections: [
+        {
+          heading: 'Quotation',
+          rows: [
+            {
+              customer: (quotation as { customerName?: string }).customerName,
+              destination: (quotation as { destination?: string }).destination,
+              travelDates: (quotation as { travelDates?: string }).travelDates,
+              travellers: (quotation as { travellers?: number }).travellers,
+              status: (quotation as { status?: string }).status,
+            },
+          ],
+        },
+        {
+          heading: 'Services',
+          rows:
+            (quotation as { services?: Array<Record<string, unknown>> })
+              .services ?? [],
+        },
+      ],
+      totals: (quotation as { pricing?: Record<string, unknown> }).pricing,
+    });
   }
 }
 

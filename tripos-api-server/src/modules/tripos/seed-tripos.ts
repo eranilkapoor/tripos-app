@@ -528,6 +528,7 @@ async function main() {
       filters: {},
       schedule: { frequency: 'daily', time: '09:00' },
       recipients: ['ops@webnza.test'],
+      nextRunAt: new Date(Date.now() - 60 * 60 * 1000),
       status: 'active',
     },
     {
@@ -538,6 +539,7 @@ async function main() {
       filters: {},
       schedule: { frequency: 'weekly', day: 'monday' },
       recipients: ['finance@webnza.test'],
+      nextRunAt: new Date(Date.now() - 60 * 60 * 1000),
       status: 'active',
     },
   ]);

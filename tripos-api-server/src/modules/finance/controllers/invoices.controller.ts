@@ -32,4 +32,13 @@ export class InvoicesController {
   create(@Body() dto: CreateInvoiceDto) {
     return this.invoicesService.create(dto);
   }
+
+  @Post(':id/pdf')
+  document(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.invoicesService.document(id, tenantScopedQuery(query, request));
+  }
 }

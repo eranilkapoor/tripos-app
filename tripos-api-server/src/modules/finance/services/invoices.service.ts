@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { scopeFilter } from '../../../common/utils/crm-list.util';
+import {
+  findScopedCrmRecord,
+  scopeFilter,
+} from '../../../common/utils/crm-list.util';
+import { buildDocumentTemplate } from '../../../common/utils/document-template.util';
 import { CreateInvoiceDto } from '../dto/invoice.dto';
 import { Invoice } from '../schemas/invoice.schema';
 
@@ -52,6 +56,52 @@ export class InvoicesService {
       message: 'TripOS invoice saved.',
       invoice,
     };
+  }
+
+  async document(id: string, query: CrmListQueryDto) {
+    const invoice = await findScopedCrmRecord(
+      this.invoiceModel,
+      id,
+      query,
+      'Invoice not found',
+    );
+    return buildDocumentTemplate({
+      type: 'invoice',
+      title: `Invoice ${String((invoice as { invoiceSeries?: string }).invoiceSeries ?? '')}${String((invoice as { invoiceNo?: string }).invoiceNo ?? id)}`,
+      fileName: `invoice-${id}.pdf`,
+      organizationId: (invoice as { organizationId?: string }).organizationId,
+      branchId: (invoice as { branchId?: string }).branchId,
+      sections: [
+        {
+          heading: 'Invoice',
+          rows: [
+            {
+              invoiceSeries: (invoice as { invoiceSeries?: string })
+                .invoiceSeries,
+              invoiceNo: (invoice as { invoiceNo?: string }).invoiceNo,
+              invoiceDate: (invoice as { invoiceDate?: string }).invoiceDate,
+              countryCode: (invoice as { countryCode?: string }).countryCode,
+              currencyCode: (invoice as { currencyCode?: string }).currencyCode,
+              status: (invoice as { status?: string }).status,
+            },
+          ],
+        },
+        {
+          heading: 'Customer',
+          rows: [
+            ((invoice as { customer?: Record<string, unknown> }).customer ??
+              {}) as Record<string, unknown>,
+          ],
+        },
+        {
+          heading: 'Entries',
+          rows:
+            (invoice as { entries?: Array<Record<string, unknown>> }).entries ??
+            [],
+        },
+      ],
+      totals: (invoice as { totals?: Record<string, unknown> }).totals,
+    });
   }
 }
 
