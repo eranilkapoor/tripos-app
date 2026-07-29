@@ -1,12 +1,14 @@
 export type FieldType =
   "text" | "number" | "email" | "date" | "select" | "textarea" | "tags";
 
+export type SelectOption = string | { value: string; label: string };
+
 export type ModuleField = {
   key: string;
   label: string;
   type?: FieldType;
   required?: boolean;
-  options?: string[];
+  options?: SelectOption[];
   placeholder?: string;
 };
 

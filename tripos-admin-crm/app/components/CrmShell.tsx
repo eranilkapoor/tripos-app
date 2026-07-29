@@ -34,6 +34,8 @@ import {
   formatDisplayValue,
   getRecordId,
   normalizeRecords,
+  optionLabel,
+  optionValue,
   recordToRow,
   sessionHeaders,
   statusClass,
@@ -819,8 +821,17 @@ const themeIcons = {
   dark: faMoon,
 };
 
-const tenantOptions = ["WEBNZA", "TRIPOS", "DMC"];
-const branchOptions = ["delhi", "mumbai", "dubai", "remote"];
+const tenantOptions = [
+  { value: "WEBNZA", label: "Webnza Travel Group" },
+  { value: "TRIPOS", label: "TripOS Demo Company" },
+  { value: "DMC", label: "DMC Operations" },
+];
+const branchOptions = [
+  { value: "delhi", label: "Delhi Branch" },
+  { value: "mumbai", label: "Mumbai Branch" },
+  { value: "dubai", label: "Dubai Branch" },
+  { value: "remote", label: "Remote Team" },
+];
 
 export default function CrmShell() {
   const router = useRouter();
@@ -1152,8 +1163,8 @@ export default function CrmShell() {
                   )}
                 >
                   {tenantOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {formatDisplayValue(item, "tenantCode")}
+                    <option key={item.value} value={item.value}>
+                      {item.label}
                     </option>
                   ))}
                 </select>
@@ -1168,8 +1179,8 @@ export default function CrmShell() {
                   value={String(session.user.branchId ?? "delhi")}
                 >
                   {branchOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {formatDisplayValue(item, "branchId")}
+                    <option key={item.value} value={item.value}>
+                      {item.label}
                     </option>
                   ))}
                 </select>
@@ -1548,7 +1559,7 @@ function RecordTable({
                     >
                       {module.statusOptions.map((status) => (
                         <option key={status} value={status}>
-                          {status}
+                          {optionLabel(status, "status")}
                         </option>
                       ))}
                     </select>
@@ -1629,10 +1640,10 @@ function RecordTable({
               }}
               value={pageSize}
             >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
+              <option value={5}>5 per page</option>
+              <option value={10}>10 per page</option>
+              <option value={25}>25 per page</option>
+              <option value={50}>50 per page</option>
             </select>
           </label>
         </div>
@@ -1904,7 +1915,10 @@ function RecordForm({
 }) {
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(
-      module.fields.map((field) => [field.key, field.options?.[0] ?? ""]),
+      module.fields.map((field) => [
+        field.key,
+        field.options?.[0] ? optionValue(field.options[0]) : "",
+      ]),
     ),
   );
   const [error, setError] = useState("");
@@ -1988,8 +2002,8 @@ function FormField({
           value={value}
         >
           {field.options?.map((option) => (
-            <option key={option} value={option}>
-              {option}
+            <option key={optionValue(option)} value={optionValue(option)}>
+              {optionLabel(option, field.key)}
             </option>
           ))}
         </select>

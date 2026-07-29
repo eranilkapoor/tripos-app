@@ -1,4 +1,9 @@
-import type { ApiRecord, CrmModule, ModuleField } from "./crmTypes";
+import type {
+  ApiRecord,
+  CrmModule,
+  ModuleField,
+  SelectOption,
+} from "./crmTypes";
 
 export const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
@@ -79,6 +84,16 @@ export function titleize(value: string) {
     .replace(/\s+/g, " ")
     .trim()
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export function optionValue(option: SelectOption) {
+  return typeof option === "string" ? option : option.value;
+}
+
+export function optionLabel(option: SelectOption, path = "") {
+  return typeof option === "string"
+    ? formatDisplayValue(option, path)
+    : option.label;
 }
 
 export function formatNumber(value: number) {
