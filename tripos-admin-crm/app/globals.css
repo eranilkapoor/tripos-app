@@ -443,27 +443,39 @@ td button {
   min-width: 220px;
 }
 
-.breadcrumb {
+.topbar-title strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.workspace-breadcrumb {
   align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  box-shadow: var(--shadow-soft);
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
+  margin-bottom: 16px;
+  padding: 11px 14px;
 }
 
-.breadcrumb span,
-.breadcrumb strong {
+.workspace-breadcrumb span,
+.workspace-breadcrumb strong {
   color: var(--muted);
   font-size: 12px;
   font-weight: 900;
 }
 
-.breadcrumb span::after {
+.workspace-breadcrumb span::after {
   color: var(--line-strong);
   content: "/";
   margin-left: 7px;
 }
 
-.breadcrumb strong {
+.workspace-breadcrumb strong {
   color: var(--ink);
 }
 
@@ -891,14 +903,20 @@ td {
 
 .select-col,
 .serial-col {
+  box-sizing: border-box;
+  padding-left: 8px;
+  padding-right: 8px;
   text-align: center;
-  width: 54px;
+  width: 52px;
 }
 
 .select-col input,
 td input[type="checkbox"] {
   accent-color: var(--brand);
+  display: inline-block;
   height: 16px;
+  margin: 0;
+  vertical-align: middle;
   width: 16px;
 }
 

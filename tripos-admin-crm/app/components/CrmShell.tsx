@@ -95,7 +95,11 @@ const modules: CrmModule[] = [
         key: "channel",
         label: "Channel",
         type: "select",
-        options: ["b2c", "b2b", "corporate"],
+        options: [
+          { value: "b2c", label: "B2C Customer" },
+          { value: "b2b", label: "B2B Agent" },
+          { value: "corporate", label: "Corporate Client" },
+        ],
       },
       { key: "requirement.destination", label: "Destination" },
       { key: "requirement.travelDate", label: "Travel Date", type: "date" },
@@ -121,7 +125,13 @@ const modules: CrmModule[] = [
         key: "customerType",
         label: "Type",
         type: "select",
-        options: ["b2c", "corporate", "family", "repeat"],
+        options: [
+          { value: "b2c", label: "B2C Traveller" },
+          { value: "b2b", label: "B2B Agent" },
+          { value: "corporate", label: "Corporate Account" },
+          { value: "family", label: "Family Traveller" },
+          { value: "repeat", label: "Repeat Customer" },
+        ],
       },
       { key: "source", label: "Source" },
       { key: "city", label: "City" },
@@ -1145,11 +1155,7 @@ export default function CrmShell() {
       <section className="right-sec">
         <header className="topbar">
           <div className="topbar-title">
-            <nav className="breadcrumb" aria-label="Current location">
-              <span>TripOS Admin CRM</span>
-              <span>{selected.group}</span>
-              <strong>{selected.title}</strong>
-            </nav>
+            <strong>TripOS Admin CRM</strong>
             <small>{String(session.tenant.name ?? "Tenant Workspace")}</small>
           </div>
           <div className="top-actions">
@@ -1223,6 +1229,12 @@ export default function CrmShell() {
         </header>
 
         <main className="workspace">
+          <nav className="workspace-breadcrumb" aria-label="Current location">
+            <span>TripOS Admin CRM</span>
+            <span>{selected.group}</span>
+            <strong>{selected.title}</strong>
+          </nav>
+
           <section className="hero-panel">
             <div>
               <span className="eyebrow">{selected.group}</span>
@@ -1579,7 +1591,10 @@ function RecordTable({
               const rowId = getRecordId(record) || row.join("-");
               return (
                 <tr key={rowId} onClick={() => onSelect(record)}>
-                  <td onClick={(event) => event.stopPropagation()}>
+                  <td
+                    className="select-col"
+                    onClick={(event) => event.stopPropagation()}
+                  >
                     <input
                       aria-label={`Select row ${(safePage - 1) * pageSize + rowIndex + 1}`}
                       checked={selectedRows.includes(rowId)}
@@ -1587,7 +1602,9 @@ function RecordTable({
                       type="checkbox"
                     />
                   </td>
-                  <td>{(safePage - 1) * pageSize + rowIndex + 1}</td>
+                  <td className="serial-col">
+                    {(safePage - 1) * pageSize + rowIndex + 1}
+                  </td>
                   {row.map((cell, index) => (
                     <td key={`${cell}-${index}`}>{renderCell(cell)}</td>
                   ))}
@@ -1683,10 +1700,10 @@ function RecordTable({
               }}
               value={pageSize}
             >
-              <option value={5}>5 per page</option>
-              <option value={10}>10 per page</option>
-              <option value={25}>25 per page</option>
-              <option value={50}>50 per page</option>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
             </select>
           </label>
         </div>

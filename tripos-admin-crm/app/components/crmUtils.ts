@@ -66,6 +66,25 @@ export function recordToRow(record: ApiRecord, module: CrmModule) {
 export function formatDisplayValue(value: string, path = "") {
   if (!value || value === "-") return "-";
   const normalizedPath = path.toLowerCase();
+  const semanticLabelPaths = [
+    "status",
+    "stage",
+    "type",
+    "customertype",
+    "priority",
+    "audience",
+    "role",
+  ];
+  const labelOverrides: Record<string, string> = {
+    b2b: "B2B",
+    b2c: "B2C",
+    kyc: "KYC",
+    api: "API",
+    dmc: "DMC",
+    crm: "CRM",
+  };
+  const normalizedValue = value.toLowerCase();
+  if (labelOverrides[normalizedValue]) return labelOverrides[normalizedValue];
   const isTechnicalId =
     normalizedPath.endsWith("id") ||
     normalizedPath.includes(".id") ||
@@ -74,7 +93,11 @@ export function formatDisplayValue(value: string, path = "") {
     return `Ref ${value.slice(-6).toUpperCase()}`;
   if (isTechnicalId && /^[a-z0-9_-]{8,}$/i.test(value))
     return `Ref ${value.slice(-8).replace(/[_-]/g, " ").toUpperCase()}`;
-  if (/[_-]/.test(value)) return titleize(value);
+  if (
+    /[_-]/.test(value) ||
+    semanticLabelPaths.some((item) => normalizedPath.endsWith(item))
+  )
+    return titleize(value);
   return value;
 }
 
@@ -83,7 +106,13 @@ export function titleize(value: string) {
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+    .replace(/\bB2b\b/g, "B2B")
+    .replace(/\bB2c\b/g, "B2C")
+    .replace(/\bKyc\b/g, "KYC")
+    .replace(/\bApi\b/g, "API")
+    .replace(/\bDmc\b/g, "DMC")
+    .replace(/\bCrm\b/g, "CRM");
 }
 
 export function optionValue(option: SelectOption) {
