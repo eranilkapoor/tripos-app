@@ -914,10 +914,13 @@ export default function CrmShell() {
   }, [pathModule]);
 
   useEffect(() => {
-    activeNavItemRef.current?.scrollIntoView({
-      block: "center",
-      behavior: "smooth",
-    });
+    window.setTimeout(() => {
+      activeNavItemRef.current?.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
+      activeNavItemRef.current?.focus({ preventScroll: true });
+    }, 60);
   }, [selectedId]);
 
   useEffect(() => {
@@ -1243,7 +1246,7 @@ export default function CrmShell() {
             <div>
               <span className="eyebrow">{selected.group}</span>
               <h2>
-                {selected.id === "dashboard" ? "Live Control" : "Workspace"}
+                {selected.id === "dashboard" ? "Live Dashboard" : "Workspace"}
               </h2>
               <p>{selected.description}</p>
             </div>
@@ -1434,7 +1437,9 @@ function RecordTable({
     safePage * pageSize,
   );
   const pageRowIds = pageRows.map(
-    ({ record, row }) => getRecordId(record) || row.join("-"),
+    ({ record, row }, index) =>
+      getRecordId(record) ||
+      `${module.id}-${safePage}-${index}-${row.join("-")}`,
   );
   const allPageSelected =
     pageRowIds.length > 0 &&
@@ -1592,7 +1597,9 @@ function RecordTable({
               </tr>
             ) : null}
             {pageRows.map(({ record, row }, rowIndex) => {
-              const rowId = getRecordId(record) || row.join("-");
+              const rowId =
+                getRecordId(record) ||
+                `${module.id}-${safePage}-${rowIndex}-${row.join("-")}`;
               return (
                 <tr key={rowId} onClick={() => onSelect(record)}>
                   <td
@@ -1795,29 +1802,61 @@ function DashboardPanel({
 }: {
   dashboard: Record<string, unknown> | null;
 }) {
-  const modulesPayload = dashboard?.modules;
-  const items = Array.isArray(modulesPayload)
-    ? (modulesPayload.slice(0, 8) as Record<string, unknown>[])
+  const counters =
+    dashboard?.counters && typeof dashboard.counters === "object"
+      ? (dashboard.counters as Record<string, unknown>)
+      : {};
+  const pipeline = Array.isArray(dashboard?.pipeline)
+    ? (dashboard.pipeline as Record<string, unknown>[])
+    : [];
+  const recentActivity = Array.isArray(dashboard?.recentActivity)
+    ? (dashboard.recentActivity as Record<string, unknown>[])
     : [];
   return (
     <section className="table-card">
       <div className="table-head">
         <div>
-          <span className="eyebrow">Dashboard</span>
-          <h2>Backend Module Readiness</h2>
+          <span className="eyebrow">Live Dashboard API</span>
+          <h2>{String(dashboard?.tenant ?? "TripOS Workspace")}</h2>
         </div>
-        <strong>{items.length || "Live"}</strong>
+        <strong>{String(dashboard?.branch ?? "All Branches")}</strong>
       </div>
-      <div className="module-grid">
-        {modules
-          .filter((item) => item.id !== "dashboard")
-          .map((item) => (
-            <article key={item.id}>
-              <strong>{item.title}</strong>
-              <span>{item.endpoint ? `/${item.endpoint}` : "workspace"}</span>
-              <p>{item.description}</p>
-            </article>
+      <div className="dashboard-live-grid">
+        {Object.entries(counters).map(([key, value]) => (
+          <article key={key}>
+            <span>{formatDisplayValue(key)}</span>
+            <strong>{String(value ?? 0)}</strong>
+          </article>
+        ))}
+      </div>
+      <div className="dashboard-split">
+        <section>
+          <h3>Pipeline</h3>
+          {pipeline.map((item, index) => (
+            <div className="dashboard-row" key={`${item.stage}-${index}`}>
+              <span>{String(item.stage ?? "Stage")}</span>
+              <strong>{String(item.count ?? 0)}</strong>
+            </div>
           ))}
+        </section>
+        <section>
+          <h3>Recent Activity</h3>
+          {recentActivity.length ? (
+            recentActivity.map((item, index) => (
+              <div className="dashboard-row" key={`${item.id}-${index}`}>
+                <span>
+                  {formatDisplayValue(String(item.action ?? "Activity"))}
+                </span>
+                <strong>{String(item.method ?? "-")}</strong>
+              </div>
+            ))
+          ) : (
+            <div className="dashboard-row">
+              <span>No recent activity</span>
+              <strong>Live</strong>
+            </div>
+          )}
+        </section>
       </div>
     </section>
   );
