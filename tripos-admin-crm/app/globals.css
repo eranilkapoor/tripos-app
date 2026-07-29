@@ -38,8 +38,8 @@
   --surface-3: #24394a;
   --ink: #f4fbf8;
   --muted: #d0ddd8;
-  --line: #334858;
-  --line-strong: #557083;
+  --line: #466173;
+  --line-strong: #7792a3;
   --brand: #7ee7dc;
   --brand-dark: #103f43;
   --brand-soft: #173f42;
@@ -75,8 +75,8 @@
     --surface-3: #24394a;
     --ink: #f4fbf8;
     --muted: #d0ddd8;
-    --line: #334858;
-    --line-strong: #557083;
+    --line: #466173;
+    --line-strong: #7792a3;
     --brand: #7ee7dc;
     --brand-dark: #103f43;
     --brand-soft: #173f42;
@@ -217,6 +217,7 @@ td button {
 
 .auth-card button,
 .top-actions button,
+.table-tool-button,
 .action-bar button,
 .record-modal-actions button:last-child,
 .invoice-form-panel .table-head button {
@@ -234,6 +235,7 @@ td button {
 
 .auth-card > button,
 .top-actions button.primary,
+.table-tool-button.primary,
 .action-bar button,
 .record-modal-actions button:last-child,
 .invoice-form-panel .table-head button {
@@ -244,7 +246,7 @@ td button {
 
 .admin-shell {
   --crm-shell-header-height: 68px;
-  --crm-shell-header-border: 1px solid var(--line);
+  --crm-shell-header-border: 1px solid var(--line-strong);
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
   min-height: 100vh;
@@ -271,6 +273,7 @@ td button {
 .sidebar-head {
   align-items: center;
   border-bottom: var(--crm-shell-header-border);
+  box-shadow: inset -1px 0 color-mix(in srgb, #ffffff 18%, transparent);
   display: flex;
   gap: 12px;
   height: var(--crm-shell-header-height);
@@ -364,13 +367,30 @@ td button {
   min-height: 42px;
   padding: 9px 10px;
   text-align: left;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
   width: 100%;
 }
 
 .nav-group button.selected,
 .nav-group button:hover {
   background: var(--surface);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: inset 4px 0 0 var(--accent);
   color: var(--brand);
+}
+
+.nav-group button:focus-visible {
+  outline-color: rgba(255, 255, 255, 0.72);
+}
+
+.nav-group button span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-group em {
@@ -412,13 +432,17 @@ td button {
 
 .topbar-title {
   display: grid;
-  gap: 2px;
+  gap: 3px;
   min-width: 220px;
+}
+
+.topbar-title .eyebrow {
+  margin-bottom: 0;
 }
 
 .topbar-title strong {
   color: var(--ink);
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.15;
 }
 
@@ -630,7 +654,7 @@ td button:hover {
 .table-head {
   align-items: center;
   background: var(--surface-2);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-strong);
   display: flex;
   gap: 12px;
   justify-content: space-between;
@@ -652,6 +676,23 @@ td button:hover {
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
+}
+
+.table-tool-button {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  color: var(--brand);
+}
+
+.table-tool-button:hover:not(:disabled) {
+  background: var(--surface-3);
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+.table-tool-button:disabled {
+  cursor: progress;
+  opacity: 0.66;
 }
 
 .table-search {
@@ -708,7 +749,40 @@ th {
   background: var(--surface-3);
   color: var(--ink);
   font-size: 12px;
+  padding: 0;
   text-transform: uppercase;
+}
+
+th:last-child {
+  padding: 11px;
+}
+
+.sort-header {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 950;
+  gap: 7px;
+  justify-content: space-between;
+  min-height: 42px;
+  padding: 11px;
+  text-align: left;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.sort-header:hover {
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
+  color: var(--brand);
+}
+
+.sort-header svg {
+  color: var(--muted);
+  height: 12px;
+  width: 12px;
 }
 
 td {
@@ -717,6 +791,13 @@ td {
 
 tbody tr:nth-child(even) {
   background: var(--surface-2);
+}
+
+.empty-row {
+  color: var(--muted);
+  font-weight: 900;
+  padding: 26px 14px;
+  text-align: center;
 }
 
 .pagination-bar {

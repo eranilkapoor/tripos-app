@@ -13,6 +13,9 @@ import {
   faPlus,
   faRightFromBracket,
   faSearch,
+  faSort,
+  faSortDown,
+  faSortUp,
 } from "@fortawesome/free-solid-svg-icons";
 import type { ApiRecord, CrmModule, CrmSession, ModuleField } from "./crmTypes";
 import {
@@ -772,6 +775,8 @@ export default function CrmShell() {
     "TripOS CRM connected to production APIs.",
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingModuleId, setLoadingModuleId] = useState<string | null>(null);
+  const [recordModuleId, setRecordModuleId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
   const [session, setSession] = useState<CrmSession | null>(null);
@@ -835,6 +840,7 @@ export default function CrmShell() {
 
   async function loadModule(module: CrmModule, search = query) {
     setIsLoading(true);
+    setLoadingModuleId(module.id);
     setSelectedRecord(null);
     try {
       if (module.id === "dashboard") {
@@ -845,6 +851,7 @@ export default function CrmShell() {
         if (!response.ok) throw new Error("Dashboard API unavailable");
         setDashboard((await response.json()) as Record<string, unknown>);
         setRecords([]);
+        setRecordModuleId(null);
       } else if (module.endpoint) {
         const params = new URLSearchParams({ limit: "100" });
         if (search.trim()) params.set("search", search.trim());
@@ -857,13 +864,16 @@ export default function CrmShell() {
         );
         if (!response.ok) throw new Error(`${module.title} API unavailable`);
         setRecords(normalizeRecords(await response.json()));
+        setRecordModuleId(module.id);
       }
       setToast(`${module.title} refreshed from TripOS API.`);
     } catch (error) {
       setRecords([]);
+      setRecordModuleId(module.id);
       setToast(error instanceof Error ? error.message : "API unavailable.");
     } finally {
       setIsLoading(false);
+      setLoadingModuleId(null);
     }
   }
 
@@ -927,13 +937,19 @@ export default function CrmShell() {
 
   const rows = useMemo(
     () =>
-      records.map((record) => ({ record, row: recordToRow(record, selected) })),
-    [records, selected],
+      recordModuleId === selected.id
+        ? records.map((record) => ({
+            record,
+            row: recordToRow(record, selected),
+          }))
+        : [],
+    [recordModuleId, records, selected],
   );
   const filteredRows = rows.filter(({ row }) =>
     row.join(" ").toLowerCase().includes(query.toLowerCase()),
   );
   const metrics = buildMetrics(records, dashboard);
+  const isModuleLoading = isLoading && loadingModuleId === selected.id;
 
   if (!authReady)
     return (
@@ -1013,24 +1029,6 @@ export default function CrmShell() {
           </div>
           <div className="top-actions">
             <ThemeSwitcher onChange={changeTheme} selectedTheme={theme} />
-            <button
-              className="utility-button"
-              onClick={() => void loadModule(selected, query)}
-              type="button"
-            >
-              <FontAwesomeIcon aria-hidden icon={faArrowRotateRight} />
-              <span>Refresh</span>
-            </button>
-            {selected.fields.length ? (
-              <button
-                className="utility-button primary"
-                onClick={() => setModalOpen(true)}
-                type="button"
-              >
-                <FontAwesomeIcon aria-hidden icon={faPlus} />
-                <span>Create</span>
-              </button>
-            ) : null}
             <div className="profile-chip">
               <span>{String(session.user.name ?? "Admin").slice(0, 1)}</span>
               <div>
@@ -1056,7 +1054,7 @@ export default function CrmShell() {
               <h2>
                 {selected.id === "dashboard"
                   ? "Live Control"
-                  : `${records.length} Records`}
+                  : `${filteredRows.length} Records`}
               </h2>
               <p>{selected.description}</p>
             </div>
@@ -1082,7 +1080,10 @@ export default function CrmShell() {
             <RecordTable
               columns={selected.columns}
               filteredRows={filteredRows}
+              isLoading={isModuleLoading}
               module={selected}
+              onCreate={() => setModalOpen(true)}
+              onRefresh={() => void loadModule(selected, query)}
               onSelect={setSelectedRecord}
               onStatus={updateStatus}
               query={query}
@@ -1172,7 +1173,10 @@ function ThemeSwitcher({
 function RecordTable({
   columns,
   filteredRows,
+  isLoading,
   module,
+  onCreate,
+  onRefresh,
   onSelect,
   onStatus,
   query,
@@ -1180,7 +1184,10 @@ function RecordTable({
 }: {
   columns: string[];
   filteredRows: { record: ApiRecord; row: string[] }[];
+  isLoading: boolean;
   module: CrmModule;
+  onCreate: () => void;
+  onRefresh: () => void;
   onSelect: (record: ApiRecord) => void;
   onStatus: (record: ApiRecord, status: string) => Promise<void>;
   query: string;
@@ -1188,10 +1195,35 @@ function RecordTable({
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const total = filteredRows.length;
+  const [sortColumn, setSortColumn] = useState(0);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [module.id, query, pageSize]);
+
+  const sortedRows = useMemo(() => {
+    return [...filteredRows].sort((left, right) => {
+      const leftValue = left.row[sortColumn] ?? "";
+      const rightValue = right.row[sortColumn] ?? "";
+      const numericLeft = Number(leftValue.replace(/[^0-9.-]/g, ""));
+      const numericRight = Number(rightValue.replace(/[^0-9.-]/g, ""));
+      const comparison =
+        Number.isFinite(numericLeft) &&
+        Number.isFinite(numericRight) &&
+        leftValue.match(/\d/) &&
+        rightValue.match(/\d/)
+          ? numericLeft - numericRight
+          : leftValue.localeCompare(rightValue, undefined, {
+              numeric: true,
+              sensitivity: "base",
+            });
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [filteredRows, sortColumn, sortDirection]);
+  const total = sortedRows.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const safePage = Math.min(currentPage, totalPages);
-  const pageRows = filteredRows.slice(
+  const pageRows = sortedRows.slice(
     (safePage - 1) * pageSize,
     safePage * pageSize,
   );
@@ -1204,6 +1236,16 @@ function RecordTable({
         Math.abs(page - safePage) <= 2 || page === 1 || page === totalPages,
     )
     .slice(0, 7);
+
+  function updateSort(index: number) {
+    if (sortColumn === index) {
+      setSortDirection((direction) => (direction === "asc" ? "desc" : "asc"));
+      return;
+    }
+    setSortColumn(index);
+    setSortDirection("asc");
+    setCurrentPage(1);
+  }
 
   return (
     <section className="table-card listmanager">
@@ -1222,6 +1264,25 @@ function RecordTable({
               value={query}
             />
           </label>
+          <button
+            className="table-tool-button"
+            disabled={isLoading}
+            onClick={onRefresh}
+            type="button"
+          >
+            <FontAwesomeIcon aria-hidden icon={faArrowRotateRight} />
+            <span>{isLoading ? "Refreshing" : "Refresh"}</span>
+          </button>
+          {module.fields.length ? (
+            <button
+              className="table-tool-button primary"
+              onClick={onCreate}
+              type="button"
+            >
+              <FontAwesomeIcon aria-hidden icon={faPlus} />
+              <span>Create</span>
+            </button>
+          ) : null}
           <strong>{total} records</strong>
         </div>
       </div>
@@ -1229,13 +1290,38 @@ function RecordTable({
         <table>
           <thead>
             <tr>
-              {columns.map((column) => (
-                <th key={column}>{column}</th>
+              {columns.map((column, index) => (
+                <th key={column}>
+                  <button
+                    className="sort-header"
+                    onClick={() => updateSort(index)}
+                    type="button"
+                  >
+                    <span>{column}</span>
+                    <FontAwesomeIcon
+                      aria-hidden
+                      icon={
+                        sortColumn === index
+                          ? sortDirection === "asc"
+                            ? faSortUp
+                            : faSortDown
+                          : faSort
+                      }
+                    />
+                  </button>
+                </th>
               ))}
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
+            {isLoading && pageRows.length === 0 ? (
+              <tr>
+                <td className="empty-row" colSpan={columns.length + 1}>
+                  Loading {module.title.toLowerCase()}...
+                </td>
+              </tr>
+            ) : null}
             {pageRows.map(({ record, row }) => (
               <tr
                 key={getRecordId(record) || row.join("-")}
@@ -1269,9 +1355,9 @@ function RecordTable({
                 </td>
               </tr>
             ))}
-            {!total ? (
+            {!isLoading && !total ? (
               <tr>
-                <td colSpan={columns.length + 1}>
+                <td className="empty-row" colSpan={columns.length + 1}>
                   No API records found for this module.
                 </td>
               </tr>
