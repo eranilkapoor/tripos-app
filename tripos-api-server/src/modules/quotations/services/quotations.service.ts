@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
+import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
+import { listCrmRecords } from '../../../common/utils/crm-list.util';
 import { CreateQuotationDto } from '../dto/quotation.dto';
 import { Quotation } from '../schemas/quotation.schema';
 
@@ -14,8 +16,8 @@ export class QuotationsService {
     return this.model.create({ ...dto, travellers: dto.travellers ?? 1, services: dto.services ?? [], pricing });
   }
 
-  list() {
-    return this.model.find().sort({ updatedAt: -1 }).lean().exec();
+  list(query: CrmListQueryDto) {
+    return listCrmRecords(this.model, query, ['customerName', 'destination', 'travelDates']);
   }
 
   async findOne(id: string) {
@@ -38,4 +40,3 @@ function calculatePricing(pricing: Record<string, number>, services: Array<Recor
   const tax = pricing.tax ?? Math.max(0, supplierCost + markup - discount) * 0.18;
   return { supplierCost, markup, discount, tax, total: supplierCost + markup - discount + tax };
 }
-

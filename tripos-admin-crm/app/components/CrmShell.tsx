@@ -172,10 +172,13 @@ export default function CrmShell() {
   }, [pathModule]);
 
   useEffect(() => {
-    void loadModule(selected);
-  }, [selectedId]);
+    const timeout = window.setTimeout(() => {
+      void loadModule(selected, query);
+    }, 250);
+    return () => window.clearTimeout(timeout);
+  }, [selectedId, query]);
 
-  async function loadModule(module: CrmModule) {
+  async function loadModule(module: CrmModule, search = query) {
     setIsLoading(true);
     setSelectedRecord(null);
     try {
@@ -185,7 +188,9 @@ export default function CrmShell() {
         setDashboard((await response.json()) as Record<string, unknown>);
         setRecords([]);
       } else if (module.endpoint) {
-        const response = await fetch(`${apiBaseUrl}/${module.endpoint}`, { cache: "no-store" });
+        const params = new URLSearchParams({ limit: "100" });
+        if (search.trim()) params.set("search", search.trim());
+        const response = await fetch(`${apiBaseUrl}/${module.endpoint}?${params.toString()}`, { cache: "no-store" });
         if (!response.ok) throw new Error(`${module.title} API unavailable`);
         setRecords(normalizeRecords(await response.json()));
       }
@@ -262,7 +267,7 @@ export default function CrmShell() {
           <div><span className="eyebrow">Webnza Demo Tenant / Delhi Branch</span><h1>{selected.title}</h1></div>
           <div className="top-actions">
             <input aria-label="Search records" onChange={(event) => setQuery(event.target.value)} placeholder="Search live records" value={query} />
-            <button onClick={() => void loadModule(selected)} type="button">Refresh</button>
+            <button onClick={() => void loadModule(selected, query)} type="button">Refresh</button>
             {selected.fields.length ? <button onClick={() => setModalOpen(true)} type="button">Create</button> : null}
           </div>
         </header>
