@@ -20,4 +20,5 @@ export const COLLECTION_NAMES = {
   TENANT: 'tripos_tenants',
   CRM_USER: 'tripos_crm_users',
   USER_SESSION: 'tripos_user_sessions',
+  AUDIT_LOG: 'tripos_audit_logs',
 } as const;

@@ -16,6 +16,8 @@
 - invitations
 - audit_logs
 
+TripOS uses MongoDB as the primary database. Redis is reserved for cache, queues, locks, rate limits, and short-lived session acceleration; PostgreSQL is not part of the current TripOS stack.
+
 ### CRM
 
 - customers
@@ -156,4 +158,3 @@ Examples:
 - `quotations(organization_id, lead_id, status, created_at)`
 - `bookings(organization_id, travel_start_date, status)`
 - `payments(organization_id, booking_id, status, due_date)`
-

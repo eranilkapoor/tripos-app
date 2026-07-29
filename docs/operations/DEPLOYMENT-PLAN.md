@@ -5,7 +5,7 @@
 Initial local stack:
 
 - Node.js LTS
-- PostgreSQL
+- MongoDB
 - Redis
 - S3-compatible local storage such as MinIO
 - API app
@@ -23,7 +23,7 @@ Initial local stack:
 Recommended first production architecture:
 
 - AWS ECS/Fargate for API and workers
-- AWS RDS PostgreSQL
+- MongoDB Atlas or self-managed MongoDB on private infrastructure
 - AWS ElastiCache Redis
 - AWS S3 for files
 - AWS CloudFront for public assets
@@ -33,7 +33,7 @@ Recommended first production architecture:
 
 ## Deployment Rules
 
-- Database migrations run before application deployment.
+- MongoDB index/schema compatibility checks run before application deployment.
 - Background workers deploy with API version compatibility.
 - Rollbacks must include migration strategy.
 - Feature flags protect incomplete modules.
@@ -42,4 +42,3 @@ Recommended first production architecture:
 ## Later Scale Path
 
 Move to Kubernetes, Kafka, OpenSearch, and extracted services only when supported by real customer scale or enterprise requirements.
-

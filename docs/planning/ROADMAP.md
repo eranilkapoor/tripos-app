@@ -11,14 +11,17 @@ Completed in the repo:
 - Tenant, branch, CRM user, login, session restore, and logout foundation.
 - Tenant records support multiple branches and storage modes: TripOS cloud, customer-managed, and hybrid sync.
 - Admin CRM sends bearer session, tenant, and branch context headers.
+- Protected backend routes now require bearer sessions by default, with explicit public-route opt-in.
+- Tenant/branch scoping is enforced for CRM list, create, detail, and status mutation paths.
+- RBAC guard, role decorators, permission decorators, refresh-session rotation, and platform-only tenant management are implemented.
+- API TypeScript configuration is synced with the Mentora-style Node16 setup.
+- Basic audit logging is implemented for authenticated mutations and sensitive finance/payment/document/tenant reads.
 
 Still required for production readiness:
 
-- Enforce tenant and branch scoping in every backend query and create path.
-- Add guards/interceptors for authenticated routes, RBAC, and permissions.
-- Add audit logs for auth, financial changes, booking changes, supplier confirmations, and document access.
+- Add audit-log UI, exports, retention policies, and deeper event-specific audit metadata.
 - Add edit/delete APIs and UI flows with soft-delete where appropriate.
-- Add refresh tokens/password reset/user invitation flows.
+- Add password reset and user invitation flows.
 - Add file upload/storage abstraction for passports, vouchers, tickets, contracts, and receipts.
 - Add customer/agent mobile authentication and role-specific API contracts.
 - Add offline/customer-managed storage sync queues for hybrid tenants.
@@ -38,11 +41,11 @@ Duration: 2-3 weeks
 
 Duration: 4-6 weeks
 
-- Authentication - initial session login/logout completed; refresh/password reset/invitation pending
-- Tenant management - initial tenant/branch model completed; scoped enforcement pending
-- Roles and permissions
+- Authentication - login/logout/session restore and refresh rotation completed; password reset/invitation pending
+- Tenant management - initial tenant/branch model completed; platform-only tenant management and CRM tenant scoping completed
+- Roles and permissions - global RBAC guard and decorators completed; fine-grained permission mapping still pending
 - Branches and departments
-- Audit logs
+- Audit logs - basic backend capture completed; UI/reporting/retention pending
 - File storage
 - Notifications foundation
 

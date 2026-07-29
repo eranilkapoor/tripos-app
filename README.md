@@ -39,10 +39,10 @@ For v1, B2B agent workflows and DMC operations are modules inside `tripos-admin-
 - Frontend: Next.js, React, TypeScript
 - Mobile: React Native with Expo
 - Backend: NestJS, TypeScript, modular monolith
-- Primary database: PostgreSQL
+- Primary database: MongoDB
 - Cache and queues: Redis, BullMQ
 - Object storage: AWS S3 or S3-compatible storage
-- Search: PostgreSQL full-text first, OpenSearch later
+- Search: MongoDB text indexes first, OpenSearch later
 - Deployment: AWS ECS/Fargate first, Kubernetes later if needed
 - CI/CD: GitHub Actions
 - Observability: OpenTelemetry, CloudWatch or managed APM
@@ -105,6 +105,7 @@ Useful endpoints:
 Database:
 
 - TripOS uses its own MongoDB database named `tripos`.
+- Redis is planned for cache, queues, rate limits, locks, and short-lived session acceleration.
 - Keep credentials in `tripos-api-server/.env.development`; this file is ignored by git.
 - Use `tripos-api-server/.env.example` as the safe template.
 

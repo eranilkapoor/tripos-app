@@ -21,7 +21,7 @@ B2C Web        Admin CRM        Mobile App
   Communication  CMS  Reporting  Integrations
   ------------------------------------------------
                     |
-     PostgreSQL  Redis/BullMQ  S3  Email/WhatsApp
+      MongoDB   Redis/BullMQ  S3  Email/WhatsApp
 ```
 
 ## Frontend Applications
@@ -51,25 +51,25 @@ quotation/
 
 ## Data Architecture
 
-- PostgreSQL is the source of truth for relational business data.
-- Redis is used for cache, rate limits, queues, locks, and short-lived sessions.
+- MongoDB is the source of truth for TripOS business data.
+- Redis is used for cache, rate limits, queues, locks, and short-lived session acceleration.
 - BullMQ handles asynchronous jobs in v1.
 - S3-compatible storage holds PDFs, passports, images, invoices, vouchers, tickets, and uploaded documents.
-- PostgreSQL full-text search is enough for v1 search.
+- MongoDB text indexes are enough for v1 search.
 - OpenSearch can be introduced for destination, hotel, activity, supplier, and package search later.
 
 ## Multi-Tenancy
 
 Use shared database with tenant isolation for v1.
 
-Every business table must include:
+Every tenant-owned business document must include:
 
-- `organization_id`
-- `branch_id` where branch-level access applies
-- `created_by`
-- `updated_by`
-- `created_at`
-- `updated_at`
+- `organizationId`
+- `branchId` where branch-level access applies
+- `createdBy`
+- `updatedBy`
+- `createdAt`
+- `updatedAt`
 
 Tenant enforcement should happen in:
 
@@ -81,7 +81,7 @@ Tenant enforcement should happen in:
 
 Enterprise upgrade path:
 
-- Shared schema, shared DB for standard tenants
+- Shared MongoDB database for standard tenants
 - Dedicated database for high-value enterprise tenants
 - Dedicated infrastructure only for strict compliance or scale requirements
 

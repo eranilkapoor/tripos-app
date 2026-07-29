@@ -21,6 +21,7 @@ import { SupportTicketsModule } from "./modules/support-tickets/support-tickets.
 import { CampaignsModule } from "./modules/campaigns/campaigns.module";
 import { TenantsModule } from "./modules/tenants/tenants.module";
 import { AuthModule } from "./modules/auth/auth.module";
+import { AuditModule } from "./modules/audit/audit.module";
 import { TenantContextMiddleware } from "./common/middleware/tenant-context.middleware";
 
 @Module({
@@ -61,6 +62,7 @@ import { TenantContextMiddleware } from "./common/middleware/tenant-context.midd
     CampaignsModule,
     TenantsModule,
     AuthModule,
+    AuditModule,
     TriposModule,
   ],
 })
