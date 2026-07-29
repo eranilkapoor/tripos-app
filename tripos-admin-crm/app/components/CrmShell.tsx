@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -45,7 +45,7 @@ import {
 const modules: CrmModule[] = [
   {
     id: "dashboard",
-    title: "Command Center",
+    title: "Dashboard",
     group: "Overview",
     description:
       "Live operating view across sales, bookings, operations, partners, suppliers, documents, support, and finance.",
@@ -523,7 +523,7 @@ const modules: CrmModule[] = [
   {
     id: "notifications",
     title: "Notifications",
-    group: "Overview",
+    group: "Control",
     endpoint: "notifications",
     description:
       "Tenant and branch alerts for sales, operations, finance, support, customers, and agents.",
@@ -732,7 +732,11 @@ const modules: CrmModule[] = [
 const navGroups = [
   {
     title: "Overview",
-    items: ["dashboard", "notifications"],
+    items: ["dashboard"],
+  },
+  {
+    title: "Control",
+    items: ["notifications"],
   },
   {
     title: "Sales",
@@ -859,6 +863,7 @@ export default function CrmShell() {
   const [session, setSession] = useState<CrmSession | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const [theme, setTheme] = useState<CrmTheme>("system");
+  const activeNavItemRef = useRef<HTMLButtonElement | null>(null);
   const selected = modules.find((item) => item.id === selectedId) ?? modules[0];
 
   useEffect(() => {
@@ -907,6 +912,13 @@ export default function CrmShell() {
     if (pathModule && modules.some((item) => item.id === pathModule))
       setSelectedId(pathModule);
   }, [pathModule]);
+
+  useEffect(() => {
+    activeNavItemRef.current?.scrollIntoView({
+      block: "center",
+      behavior: "smooth",
+    });
+  }, [selectedId]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -1132,6 +1144,7 @@ export default function CrmShell() {
                     className={selectedId === id ? "selected" : ""}
                     key={id}
                     onClick={() => selectModule(id)}
+                    ref={selectedId === id ? activeNavItemRef : undefined}
                     type="button"
                   >
                     <span>{module.title}</span>
