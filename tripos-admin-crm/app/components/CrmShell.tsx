@@ -523,7 +523,7 @@ const modules: CrmModule[] = [
   {
     id: "notifications",
     title: "Notifications",
-    group: "Control",
+    group: "Overview",
     endpoint: "notifications",
     description:
       "Tenant and branch alerts for sales, operations, finance, support, customers, and agents.",
@@ -731,36 +731,34 @@ const modules: CrmModule[] = [
 
 const navGroups = [
   {
-    title: "Control",
-    items: [
-      "dashboard",
-      "notifications",
-      "leads",
-      "customers",
-      "quotations",
-      "itineraries",
-    ],
+    title: "Overview",
+    items: ["dashboard", "notifications"],
   },
   {
-    title: "Execution",
-    items: [
-      "bookings",
-      "operations",
-      "travel-documents",
-      "vouchers",
-      "support-tickets",
-    ],
+    title: "Sales",
+    items: ["leads", "customers", "quotations", "itineraries"],
+  },
+  {
+    title: "Operations",
+    items: ["bookings", "operations", "travel-documents", "vouchers"],
   },
   { title: "Inventory", items: ["destinations", "tour-packages", "suppliers"] },
+  { title: "Partners", items: ["b2b-agents"] },
   {
-    title: "Business",
-    items: [
-      "b2b-agents",
-      "payments",
-      "invoices",
-      "campaigns",
-      "finance-reports",
-    ],
+    title: "Finance",
+    items: ["payments", "invoices", "finance-reports"],
+  },
+  {
+    title: "Growth",
+    items: ["campaigns"],
+  },
+  {
+    title: "Support",
+    items: ["support-tickets"],
+  },
+  {
+    title: "Reports",
+    items: ["sales-reports", "operations-reports", "saved-reports"],
   },
   {
     title: "Security",
@@ -768,13 +766,7 @@ const navGroups = [
   },
   {
     title: "System",
-    items: [
-      "storage-files",
-      "integrations",
-      "sales-reports",
-      "operations-reports",
-      "saved-reports",
-    ],
+    items: ["storage-files", "integrations"],
   },
 ];
 
