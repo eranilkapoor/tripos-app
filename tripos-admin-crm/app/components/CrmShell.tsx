@@ -12,6 +12,7 @@ import {
   faFolderOpen,
   faPlus,
   faRightFromBracket,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import type { ApiRecord, CrmModule, CrmSession, ModuleField } from "./crmTypes";
 import {
@@ -1011,12 +1012,6 @@ export default function CrmShell() {
             </small>
           </div>
           <div className="top-actions">
-            <input
-              aria-label="Search records"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search live records"
-              value={query}
-            />
             <ThemeSwitcher onChange={changeTheme} selectedTheme={theme} />
             <button
               className="utility-button"
@@ -1090,6 +1085,8 @@ export default function CrmShell() {
               module={selected}
               onSelect={setSelectedRecord}
               onStatus={updateStatus}
+              query={query}
+              setQuery={setQuery}
             />
           )}
 
@@ -1178,12 +1175,16 @@ function RecordTable({
   module,
   onSelect,
   onStatus,
+  query,
+  setQuery,
 }: {
   columns: string[];
   filteredRows: { record: ApiRecord; row: string[] }[];
   module: CrmModule;
   onSelect: (record: ApiRecord) => void;
   onStatus: (record: ApiRecord, status: string) => Promise<void>;
+  query: string;
+  setQuery: (query: string) => void;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -1211,7 +1212,18 @@ function RecordTable({
           <span className="eyebrow">{module.title}</span>
           <h2>Live Work Queue</h2>
         </div>
-        <strong>{total} records</strong>
+        <div className="table-tools">
+          <label className="table-search">
+            <FontAwesomeIcon aria-hidden icon={faSearch} />
+            <input
+              aria-label={`Search ${module.title}`}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={`Search ${module.title.toLowerCase()}`}
+              value={query}
+            />
+          </label>
+          <strong>{total} records</strong>
+        </div>
       </div>
       <div className="table-wrap">
         <table>
