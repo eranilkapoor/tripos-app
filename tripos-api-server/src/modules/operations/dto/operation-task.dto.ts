@@ -17,3 +17,26 @@ export class CreateOperationTaskDto {
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
 }
+
+export class AssignOperationTaskDto {
+  @IsString() @MinLength(2) assignedTo!: string;
+  @IsOptional() @IsString() note?: string;
+}
+
+export class UpdateOperationSlaDto {
+  @IsOptional() @IsDateString() dueAt?: string;
+  @IsOptional() @IsString() priority?: string;
+  @IsOptional() @IsString() slaStatus?: string;
+}
+
+export class EscalateOperationTaskDto {
+  @IsString() @MinLength(2) reason!: string;
+  @IsOptional() @IsString() escalatedTo?: string;
+  @IsOptional() @IsString() severity?: string;
+}
+
+export class AddOperationTimelineEventDto {
+  @IsString() @MinLength(2) type!: string;
+  @IsString() @MinLength(2) note!: string;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
+}

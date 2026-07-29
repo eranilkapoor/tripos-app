@@ -5,9 +5,12 @@ import { B2BAgent, B2BAgentSchema } from './schemas/b2b-agent.schema';
 import { B2BAgentsService } from './services/b2b-agents.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: B2BAgent.name, schema: B2BAgentSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: B2BAgent.name, schema: B2BAgentSchema },
+    ]),
+  ],
   controllers: [B2BAgentsController],
   providers: [B2BAgentsService],
 })
 export class B2BAgentsModule {}
-

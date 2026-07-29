@@ -13,7 +13,14 @@ import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
-import { CreateB2BAgentDto } from '../dto/b2b-agent.dto';
+import {
+  AddB2BAgentCommissionDto,
+  AddB2BAgentKycDocumentDto,
+  AddB2BAgentWalletEntryDto,
+  CreateB2BAgentDto,
+  CreateB2BAgentInvoiceDto,
+  UpdateB2BAgentCreditDto,
+} from '../dto/b2b-agent.dto';
 import { B2BAgentsService } from '../services/b2b-agents.service';
 
 @ApiTags('b2b-agents')
@@ -41,6 +48,76 @@ export class B2BAgentsController {
     @Req() request: Request,
   ) {
     return this.service.updateStatus(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Post(':id/kyc-documents')
+  addKycDocument(
+    @Param('id') id: string,
+    @Body() dto: AddB2BAgentKycDocumentDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addKycDocument(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Patch(':id/credit-limit')
+  updateCredit(
+    @Param('id') id: string,
+    @Body() dto: UpdateB2BAgentCreditDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateCredit(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Post(':id/commissions')
+  addCommission(
+    @Param('id') id: string,
+    @Body() dto: AddB2BAgentCommissionDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addCommission(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Post(':id/wallet')
+  addWalletEntry(
+    @Param('id') id: string,
+    @Body() dto: AddB2BAgentWalletEntryDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addWalletEntry(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Post(':id/invoices')
+  createInvoice(
+    @Param('id') id: string,
+    @Body() dto: CreateB2BAgentInvoiceDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.createInvoice(
       id,
       dto,
       tenantScopedQuery(query, request),

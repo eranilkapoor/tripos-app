@@ -199,10 +199,10 @@ const modules: CrmModule[] = [
     columns: ["Task", "Booking", "Service", "Owner", "Due", "Status"],
     rowMap: [
       "title",
-      "bookingCode",
+      "bookingId",
       "serviceType",
-      "owner",
-      "dueDate",
+      "assignedTo",
+      "dueAt",
       "status",
     ],
     statusOptions: [
@@ -215,12 +215,12 @@ const modules: CrmModule[] = [
     ],
     fields: [
       { key: "title", label: "Task", required: true },
-      { key: "bookingCode", label: "Booking Code" },
+      { key: "bookingId", label: "Booking ID" },
       { key: "serviceType", label: "Service", required: true },
-      { key: "owner", label: "Owner" },
-      { key: "dueDate", label: "Due Date", type: "date" },
+      { key: "assignedTo", label: "Owner" },
+      { key: "dueAt", label: "Due Date", type: "date" },
       {
-        key: "priority",
+        key: "payload.priority",
         label: "Priority",
         type: "select",
         options: ["low", "medium", "high", "urgent"],
@@ -554,6 +554,35 @@ const modules: CrmModule[] = [
     fields: [],
   },
   {
+    id: "saved-reports",
+    title: "Saved Reports",
+    group: "Reports",
+    endpoint: "saved-reports",
+    description:
+      "Reusable scheduled report templates for overview, sales funnel, operations, and finance reporting.",
+    columns: ["Report", "Type", "Schedule", "Recipients", "Status", "Last Run"],
+    rowMap: [
+      "name",
+      "reportType",
+      "schedule",
+      "recipients",
+      "status",
+      "lastRunAt",
+    ],
+    statusOptions: ["active", "paused", "archived"],
+    fields: [
+      { key: "name", label: "Report Name", required: true },
+      {
+        key: "reportType",
+        label: "Report Type",
+        required: true,
+        type: "select",
+        options: ["overview", "sales-funnel", "operations", "finance"],
+      },
+      { key: "recipients", label: "Recipients", type: "tags" },
+    ],
+  },
+  {
     id: "audit-logs",
     title: "Audit Logs",
     group: "Security",
@@ -662,6 +691,7 @@ const navGroups = [
       "integrations",
       "sales-reports",
       "operations-reports",
+      "saved-reports",
     ],
   },
 ];

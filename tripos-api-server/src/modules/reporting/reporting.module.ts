@@ -13,7 +13,10 @@ import {
   QuotationSchema,
 } from '../quotations/schemas/quotation.schema';
 import { ReportingController } from './controllers/reporting.controller';
+import { SavedReportsController } from './controllers/saved-reports.controller';
 import { ReportingService } from './reporting.service';
+import { SavedReportsService } from './saved-reports.service';
+import { SavedReport, SavedReportSchema } from './schemas/saved-report.schema';
 
 @Module({
   imports: [
@@ -24,9 +27,10 @@ import { ReportingService } from './reporting.service';
       { name: OperationTask.name, schema: OperationTaskSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: Campaign.name, schema: CampaignSchema },
+      { name: SavedReport.name, schema: SavedReportSchema },
     ]),
   ],
-  controllers: [ReportingController],
-  providers: [ReportingService],
+  controllers: [ReportingController, SavedReportsController],
+  providers: [ReportingService, SavedReportsService],
 })
 export class ReportingModule {}

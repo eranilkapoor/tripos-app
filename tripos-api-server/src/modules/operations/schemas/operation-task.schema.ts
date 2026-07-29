@@ -15,9 +15,28 @@ export class OperationTask {
   @Prop({ trim: true }) assignedTo?: string;
   @Prop() dueAt?: Date;
   @Prop({ type: Object, default: {} }) payload!: Record<string, unknown>;
-  @Prop({ enum: ['pending', 'assigned', 'confirmed', 'in_progress', 'completed', 'issue'], default: 'pending', index: true }) status!: string;
+  @Prop({ default: 'medium', index: true }) priority!: string;
+  @Prop({ default: 'on_track', index: true }) slaStatus!: string;
+  @Prop({ type: [Object], default: [] }) timeline!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) escalations!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({
+    enum: [
+      'pending',
+      'assigned',
+      'confirmed',
+      'in_progress',
+      'completed',
+      'issue',
+    ],
+    default: 'pending',
+    index: true,
+  })
+  status!: string;
 }
 
 export const OperationTaskSchema = SchemaFactory.createForClass(OperationTask);
 OperationTaskSchema.index({ organizationId: 1, bookingId: 1, status: 1 });
-

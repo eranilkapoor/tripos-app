@@ -13,7 +13,12 @@ import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
-import { CreateSupplierDto } from '../dto/supplier.dto';
+import {
+  AddSupplierConfirmationDto,
+  AddSupplierContractDto,
+  AddSupplierRateDto,
+  CreateSupplierDto,
+} from '../dto/supplier.dto';
 import { SuppliersService } from '../services/suppliers.service';
 
 @ApiTags('suppliers')
@@ -41,6 +46,40 @@ export class SuppliersController {
     @Req() request: Request,
   ) {
     return this.service.updateStatus(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Post(':id/contracts')
+  addContract(
+    @Param('id') id: string,
+    @Body() dto: AddSupplierContractDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addContract(id, dto, tenantScopedQuery(query, request));
+  }
+
+  @Post(':id/rates')
+  addRate(
+    @Param('id') id: string,
+    @Body() dto: AddSupplierRateDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addRate(id, dto, tenantScopedQuery(query, request));
+  }
+
+  @Post(':id/confirmations')
+  addConfirmation(
+    @Param('id') id: string,
+    @Body() dto: AddSupplierConfirmationDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addConfirmation(
       id,
       dto,
       tenantScopedQuery(query, request),

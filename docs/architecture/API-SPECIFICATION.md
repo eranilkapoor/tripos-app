@@ -135,6 +135,10 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 - `GET /reporting/sales-funnel` - implemented
 - `GET /reporting/operations` - implemented
 - `GET /reporting/finance` - implemented
+- `POST /saved-reports` - implemented
+- `GET /saved-reports` - implemented
+- `POST /saved-reports/:id/run` - implemented
+- `PATCH /saved-reports/:id/status` - implemented
 
 ### AI
 

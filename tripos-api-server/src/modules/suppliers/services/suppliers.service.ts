@@ -8,7 +8,12 @@ import {
   listCrmRecords,
   updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
-import { CreateSupplierDto } from '../dto/supplier.dto';
+import {
+  AddSupplierConfirmationDto,
+  AddSupplierContractDto,
+  AddSupplierRateDto,
+  CreateSupplierDto,
+} from '../dto/supplier.dto';
 import { Supplier } from '../schemas/supplier.schema';
 
 @Injectable()
@@ -22,6 +27,7 @@ export class SuppliersService {
       contacts: dto.contacts ?? [],
       contracts: dto.contracts ?? [],
       rates: dto.rates ?? [],
+      confirmations: [],
     });
   }
   list(query: CrmListQueryDto) {
@@ -36,6 +42,65 @@ export class SuppliersService {
       id,
       query,
       { status: dto.status },
+      'Supplier not found',
+    );
+  }
+
+  addContract(id: string, dto: AddSupplierContractDto, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      {
+        $push: {
+          contracts: {
+            ...dto,
+            currencyCode: dto.currencyCode ?? 'INR',
+            status: 'active',
+            createdAt: new Date().toISOString(),
+          },
+        },
+      },
+      'Supplier not found',
+    );
+  }
+
+  addRate(id: string, dto: AddSupplierRateDto, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      {
+        $push: {
+          rates: {
+            ...dto,
+            currencyCode: dto.currencyCode ?? 'INR',
+            createdAt: new Date().toISOString(),
+          },
+        },
+      },
+      'Supplier not found',
+    );
+  }
+
+  addConfirmation(
+    id: string,
+    dto: AddSupplierConfirmationDto,
+    query: CrmListQueryDto,
+  ) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      {
+        $push: {
+          confirmations: {
+            ...dto,
+            status: dto.status ?? 'confirmed',
+            confirmedAt: new Date().toISOString(),
+          },
+        },
+      },
       'Supplier not found',
     );
   }

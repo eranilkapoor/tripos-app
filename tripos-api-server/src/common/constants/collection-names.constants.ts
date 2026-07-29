@@ -22,4 +22,5 @@ export const COLLECTION_NAMES = {
   USER_SESSION: 'tripos_user_sessions',
   AUDIT_LOG: 'tripos_audit_logs',
   STORED_FILE: 'tripos_stored_files',
+  SAVED_REPORT: 'tripos_saved_reports',
 } as const;

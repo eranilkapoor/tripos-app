@@ -15,10 +15,25 @@ export class B2BAgent {
   @Prop({ default: 0 }) creditLimit!: number;
   @Prop({ default: 0 }) receivable!: number;
   @Prop({ default: 0 }) commissionEarned!: number;
-  @Prop({ type: [Object], default: [] }) kycDocuments!: Array<Record<string, unknown>>;
-  @Prop({ enum: ['pending_kyc', 'active', 'suspended', 'blocked'], default: 'pending_kyc', index: true }) status!: string;
+  @Prop({ type: [Object], default: [] }) kycDocuments!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) walletLedger!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) commissionLedger!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) invoices!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({
+    enum: ['pending_kyc', 'active', 'suspended', 'blocked'],
+    default: 'pending_kyc',
+    index: true,
+  })
+  status!: string;
 }
 
 export const B2BAgentSchema = SchemaFactory.createForClass(B2BAgent);
 B2BAgentSchema.index({ organizationId: 1, market: 1, status: 1 });
-
