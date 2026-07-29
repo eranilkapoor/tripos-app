@@ -343,7 +343,7 @@ td button {
 }
 
 .nav-group {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .nav-group h2,
@@ -358,7 +358,9 @@ td button {
 
 .nav-group h2 {
   color: var(--sidebar-text);
-  padding: 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  margin-bottom: 9px;
+  padding: 0 8px 8px;
 }
 
 .nav-group button {
@@ -369,10 +371,10 @@ td button {
   color: #eefdfa;
   display: flex;
   gap: 8px;
-  justify-content: space-between;
-  margin: 7px 0;
-  min-height: 42px;
-  padding: 9px 10px;
+  justify-content: flex-start;
+  margin: 6px 0;
+  min-height: 40px;
+  padding: 9px 12px;
   text-align: left;
   transition:
     background 160ms ease,
@@ -395,15 +397,11 @@ td button {
 }
 
 .nav-group button span {
+  font-size: 13px;
+  font-weight: 850;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.nav-group em {
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 900;
 }
 
 .topbar,

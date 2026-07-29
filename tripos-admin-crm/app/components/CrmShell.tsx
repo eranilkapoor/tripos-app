@@ -1143,7 +1143,6 @@ export default function CrmShell() {
                     type="button"
                   >
                     <span>{module.title}</span>
-                    <em>{module.group}</em>
                   </button>
                 );
               })}
