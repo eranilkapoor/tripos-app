@@ -27,8 +27,11 @@ export class PaymentsController {
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
     return this.service.list(tenantScopedQuery(query, request));
   }
-  @Get('summary') summary() {
-    return this.service.summary();
+  @Get('summary') summary(
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.summary(tenantScopedQuery(query, request));
   }
   @Get(':id') findOne(
     @Param('id') id: string,

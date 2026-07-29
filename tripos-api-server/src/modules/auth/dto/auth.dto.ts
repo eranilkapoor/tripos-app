@@ -1,4 +1,10 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsEmail,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class LoginDto {
   @IsEmail() email!: string;
@@ -36,4 +42,11 @@ export class InviteCrmUserDto {
 export class AcceptInvitationDto {
   @IsString() token!: string;
   @IsString() @MinLength(6) password!: string;
+}
+
+export class UpdateCrmUserPermissionsDto {
+  @IsOptional() @IsString() role?: string;
+  @IsOptional() @IsString() status?: string;
+  @IsOptional() @IsString() branchId?: string;
+  @IsOptional() @IsArray() permissions?: string[];
 }

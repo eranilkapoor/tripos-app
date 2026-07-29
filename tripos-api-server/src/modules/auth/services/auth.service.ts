@@ -18,7 +18,9 @@ import {
   LoginDto,
   RegisterCrmUserDto,
   ResetPasswordDto,
+  UpdateCrmUserPermissionsDto,
 } from '../dto/auth.dto';
+import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { CrmUser } from '../schemas/crm-user.schema';
 import { UserSession } from '../schemas/user-session.schema';
 import { TenantsService } from '../../tenants/services/tenants.service';
@@ -247,6 +249,121 @@ export class AuthService {
     return { success: true };
   }
 
+  permissionsCatalog() {
+    const modules = [
+      'leads',
+      'quotations',
+      'itineraries',
+      'bookings',
+      'suppliers',
+      'operations',
+      'b2b-agents',
+      'payments',
+      'finance',
+      'customers',
+      'documents',
+      'campaigns',
+      'support',
+      'audit',
+      'settings',
+    ];
+    const actions = ['read', 'create', 'update', 'delete', 'approve', 'export'];
+    return {
+      modules,
+      actions,
+      permissions: modules.flatMap((module) =>
+        actions.map((action) => `${module}:${action}`),
+      ),
+      roleDefaults: {
+        platform_admin: ['*'],
+        tenant_admin: ['*'],
+        branch_manager: modules.flatMap((module) =>
+          ['read', 'create', 'update', 'export'].map(
+            (action) => `${module}:${action}`,
+          ),
+        ),
+        sales: [
+          'leads:read',
+          'leads:create',
+          'leads:update',
+          'quotations:read',
+          'quotations:create',
+          'quotations:update',
+          'itineraries:read',
+          'bookings:read',
+          'customers:read',
+        ],
+        operations: [
+          'bookings:read',
+          'bookings:update',
+          'suppliers:read',
+          'operations:read',
+          'operations:create',
+          'operations:update',
+          'documents:read',
+          'documents:update',
+        ],
+        finance: [
+          'payments:read',
+          'payments:create',
+          'payments:update',
+          'finance:read',
+          'finance:create',
+          'finance:update',
+          'finance:export',
+        ],
+        agent: [
+          'quotations:read',
+          'bookings:read',
+          'payments:read',
+          'support:read',
+          'support:create',
+        ],
+      },
+    };
+  }
+
+  async listUsers(query: CrmListQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const filter = userScopeFilter(query);
+    if (query.status) filter.status = query.status;
+    if (query.search) {
+      const search = new RegExp(escapeRegex(query.search), 'i');
+      filter.$or = [{ name: search }, { email: search }, { role: search }];
+    }
+    const [items, total] = await Promise.all([
+      this.userModel
+        .find(filter)
+        .sort({ updatedAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.userModel.countDocuments(filter).exec(),
+    ]);
+    return { items: items.map(sanitizeUser), total, page, limit };
+  }
+
+  async updateUserPermissions(
+    id: string,
+    dto: UpdateCrmUserPermissionsDto,
+    query: CrmListQueryDto,
+  ) {
+    const update: Record<string, unknown> = {};
+    if (dto.role) update.role = dto.role;
+    if (dto.status) update.status = dto.status;
+    if (dto.branchId) update.branchId = dto.branchId;
+    if (dto.permissions) update.permissions = dto.permissions;
+    const user = await this.userModel
+      .findOneAndUpdate(userScopeFilter(query, { _id: id }), update, {
+        new: true,
+      })
+      .exec();
+    if (!user) throw new ForbiddenException('CRM user not found');
+    return sanitizeUser(user.toObject());
+  }
+
   private async ensureDemoAdmin() {
     const existing = await this.userModel
       .findOne({ email: 'admin@tripos.test' })
@@ -286,6 +403,22 @@ function sanitizeUser<T extends { passwordHash?: string }>(user: T) {
   const safeUser = { ...user };
   delete safeUser.passwordHash;
   return safeUser;
+}
+
+function userScopeFilter(
+  query: CrmListQueryDto,
+  extra: Record<string, unknown> = {},
+) {
+  const filter: Record<string, unknown> = {
+    ...extra,
+    tenantId: query.organizationId ?? 'demo-org',
+  };
+  if (query.branchId) filter.branchId = query.branchId;
+  return filter;
+}
+
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function withDevelopmentToken<T extends Record<string, unknown>>(

@@ -6,7 +6,7 @@ Last reviewed: 2026-07-29
 
 TripOS is build-clean and moving toward launch readiness, but it should not yet be marked production-live.
 
-The current blockers are no longer basic scaffolding. The remaining work is deep workflow completion, production environment activation, provider credentials/webhooks, file storage, QA evidence, backup/restore, monitoring, and legal/security sign-off.
+The current blockers are no longer basic scaffolding. The remaining work is admin/mobile UI depth for the newest backend workflows, production environment activation, provider credentials/webhooks, QA evidence, backup/restore execution, monitoring, and legal/security sign-off.
 
 ## Verified Locally
 
@@ -21,7 +21,7 @@ The current blockers are no longer basic scaffolding. The remaining work is deep
 
 | Application | Current state | Production blockers |
 | --- | --- | --- |
-| `tripos-api-server` | NestJS API builds. Core travel modules, auth, tenants, RBAC, tenant scope, refresh rotation, password reset, invitations, audit logging, invoices, and first deep workflow endpoints exist. | Email delivery provider, file storage, PDF rendering, provider callbacks, finance reconciliation, load/security testing, backup evidence. |
+| `tripos-api-server` | NestJS API builds. Core travel modules, auth, tenants, RBAC, tenant scope, refresh rotation, password reset, invitations, audit list/export, file storage registry, integration health, booking subflows, finance receivables/payables/refunds/profitability/reconciliation, and invoices exist. | Email delivery provider, live storage credentials, PDF rendering templates, provider callbacks, load/security testing, backup evidence. |
 | `tripos-admin-crm` | Next.js CRM shell connects to dedicated APIs with auth, tenant/branch context, module navigation, list/actions, invoice builder, and travel SaaS styling. | Deep edit forms, role/permission management UI, audit UI, workflow-specific screens, desktop/tablet QA. |
 | `tripos-mobile-app` | Expo shell has persisted sessions and separated customer/agent navigation foundations. | Complete customer/agent screens, offline sync, refresh handling, release builds, device QA, push credentials. |
 | `tripos-public-website` | Next.js public site and lead capture foundation exist. | Production domain/SSL, SEO QA, legal pages, analytics consent, package/destination CMS depth. |
@@ -39,8 +39,8 @@ The current blockers are no longer basic scaffolding. The remaining work is deep
 
 ## Immediate Next Actions
 
-1. Complete booking, quotation, itinerary, finance, supplier, document, and B2B agent deep workflow endpoints.
-2. Add admin CRM forms/actions for those endpoints.
-3. Add file storage and generated PDF workflows.
-4. Add email delivery for auth tokens, audit UI/export, and permission management.
-5. Prepare staging with production-like MongoDB, Redis, storage, monitoring, and secrets.
+1. Add admin CRM forms/actions for audit logs, permissions, storage attachments, booking subflows, finance reconciliation, supplier contracts, and B2B agent finance/KYC.
+2. Complete mobile customer/agent screens on top of the secured API, keeping mobile multi-theme and multi-language enabled.
+3. Add generated PDF templates for quotations, itineraries, invoices, and vouchers.
+4. Activate provider credentials/webhooks for email, WhatsApp, SMS, payments, maps, storage, analytics, and monitoring.
+5. Prepare staging with production-like MongoDB, Redis, storage, monitoring, backups, and secrets.

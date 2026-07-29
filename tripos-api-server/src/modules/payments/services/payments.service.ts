@@ -6,6 +6,7 @@ import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
   findScopedCrmRecord,
   listCrmRecords,
+  scopeFilter,
   updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
 import { CreatePaymentDto } from '../dto/payment.dto';
@@ -31,8 +32,8 @@ export class PaymentsService {
       { dueDate: 1, updatedAt: -1 },
     );
   }
-  async summary() {
-    const rows = await this.model.find().lean().exec();
+  async summary(query: CrmListQueryDto) {
+    const rows = await this.model.find(scopeFilter(query)).lean().exec();
     return rows.reduce(
       (summary, row) => {
         const key = `${row.type}_${row.status}`;
