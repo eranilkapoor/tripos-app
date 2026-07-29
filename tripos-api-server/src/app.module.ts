@@ -12,6 +12,12 @@ import { SuppliersModule } from "./modules/suppliers/suppliers.module";
 import { OperationsModule } from "./modules/operations/operations.module";
 import { B2BAgentsModule } from "./modules/b2b-agents/b2b-agents.module";
 import { PaymentsModule } from "./modules/payments/payments.module";
+import { CustomersModule } from "./modules/customers/customers.module";
+import { DestinationsModule } from "./modules/destinations/destinations.module";
+import { TourPackagesModule } from "./modules/tour-packages/tour-packages.module";
+import { TravelDocumentsModule } from "./modules/travel-documents/travel-documents.module";
+import { VouchersModule } from "./modules/vouchers/vouchers.module";
+import { SupportTicketsModule } from "./modules/support-tickets/support-tickets.module";
 
 @Module({
   imports: [
@@ -42,6 +48,12 @@ import { PaymentsModule } from "./modules/payments/payments.module";
     OperationsModule,
     B2BAgentsModule,
     PaymentsModule,
+    CustomersModule,
+    DestinationsModule,
+    TourPackagesModule,
+    TravelDocumentsModule,
+    VouchersModule,
+    SupportTicketsModule,
     TriposModule,
   ],
 })

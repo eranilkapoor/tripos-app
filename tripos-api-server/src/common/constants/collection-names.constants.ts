@@ -10,4 +10,10 @@ export const COLLECTION_NAMES = {
   OPERATION_TASK: 'tripos_operation_tasks',
   B2B_AGENT: 'tripos_b2b_agents',
   PAYMENT: 'tripos_payments',
+  CUSTOMER: 'tripos_customers',
+  DESTINATION: 'tripos_destinations',
+  TOUR_PACKAGE: 'tripos_tour_packages',
+  TRAVEL_DOCUMENT: 'tripos_travel_documents',
+  VOUCHER: 'tripos_vouchers',
+  SUPPORT_TICKET: 'tripos_support_tickets',
 } as const;

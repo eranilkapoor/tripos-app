@@ -1,0 +1,22 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
+import { COLLECTION_NAMES } from '../../../common/constants/collection-names.constants';
+
+export type VoucherDocument = HydratedDocument<Voucher>;
+
+@Schema({ collection: COLLECTION_NAMES.VOUCHER, timestamps: true })
+export class Voucher {
+  @Prop({ default: 'demo-org', index: true }) organizationId!: string;
+  @Prop({ default: 'main', index: true }) branchId!: string;
+  @Prop({ required: true, trim: true, index: true }) bookingId!: string;
+  @Prop({ required: true, trim: true, index: true }) customerName!: string;
+  @Prop({ required: true, trim: true, index: true }) voucherType!: string;
+  @Prop({ trim: true, index: true }) supplierName?: string;
+  @Prop({ trim: true }) issueDate?: string;
+  @Prop({ trim: true, index: true }) confirmationNumber?: string;
+  @Prop({ type: [Object], default: [] }) lineItems!: Array<Record<string, unknown>>;
+  @Prop({ enum: ['draft', 'issued', 'sent', 'cancelled'], default: 'draft', index: true }) status!: string;
+}
+
+export const VoucherSchema = SchemaFactory.createForClass(Voucher);
+VoucherSchema.index({ organizationId: 1, bookingId: 1, voucherType: 1 });
