@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { TriposModule } from "./modules/tripos/tripos.module";
@@ -21,6 +21,7 @@ import { SupportTicketsModule } from "./modules/support-tickets/support-tickets.
 import { CampaignsModule } from "./modules/campaigns/campaigns.module";
 import { TenantsModule } from "./modules/tenants/tenants.module";
 import { AuthModule } from "./modules/auth/auth.module";
+import { TenantContextMiddleware } from "./common/middleware/tenant-context.middleware";
 
 @Module({
   imports: [
@@ -63,4 +64,8 @@ import { AuthModule } from "./modules/auth/auth.module";
     TriposModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TenantContextMiddleware).forRoutes('{*path}');
+  }
+}

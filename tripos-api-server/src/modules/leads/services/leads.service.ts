@@ -37,7 +37,10 @@ export class LeadsService {
   }
 
   async list(query: LeadListQueryDto) {
-    const filter: Record<string, unknown> = {};
+    const filter: Record<string, unknown> = {
+      organizationId: query.organizationId ?? 'demo-org',
+    };
+    if (query.branchId) filter.branchId = query.branchId;
     if (query.stage) filter.stage = query.stage;
     if (query.assignedTo) filter.assignedTo = query.assignedTo;
     if (query.destination) {

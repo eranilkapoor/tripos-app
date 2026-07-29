@@ -110,5 +110,12 @@ export class LeadListQueryDto extends PaginationDto {
   @IsOptional()
   @IsString()
   destination?: string;
-}
 
+  @IsOptional()
+  @IsString()
+  organizationId?: string;
+
+  @IsOptional()
+  @IsString()
+  branchId?: string;
+}

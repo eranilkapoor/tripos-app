@@ -5,4 +5,12 @@ export class CrmListQueryDto extends PaginationDto {
   @IsOptional()
   @IsString()
   status?: string;
+
+  @IsOptional()
+  @IsString()
+  organizationId?: string;
+
+  @IsOptional()
+  @IsString()
+  branchId?: string;
 }

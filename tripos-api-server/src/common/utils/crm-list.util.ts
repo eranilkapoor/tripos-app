@@ -10,6 +10,8 @@ export async function listCrmRecords<T>(
   const page = query.page ?? 1;
   const limit = query.limit ?? 20;
   const filter: Record<string, unknown> = {};
+  filter.organizationId = query.organizationId ?? 'demo-org';
+  if (query.branchId) filter.branchId = query.branchId;
   if (query.status) filter.status = query.status;
   if (query.search) {
     filter.$or = searchFields.map((field) => ({
