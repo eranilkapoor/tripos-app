@@ -34,7 +34,7 @@ The core promise:
 
 ## Product Principles
 
-- Solve travel business operations first, OTA-style live inventory later.
+- Solve travel business operations first; OTA-style live inventory is a separate integration track after core operations are stable.
 - Build multi-tenant isolation from day one.
 - Make quotation and itinerary creation extremely fast.
 - Keep finance focused on travel profitability, not full accounting replacement.
@@ -92,4 +92,3 @@ Agent Registered
 - Operations team can see today's hotels, transfers, activities, and exceptions.
 - Marketing team can connect campaign spend to bookings and revenue.
 - B2B agents can self-serve enquiry, booking, commission, payment, and voucher status.
-

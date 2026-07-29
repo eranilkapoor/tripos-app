@@ -13,7 +13,11 @@ import { Request } from 'express';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
-import { CreateItineraryDto } from '../dto/itinerary.dto';
+import {
+  CreateItineraryDto,
+  UpsertItineraryDayDto,
+  UpsertItineraryItemDto,
+} from '../dto/itinerary.dto';
 import { ItinerariesService } from '../services/itineraries.service';
 
 @ApiTags('itineraries')
@@ -45,5 +49,41 @@ export class ItinerariesController {
       dto,
       tenantScopedQuery(query, request),
     );
+  }
+
+  @Post(':id/days')
+  addDay(
+    @Param('id') id: string,
+    @Body() dto: UpsertItineraryDayDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addDay(id, dto, tenantScopedQuery(query, request));
+  }
+
+  @Patch(':id/days/:dayId')
+  updateDay(
+    @Param('id') id: string,
+    @Param('dayId') dayId: string,
+    @Body() dto: UpsertItineraryDayDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateDay(
+      id,
+      dayId,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Post(':id/items')
+  addItem(
+    @Param('id') id: string,
+    @Body() dto: UpsertItineraryItemDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.addItem(id, dto, tenantScopedQuery(query, request));
   }
 }

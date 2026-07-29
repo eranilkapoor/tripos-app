@@ -56,7 +56,7 @@ quotation/
 - BullMQ handles asynchronous jobs in v1.
 - S3-compatible storage holds PDFs, passports, images, invoices, vouchers, tickets, and uploaded documents.
 - MongoDB text indexes are enough for v1 search.
-- OpenSearch can be introduced for destination, hotel, activity, supplier, and package search later.
+- OpenSearch is optional and should be introduced only when MongoDB text indexes are not enough for destination, hotel, activity, supplier, and package search.
 
 ## Multi-Tenancy
 

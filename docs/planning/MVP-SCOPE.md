@@ -14,8 +14,8 @@ Tenant -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Bookings -
 
 - Tenant onboarding - backend tenant model completed
 - User login/logout - completed for CRM session foundation
-- User invitation - pending
-- Roles and permissions - role field exists; enforcement pending
+- User invitation - backend flow implemented; email delivery provider pending
+- Roles and permissions - RBAC guard/decorators implemented; admin permission UI pending
 - Lead management - completed API and CRM surface
 - Customer profiles - completed API and CRM surface
 - Tasks and follow-ups

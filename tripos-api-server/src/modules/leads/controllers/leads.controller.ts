@@ -13,6 +13,7 @@ import { Request } from 'express';
 import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
 import {
   AssignLeadDto,
+  AddLeadActivityDto,
   CreateLeadDto,
   LeadListQueryDto,
   UpdateLeadStageDto,
@@ -61,6 +62,43 @@ export class LeadsController {
     @Req() request: Request,
   ) {
     return this.leadsService.updateStage(
+      id,
+      dto,
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Get(':id/activities')
+  activities(
+    @Param('id') id: string,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.activities(id, tenantScopedQuery(query, request));
+  }
+
+  @Post(':id/notes')
+  addNote(
+    @Param('id') id: string,
+    @Body() dto: AddLeadActivityDto,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.addActivity(
+      id,
+      { ...dto, type: 'note_added' },
+      tenantScopedQuery(query, request),
+    );
+  }
+
+  @Post(':id/activities')
+  addActivity(
+    @Param('id') id: string,
+    @Body() dto: AddLeadActivityDto,
+    @Query() query: LeadListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.leadsService.addActivity(
       id,
       dto,
       tenantScopedQuery(query, request),

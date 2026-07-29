@@ -106,6 +106,24 @@ export class AssignLeadDto {
   assignedTo!: string;
 }
 
+export class AddLeadActivityDto {
+  @IsOptional()
+  @IsEnum(['note_added', 'lead_created', 'assignment_changed', 'stage_changed'])
+  type?: string;
+
+  @IsString()
+  @MinLength(2)
+  subject!: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
+}
+
 export class LeadListQueryDto extends PaginationDto {
   @IsOptional()
   @IsString()

@@ -42,8 +42,8 @@ For v1, B2B agent workflows and DMC operations are modules inside `tripos-admin-
 - Primary database: MongoDB
 - Cache and queues: Redis, BullMQ
 - Object storage: AWS S3 or S3-compatible storage
-- Search: MongoDB text indexes first, OpenSearch later
-- Deployment: AWS ECS/Fargate first, Kubernetes later if needed
+- Search: MongoDB text indexes first; OpenSearch only if package/search scale requires it
+- Deployment: AWS ECS/Fargate first; Kubernetes only if operational scale requires it
 - CI/CD: GitHub Actions
 - Observability: OpenTelemetry, CloudWatch or managed APM
 
@@ -56,7 +56,7 @@ Keep environment files, Docker Compose files, and infrastructure definitions ins
 1. Read [Product Requirements](docs/product/PRD.md).
 2. Review [Technical Architecture](docs/architecture/TECHNICAL-ARCHITECTURE.md).
 3. Use [MVP Scope](docs/planning/MVP-SCOPE.md) to avoid building too much too early.
-4. Follow [90-Day Plan](docs/planning/90-DAY-PLAN.md) for the first execution cycle.
+4. Follow [Launch Execution Plan](docs/planning/LAUNCH-EXECUTION-PLAN.md) and [Task Roadmap](docs/planning/ROADMAP.md) for the build-now sequence.
 
 ## MVP Apps
 

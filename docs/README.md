@@ -15,8 +15,12 @@
 ## Planning
 
 - [MVP Scope](planning/MVP-SCOPE.md)
-- [90-Day Plan](planning/90-DAY-PLAN.md)
+- [Launch Execution Plan](planning/LAUNCH-EXECUTION-PLAN.md)
 - [Roadmap](planning/ROADMAP.md)
+
+## Launch
+
+- [Production Readiness Audit](launch/PRODUCTION-READINESS-AUDIT.md)
 
 ## Operations
 
@@ -25,4 +29,3 @@
 ## Standards
 
 - [Engineering Standards](standards/ENGINEERING-STANDARDS.md)
-

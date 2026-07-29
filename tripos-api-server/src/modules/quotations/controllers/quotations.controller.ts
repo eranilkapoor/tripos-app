@@ -46,4 +46,40 @@ export class QuotationsController {
       tenantScopedQuery(query, request),
     );
   }
+
+  @Post(':id/calculate')
+  calculate(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.calculate(id, tenantScopedQuery(query, request));
+  }
+
+  @Post(':id/send')
+  send(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.send(id, tenantScopedQuery(query, request));
+  }
+
+  @Post(':id/accept')
+  accept(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.accept(id, tenantScopedQuery(query, request));
+  }
+
+  @Post(':id/pdf')
+  pdf(
+    @Param('id') id: string,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.pdf(id, tenantScopedQuery(query, request));
+  }
 }

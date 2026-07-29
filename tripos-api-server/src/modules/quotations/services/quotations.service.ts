@@ -48,6 +48,48 @@ export class QuotationsService {
       'Quotation not found',
     );
   }
+
+  async calculate(id: string, query: CrmListQueryDto) {
+    const quotation = await this.findOne(id, query);
+    return {
+      quotationId: id,
+      pricing: calculatePricing(
+        (quotation as { pricing?: Record<string, number> }).pricing ?? {},
+        (quotation as { services?: Array<Record<string, unknown>> }).services ??
+          [],
+      ),
+    };
+  }
+
+  send(id: string, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      { status: 'sent' },
+      'Quotation not found',
+    );
+  }
+
+  accept(id: string, query: CrmListQueryDto) {
+    return updateScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      { status: 'accepted' },
+      'Quotation not found',
+    );
+  }
+
+  async pdf(id: string, query: CrmListQueryDto) {
+    const quotation = await this.findOne(id, query);
+    return {
+      quotationId: id,
+      fileName: `quotation-${id}.pdf`,
+      status: 'ready',
+      payload: quotation,
+    };
+  }
 }
 
 function calculatePricing(

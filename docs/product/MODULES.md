@@ -1,17 +1,19 @@
 # TripOS Modules
 
-## Phase 1 Foundation
+TripOS modules are grouped by launch ownership, not by slow delivery phases. The goal is to complete code-side readiness as quickly as possible and keep external/provider blockers separate.
+
+## Platform Foundation
 
 ### Identity and Access
 
 - Email/password login
-- Mobile OTP login later
-- JWT sessions
+- Session restore, logout, and refresh rotation
 - Roles and permissions
 - Branch and department access
 - User invitations
 - Password reset
 - Audit logs
+- Optional mobile OTP/SSO when providers are selected
 
 ### Tenant and Organization
 
@@ -23,6 +25,9 @@
 - Tenant settings
 - White-label branding
 - Subscription plan metadata
+- Storage mode: TripOS cloud, customer-managed, or hybrid sync
+
+## CRM and Sales
 
 ### CRM and Leads
 
@@ -53,7 +58,7 @@
 ### Itinerary Builder
 
 - Day-wise itinerary
-- Drag and reorder later
+- Day and item editing
 - Activity details
 - Hotel details
 - Transfers
@@ -61,6 +66,7 @@
 - Images
 - Notes
 - PDF and shareable web view
+- Drag/reorder after the stable day/item model is complete
 
 ### Booking
 
@@ -72,7 +78,7 @@
 - Vouchers
 - Booking statuses
 
-## Phase 2 Commercial Depth
+## Operations and Finance
 
 ### Supplier Management
 
@@ -96,7 +102,7 @@
 - Issue tracking
 - Trip monitoring
 
-Operations lives inside `tripos-admin-crm` for v1.
+Operations lives inside `tripos-admin-crm` as role-based views for launch.
 
 ### Finance
 
@@ -120,7 +126,7 @@ Operations lives inside `tripos-admin-crm` for v1.
 - Trip reminders
 - Feedback messages
 
-## Phase 3 Expansion
+## Market and Growth
 
 ### B2B Agent Management
 
@@ -134,7 +140,7 @@ Operations lives inside `tripos-admin-crm` for v1.
 - Booking status
 - Voucher download
 
-B2B lives inside `tripos-admin-crm` for v1 as restricted role-based views. A separate partner portal can be extracted later if agent self-service becomes a major growth channel.
+B2B lives inside `tripos-admin-crm` as restricted role-based views for launch. A separate partner portal is an extraction decision only if agent self-service becomes a major product requirement.
 
 ### B2C Website and CMS
 

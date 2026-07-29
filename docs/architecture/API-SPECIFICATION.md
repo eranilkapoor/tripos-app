@@ -36,9 +36,11 @@
 - `POST /auth/logout` - implemented
 - `GET /auth/me` - implemented
 - `POST /auth/register-crm-user` - implemented for CRM bootstrap/admin use
-- `POST /auth/refresh` - pending
-- `POST /auth/password/forgot` - pending
-- `POST /auth/password/reset` - pending
+- `POST /auth/refresh` - implemented
+- `POST /auth/password/forgot` - implemented
+- `POST /auth/password/reset` - implemented
+- `POST /auth/invitations` - implemented
+- `POST /auth/invitations/accept` - implemented
 
 ### Organizations
 
@@ -103,17 +105,17 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 
 ### Pending Deep Workflow Endpoints
 
-- `POST /crm/leads/:id/tasks`
-- `POST /crm/leads/:id/notes`
-- `POST /crm/leads/:id/activities`
+- `POST /leads/:id/notes` - implemented
+- `GET /leads/:id/activities` - implemented
+- `POST /leads/:id/activities` - implemented
 - `POST /crm/leads/:id/convert-to-customer`
-- `POST /sales/quotations/:id/calculate`
-- `POST /sales/quotations/:id/send`
-- `POST /sales/quotations/:id/accept`
-- `POST /sales/quotations/:id/pdf`
-- `POST /itineraries/:id/days`
-- `PATCH /itineraries/:id/days/:dayId`
-- `POST /itineraries/:id/items`
+- `POST /quotations/:id/calculate` - implemented
+- `POST /quotations/:id/send` - implemented
+- `POST /quotations/:id/accept` - implemented
+- `POST /quotations/:id/pdf` - implemented as generated payload; real PDF storage pending
+- `POST /itineraries/:id/days` - implemented
+- `PATCH /itineraries/:id/days/:dayId` - implemented
+- `POST /itineraries/:id/items` - implemented
 - `PATCH /itineraries/:id/items/:itemId`
 - `POST /bookings/from-quotation/:quotationId`
 - `POST /bookings/:id/passengers`

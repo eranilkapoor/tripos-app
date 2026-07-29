@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
   AssignLeadDto,
+  AddLeadActivityDto,
   CreateLeadDto,
   LeadListQueryDto,
   UpdateLeadStageDto,
@@ -121,6 +122,31 @@ export class LeadsService {
       metadata: { stage: dto.stage },
     });
     return lead;
+  }
+
+  async activities(id: string, query: LeadListQueryDto) {
+    await this.findOne(id, query);
+    return this.activityModel
+      .find({ organizationId: query.organizationId ?? 'demo-org', leadId: id })
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+  }
+
+  async addActivity(
+    id: string,
+    dto: AddLeadActivityDto,
+    query: LeadListQueryDto,
+  ) {
+    await this.findOne(id, query);
+    return this.activityModel.create({
+      organizationId: query.organizationId ?? 'demo-org',
+      leadId: id,
+      type: dto.type ?? 'note_added',
+      subject: dto.subject,
+      description: dto.description,
+      metadata: dto.metadata ?? {},
+    });
   }
 }
 

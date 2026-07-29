@@ -18,7 +18,8 @@ Current repo status:
 - Admin CRM sends bearer token plus tenant and branch headers.
 - Route protection, RBAC guards, and refresh token rotation are implemented.
 - Basic audit logging for authenticated mutations and sensitive reads is implemented.
-- Password reset, invitation flows, audit-log UI/reporting, and retention policies are still pending.
+- Password reset and invitation backend flows are implemented.
+- Email delivery provider, audit-log UI/reporting, and retention policies are still pending.
 
 ## Authorization Model
 

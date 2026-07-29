@@ -1,151 +1,98 @@
-# TripOS Product Roadmap
+# TripOS Task Roadmap
+
+Last reviewed: 2026-07-29
+
+TripOS is being built for launch as soon as the product is code-ready and the production environment is activated. This roadmap does not use 90-day or future-phase timing. Status reflects current code-side readiness in this repository.
+
+Status legend:
+
+- `Product Ready`: dedicated backend/API and frontend/mobile surface exist with tenant scoping, auth, and audit-aware operations where applicable.
+- `Workflow Ready`: usable MVP workflow exists, but deeper business rules, exports, provider callbacks, or frontend detail screens still need expansion.
+- `Foundation`: schema/module shell exists; needs richer production workflow.
+- `External`: blocked by infrastructure, provider credentials, legal/security review, or live deployment setup.
+
+## Production Gates
+
+| Priority | Launch gate | Status |
+| --- | --- | --- |
+| P0 | Production environment, secrets, MongoDB, Redis, S3-compatible storage, strict CORS, seeder policy | External |
+| P0 | API lint/typecheck/build, admin CRM build, public website build, mobile typecheck | Verified locally |
+| P0 | Tenant/branch isolation, authenticated protected routes, RBAC, refresh rotation | Product Ready |
+| P0 | Audit logging for protected mutations and sensitive reads | Workflow Ready |
+| P0 | Provider smoke tests for email, WhatsApp, SMS, payments, storage, maps, analytics, monitoring | External |
+| P0 | Desktop/tablet CRM QA, mobile Android/iOS QA, public website SEO/legal QA | Pending QA |
+| P0 | Backup/restore, load testing, monitoring alerts, incident runbook | External |
 
 ## Current Implementation Status
 
 Completed in the repo:
 
 - Monorepo structure aligned with Mentora-style app boundaries.
-- Mongo-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, and finance invoices.
-- Admin CRM connected to dedicated production APIs instead of generic demo records.
-- CRM list pagination, status filtering, and server-side search.
-- Tenant, branch, CRM user, login, session restore, and logout foundation.
-- Tenant records support multiple branches and storage modes: TripOS cloud, customer-managed, and hybrid sync.
-- Admin CRM sends bearer session, tenant, and branch context headers.
-- Protected backend routes now require bearer sessions by default, with explicit public-route opt-in.
-- Tenant/branch scoping is enforced for CRM list, create, detail, and status mutation paths.
-- RBAC guard, role decorators, permission decorators, refresh-session rotation, and platform-only tenant management are implemented.
-- API TypeScript configuration is synced with the Mentora-style Node16 setup.
-- Basic audit logging is implemented for authenticated mutations and sensitive finance/payment/document/tenant reads.
+- MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, tenants, auth, finance invoices, and audit logs.
+- Admin CRM connected to dedicated production APIs with bearer session handling.
+- CRM list pagination, status filtering, server-side search, tenant/branch scoping, detail scoping, and status mutation scoping.
+- Tenant, branch, CRM user, login, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only tenant management.
+- Basic audit logging for authenticated mutations and sensitive finance/payment/document/tenant reads.
+- Mobile app shell with persisted secure session storage and separate customer/agent navigation foundations.
+- Public website lead capture wired to backend public lead endpoint.
+- API TypeScript configuration synced with Mentora-style Node16 setup.
 
-Still required for production readiness:
+## Module Readiness Matrix
 
-- Add audit-log UI, exports, retention policies, and deeper event-specific audit metadata.
-- Add edit/delete APIs and UI flows with soft-delete where appropriate.
-- Add password reset and user invitation flows.
-- Add file upload/storage abstraction for passports, vouchers, tickets, contracts, and receipts.
-- Add customer/agent mobile authentication and role-specific API contracts.
-- Add offline/customer-managed storage sync queues for hybrid tenants.
-- Add automated tests around tenant isolation, auth sessions, pricing, payments, and booking workflow.
+| # | Module | API status | Admin CRM status | Mobile/Public status | Remaining production work |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Authentication and Sessions | Product Ready | Product Ready | Workflow Ready | MFA/SSO provider and email delivery provider |
+| 2 | Tenant and Branch Management | Product Ready | Workflow Ready | N/A | Tenant onboarding UI depth, storage/sync adapters |
+| 3 | RBAC and Permissions | Workflow Ready | Workflow Ready | Workflow Ready | Fine-grained permission map per action/module |
+| 4 | Audit Logs | Workflow Ready | Foundation | N/A | Audit UI, exports, retention policies |
+| 5 | Leads | Product Ready | Product Ready | Agent Workflow Ready | Follow-up tasks, duplicate merge, import/export |
+| 6 | Customers | Workflow Ready | Product Ready | Customer Workflow Ready | Customer timeline, profile edit depth |
+| 7 | Quotations | Workflow Ready | Product Ready | Agent Workflow Ready | PDF rendering/storage, send provider integration |
+| 8 | Itineraries | Workflow Ready | Product Ready | Customer Workflow Ready | Rich day/item editor, PDF/share links |
+| 9 | Bookings | Workflow Ready | Product Ready | Customer Workflow Ready | Convert-from-quotation, passenger/payment/voucher subflows |
+| 10 | Suppliers | Workflow Ready | Product Ready | N/A | Contracts, rates, confirmations |
+| 11 | Operations | Workflow Ready | Product Ready | Agent Workflow Ready | SLA dashboards, assignment automation |
+| 12 | B2B Agents | Workflow Ready | Product Ready | Agent Workflow Ready | KYC, commissions, credit limits, wallet |
+| 13 | Payments | Workflow Ready | Product Ready | Customer Workflow Ready | Gateway callbacks, refunds, reconciliation |
+| 14 | Finance Invoices | Workflow Ready | Product Ready | N/A | PDF generation, accounting export, tax validation |
+| 15 | Destinations and Packages | Workflow Ready | Product Ready | Public Workflow Ready | CMS depth, SEO publishing workflow |
+| 16 | Travel Documents | Workflow Ready | Product Ready | Customer Workflow Ready | File upload/storage, verification workflow |
+| 17 | Vouchers | Workflow Ready | Product Ready | Customer Workflow Ready | Supplier confirmation linkage, PDF storage |
+| 18 | Support Tickets | Workflow Ready | Product Ready | Customer Workflow Ready | SLA, assignment, communication provider hooks |
+| 19 | Campaigns and Marketing | Workflow Ready | Product Ready | Public Workflow Ready | Email/WhatsApp automation providers |
+| 20 | Public Website | Workflow Ready | N/A | Workflow Ready | Production domain, analytics consent, SEO QA |
+| 21 | Mobile Customer/Agent App | Workflow Ready | N/A | Workflow Ready | Release builds, offline sync, role-specific API depth |
+| 22 | Integrations | Foundation | Foundation | N/A | Provider adapters and webhook verification |
+| 23 | Reporting and Analytics | Foundation | Foundation | N/A | Saved reports, export jobs, dashboards |
+| 24 | AI Travel Assistant | Foundation | Foundation | N/A | Provider gateway, usage metering, audit prompts |
 
-## Phase 0: Discovery
+## Immediate Build-Now Backlog
 
-Duration: 2-3 weeks
+| Priority | Status | Task |
+| --- | --- | --- |
+| P0 | Done | Protect CRM routes with bearer auth by default. |
+| P0 | Done | Enforce tenant/branch scope for list, create, detail, and status mutation paths. |
+| P0 | Done | Add RBAC decorators/guard and platform-only tenant management. |
+| P0 | Done | Add refresh-session rotation. |
+| P0 | Done | Add basic backend audit logging. |
+| P0 | Done | Sync TripOS API `tsconfig.json` with Mentora Node16 setup. |
+| P0 | In Progress | Complete deep workflow endpoints for leads, quotations, itineraries, bookings, finance, and documents. |
+| P0 | Done | Add password reset and user invitation backend flows. |
+| P0 | Todo | Add file storage abstraction for passports, vouchers, tickets, contracts, receipts, and generated PDFs. |
+| P0 | Todo | Add fine-grained module permission map and admin UI permission management. |
+| P0 | Todo | Add audit-log list/export APIs and admin CRM audit screens. |
+| P1 | Todo | Add production provider adapters for email, WhatsApp, SMS, payments, maps, storage, and monitoring. |
+| P1 | Todo | Add backup/restore runbook, index audit, load testing, and staging smoke scripts. |
 
-- Customer interviews
-- Workflow analysis
-- MVP validation
-- Pricing validation
-- Sample documents collection
+## Module Completion Focus
 
-## Phase 1: Platform Foundation
+The next code-side completion order is:
 
-Duration: 4-6 weeks
-
-- Authentication - login/logout/session restore and refresh rotation completed; password reset/invitation pending
-- Tenant management - initial tenant/branch model completed; platform-only tenant management and CRM tenant scoping completed
-- Roles and permissions - global RBAC guard and decorators completed; fine-grained permission mapping still pending
-- Branches and departments
-- Audit logs - basic backend capture completed; UI/reporting/retention pending
-- File storage
-- Notifications foundation
-
-## Phase 2: CRM and Sales
-
-Duration: 6-8 weeks
-
-- Leads
-- Customers
-- Contacts
-- Tasks and follow-ups
-- Activities
-- Sales pipeline
-- Quotation builder
-- Pricing engine
-- PDF quotation
-- Email and WhatsApp tracking
-
-## Phase 3: Itinerary and Booking
-
-Duration: 6-8 weeks
-
-- Itinerary builder
-- Package templates
-- Booking conversion
-- Passengers
-- Vouchers
-- Payment schedule
-- Basic finance reports
-
-## Phase 3A: Mobile Customer and Agent App
-
-Duration: 4-6 weeks
-
-- Shared mobile login/session restore
-- Customer mode: trips, itinerary, vouchers, travel documents, payments, support, feedback
-- Agent mode: assigned leads, quotations, bookings, customer documents, payment follow-ups, support tickets
-- Tenant/branch-aware API headers
-- Offline cache for current trip and pending support/document actions
-- Role-specific navigation and permissions
-
-## Phase 4: Supplier and Operations
-
-Duration: 8-10 weeks
-
-- Supplier directory
-- Contracts and rates
-- Supplier confirmations
-- Drivers and guides
-- Transfers
-- Operations dashboard
-- Issue tracking
-
-## Phase 5: B2B Agent Workflows Inside Admin CRM
-
-Duration: 6-8 weeks
-
-- Agent onboarding
-- KYC
-- Credit limit
-- Agent enquiries
-- Agent bookings
-- Wallet
-- Commission
-- Agent invoices
-- Voucher download
-
-Keep these workflows inside `tripos-admin-crm` for v1. Consider a separate partner portal only after real agent usage proves the need.
-
-## Phase 6: B2C Website and CMS
-
-Duration: 6-8 weeks
-
-- Destination pages
-- Packages
-- Blog
-- Offers
-- Reviews
-- Lead forms
-- SEO metadata
-- Customer portal
-
-## Phase 7: Marketing Automation
-
-Duration: 4-6 weeks
-
-- Campaign tracking
-- Lead source analytics
-- WhatsApp automation
-- Email automation
-- Funnel reporting
-- ROI dashboards
-
-## Phase 8: AI Platform
-
-Duration: continuous
-
-- AI itinerary generator
-- AI quotation assistant
-- AI sales assistant
-- AI support assistant
-- AI content generation
-- AI analytics
+1. Booking conversion and passenger/payment/voucher subflows.
+2. File storage and document/voucher/quotation PDF workflows.
+3. Finance receivables, payables, refunds, profitability, and reconciliation.
+4. Supplier contracts/rates/confirmations.
+5. B2B agent KYC, credit limits, commissions, wallet, and agent invoices.
+6. Operations SLA, assignment, escalations, and activity timeline.
+7. Reporting exports and audit-log UI.
+8. Provider integrations and production webhooks.

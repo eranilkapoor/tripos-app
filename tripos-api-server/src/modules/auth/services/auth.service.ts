@@ -11,7 +11,14 @@ import {
   createHash,
 } from 'node:crypto';
 import { Model } from 'mongoose';
-import { LoginDto, RegisterCrmUserDto } from '../dto/auth.dto';
+import {
+  AcceptInvitationDto,
+  ForgotPasswordDto,
+  InviteCrmUserDto,
+  LoginDto,
+  RegisterCrmUserDto,
+  ResetPasswordDto,
+} from '../dto/auth.dto';
 import { CrmUser } from '../schemas/crm-user.schema';
 import { UserSession } from '../schemas/user-session.schema';
 import { TenantsService } from '../../tenants/services/tenants.service';
@@ -43,6 +50,48 @@ export class AuthService {
       passwordHash: hashPassword(dto.password),
     });
     return sanitizeUser(user.toObject());
+  }
+
+  async inviteUser(
+    dto: InviteCrmUserDto,
+    actor?: { tenantId?: unknown; role?: string },
+  ) {
+    const tenantId =
+      actor?.role === 'platform_admin'
+        ? String(dto.tenantId ?? '')
+        : String(actor?.tenantId ?? '');
+    if (!tenantId) throw new ForbiddenException('Tenant context is required');
+    const invitationToken = randomBytes(32).toString('hex');
+    const user = await this.userModel
+      .findOneAndUpdate(
+        { email: dto.email.toLowerCase() },
+        {
+          $set: {
+            email: dto.email.toLowerCase(),
+            name: dto.name,
+            tenantId,
+            branchId: dto.branchId ?? 'main',
+            role: dto.role ?? 'sales',
+            status: 'invited',
+            invitationTokenHash: hashToken(invitationToken),
+            invitationExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+          },
+          $setOnInsert: {
+            passwordHash: hashPassword(randomBytes(24).toString('hex')),
+            permissions: [],
+          },
+        },
+        { new: true, upsert: true },
+      )
+      .exec();
+    return withDevelopmentToken(
+      {
+        message: 'CRM user invitation created.',
+        user: sanitizeUser(user.toObject()),
+      },
+      'invitationToken',
+      invitationToken,
+    );
   }
 
   async login(dto: LoginDto) {
@@ -125,6 +174,72 @@ export class AuthService {
     };
   }
 
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const resetToken = randomBytes(32).toString('hex');
+    const user = await this.userModel
+      .findOneAndUpdate(
+        {
+          email: dto.email.toLowerCase(),
+          status: { $in: ['active', 'locked'] },
+        },
+        {
+          resetTokenHash: hashToken(resetToken),
+          resetTokenExpiresAt: new Date(Date.now() + 1000 * 60 * 30),
+        },
+        { new: true },
+      )
+      .exec();
+    return withDevelopmentToken(
+      { message: 'If the email exists, a password reset link will be sent.' },
+      'resetToken',
+      user ? resetToken : undefined,
+    );
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.userModel
+      .findOneAndUpdate(
+        {
+          resetTokenHash: hashToken(dto.token),
+          resetTokenExpiresAt: { $gt: new Date() },
+        },
+        {
+          passwordHash: hashPassword(dto.password),
+          status: 'active',
+          $unset: { resetTokenHash: '', resetTokenExpiresAt: '' },
+        },
+        { new: true },
+      )
+      .exec();
+    if (!user)
+      throw new UnauthorizedException('Invalid or expired reset token');
+    await this.sessionModel
+      .updateMany({ userId: String(user._id) }, { revokedAt: new Date() })
+      .exec();
+    return { success: true };
+  }
+
+  async acceptInvitation(dto: AcceptInvitationDto) {
+    const user = await this.userModel
+      .findOneAndUpdate(
+        {
+          invitationTokenHash: hashToken(dto.token),
+          invitationExpiresAt: { $gt: new Date() },
+          status: 'invited',
+        },
+        {
+          passwordHash: hashPassword(dto.password),
+          status: 'active',
+          $unset: { invitationTokenHash: '', invitationExpiresAt: '' },
+        },
+        { new: true },
+      )
+      .exec();
+    if (!user)
+      throw new UnauthorizedException('Invalid or expired invitation token');
+    return sanitizeUser(user.toObject());
+  }
+
   async logout(token: string) {
     await this.sessionModel
       .updateOne({ tokenHash: hashToken(token) }, { revokedAt: new Date() })
@@ -171,4 +286,13 @@ function sanitizeUser<T extends { passwordHash?: string }>(user: T) {
   const safeUser = { ...user };
   delete safeUser.passwordHash;
   return safeUser;
+}
+
+function withDevelopmentToken<T extends Record<string, unknown>>(
+  payload: T,
+  key: string,
+  token?: string,
+) {
+  if (process.env.NODE_ENV === 'production' || !token) return payload;
+  return { ...payload, [key]: token };
 }
