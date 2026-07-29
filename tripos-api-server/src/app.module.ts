@@ -27,7 +27,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
 import { AiAssistantModule } from './modules/ai/ai-assistant.module';
 import { TenantContextMiddleware } from './common/middleware/tenant-context.middleware';
-import { AppService } from './app.service';
+import { AppStateModule } from './app-state.module';
 
 @Module({
   imports: [
@@ -49,6 +49,7 @@ import { AppService } from './app.service';
         socketTimeoutMS: configService.get<number>('mongo.socketTimeoutMs'),
       }),
     }),
+    AppStateModule,
     LeadsModule,
     FinanceModule,
     QuotationsModule,
@@ -74,7 +75,6 @@ import { AppService } from './app.service';
     AiAssistantModule,
     TriposModule,
   ],
-  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
