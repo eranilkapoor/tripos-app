@@ -1,0 +1,20 @@
+name: TripOS CodeQL configuration
+
+queries:
+  - uses: security-extended
+
+paths:
+  - tripos-api-server/src
+  - tripos-api-server/test
+  - tripos-mobile-app/src
+  - packages
+  - scripts
+
+paths-ignore:
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/coverage/**"
+  - "**/.expo/**"
+  - packages/api-contract/src/generated.ts
+

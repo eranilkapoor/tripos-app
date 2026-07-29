@@ -1,0 +1,50 @@
+{
+  "name": "tripos-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Repository-level tooling for TripOS API, mobile, public website, and admin CRM applications.",
+  "scripts": {
+    "prepare": "node -e \"const {existsSync}=require('fs'); if(!process.env.CI && !process.env.EAS_BUILD && existsSync('.git')) require('child_process').execSync('npx husky',{stdio:'inherit'})\"",
+    "lint": "npm run lint:api && npm run lint:mobile",
+    "lint:api": "npm --prefix tripos-api-server run lint:check",
+    "lint:mobile": "npm --prefix tripos-mobile-app run lint",
+    "lint:website": "npm --prefix tripos-public-website run lint",
+    "lint:admin": "npm --prefix tripos-admin-crm run lint",
+    "lint:frontends": "npm run lint:website && npm run lint:admin",
+    "dev:api": "npm --prefix tripos-api-server run start:dev",
+    "dev:mobile": "npm --prefix tripos-mobile-app run start",
+    "dev:website": "npm --prefix tripos-public-website run dev",
+    "dev:admin": "npm --prefix tripos-admin-crm run dev",
+    "build:api": "npm --prefix tripos-api-server run build",
+    "build:website": "npm --prefix tripos-public-website run build",
+    "build:admin": "npm --prefix tripos-admin-crm run build",
+    "typecheck:api": "npm --prefix tripos-api-server run typecheck",
+    "typecheck:mobile": "npm --prefix tripos-mobile-app run typecheck",
+    "test:api": "npm --prefix tripos-api-server run test -- --runInBand",
+    "test:mobile": "npm --prefix tripos-mobile-app run test",
+    "contracts:snapshot": "node scripts/snapshot-openapi.mjs",
+    "contracts:generate": "openapi-typescript packages/api-contract/openapi.json --output packages/api-contract/src/generated.ts --immutable --alphabetize",
+    "contracts:check": "npm run contracts:generate -- --check",
+    "verify": "npm run lint && npm run typecheck:api && npm run typecheck:mobile && npm run build:api",
+    "ci": "npm run verify && npm run test:api && npm run test:mobile",
+    "docs:check": "echo \"TripOS documentation scaffold ready\""
+  },
+  "keywords": [
+    "travel",
+    "dmc",
+    "crm",
+    "b2b",
+    "b2c",
+    "saas",
+    "multi-tenant"
+  ],
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "openapi-typescript": "^7.13.0"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  }
+}
