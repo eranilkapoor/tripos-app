@@ -80,6 +80,17 @@ Runs on `http://localhost:4000`.
 
 Useful endpoints:
 
+- Production module routes:
+  - `GET /api/v1/leads`
+  - `POST /api/v1/leads`
+  - `GET /api/v1/leads/:id`
+  - `PATCH /api/v1/leads/:id/assign`
+  - `PATCH /api/v1/leads/:id/stage`
+  - `POST /api/v1/public/leads`
+  - `GET /api/v1/finance/invoices`
+  - `GET /api/v1/finance/invoices/next-number/:series`
+  - `POST /api/v1/finance/invoices`
+- Compatibility/MVP routes:
 - `GET /api/v1/tripos/health`
 - `GET /api/v1/tripos/dashboard`
 - `GET /api/v1/tripos/leads`

@@ -1,13 +1,20 @@
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { ConfigService } from "@nestjs/config";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix("api/v1");
-  app.enableCors();
+  const configService = app.get(ConfigService);
+  const apiPrefix = configService.get<string>("api.prefix") ?? "api";
+  const apiVersion = configService.get<string>("api.version") ?? "v1";
+  app.setGlobalPrefix(`${apiPrefix}/${apiVersion}`);
+  app.enableCors({
+    origin: configService.get<string[]>("cors.origins"),
+    maxAge: configService.get<number>("cors.maxAgeSeconds"),
+  });
   app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -24,8 +31,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/docs", app, document);
 
-  await app.listen(process.env.PORT ? Number(process.env.PORT) : 4000);
+  await app.listen(configService.get<number>("port") ?? 4000);
 }
 
 void bootstrap();
-

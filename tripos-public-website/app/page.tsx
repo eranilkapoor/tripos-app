@@ -39,8 +39,23 @@ export default function HomePage() {
     try {
       setIsSubmitting(true);
       setStatus("Sending demo request...");
-      const response = await fetch(`${apiBaseUrl}/tripos/demo-leads`, {
-        body: JSON.stringify(payload),
+      const response = await fetch(`${apiBaseUrl}/public/leads`, {
+        body: JSON.stringify({
+          customerName: payload.companyName,
+          email: payload.email,
+          phone: payload.phone,
+          source: "public-website",
+          channel: payload.businessType === "B2B Travel Network" ? "b2b" : "b2c",
+          requirement: {
+            budget: payload.monthlyBookings
+              ? `${payload.monthlyBookings} monthly bookings`
+              : undefined,
+          },
+          metadata: {
+            contactName: payload.contactName,
+            businessType: payload.businessType,
+          },
+        }),
         headers: { "Content-Type": "application/json" },
         method: "POST",
       });

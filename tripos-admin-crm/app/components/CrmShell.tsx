@@ -432,14 +432,14 @@ function InvoiceBuilder() {
   }
 
   async function generateNumber() {
-    const response = await fetch(`${apiBaseUrl}/tripos/invoices/next-number/${encodeURIComponent(series)}`);
+    const response = await fetch(`${apiBaseUrl}/finance/invoices/next-number/${encodeURIComponent(series)}`);
     const result = (await response.json()) as { invoiceNo?: string };
     setInvoiceNo(result.invoiceNo ?? "0001");
     setStatus("Invoice number generated from backend history.");
   }
 
   async function saveInvoice() {
-    const response = await fetch(`${apiBaseUrl}/tripos/invoices`, {
+    const response = await fetch(`${apiBaseUrl}/finance/invoices`, {
       body: JSON.stringify({
         invoiceSeries: series,
         invoiceNo,
