@@ -1,38 +1,629 @@
-import "reflect-metadata";
-import { config } from "dotenv";
-import mongoose from "mongoose";
-import { TriposRecordSchema } from "./tripos-record.schema";
+import 'reflect-metadata';
+import { config } from 'dotenv';
+import mongoose from 'mongoose';
+import { randomBytes, scryptSync } from 'node:crypto';
+import { TenantSchema } from '../tenants/schemas/tenant.schema';
+import { CrmUserSchema } from '../auth/schemas/crm-user.schema';
+import { LeadSchema } from '../leads/schemas/leads.schema';
+import { CustomerSchema } from '../customers/schemas/customer.schema';
+import { QuotationSchema } from '../quotations/schemas/quotation.schema';
+import { ItinerarySchema } from '../itineraries/schemas/itinerary.schema';
+import { BookingSchema } from '../bookings/schemas/booking.schema';
+import { SupplierSchema } from '../suppliers/schemas/supplier.schema';
+import { OperationTaskSchema } from '../operations/schemas/operation-task.schema';
+import { B2BAgentSchema } from '../b2b-agents/schemas/b2b-agent.schema';
+import { PaymentSchema } from '../payments/schemas/payment.schema';
+import { InvoiceSchema } from '../finance/schemas/invoice.schema';
+import { DestinationSchema } from '../destinations/schemas/destination.schema';
+import { TourPackageSchema } from '../tour-packages/schemas/tour-package.schema';
+import { TravelDocumentSchema } from '../travel-documents/schemas/travel-document.schema';
+import { VoucherSchema } from '../vouchers/schemas/voucher.schema';
+import { SupportTicketSchema } from '../support-tickets/schemas/support-ticket.schema';
+import { CampaignSchema } from '../campaigns/schemas/campaign.schema';
+import { StoredFileSchema } from '../storage/schemas/stored-file.schema';
+import { SavedReportSchema } from '../reporting/schemas/saved-report.schema';
+import { AuditLogSchema } from '../audit/schemas/audit-log.schema';
+import { TriposRecordSchema } from './tripos-record.schema';
 
-config({ path: ".env.development" });
+config({ path: '.env.development' });
 config();
 
-const seedRecords = [
-  ["leads", "Sharma Family", "requirement", { destination: "Dubai", source: "Website", owner: "Ritika" }],
-  ["leads", "Mehta Group", "quotation_sent", { destination: "Singapore", source: "B2B Agent", owner: "Aman" }],
-  ["quotations", "Q-1029 Dubai Family", "sent", { customer: "Sharma Family", sellingPrice: 129500 }],
-  ["quotations", "Q-1030 Singapore Group", "draft", { customer: "Mehta Group", sellingPrice: 864000 }],
-  ["itineraries", "Dubai Family 5N", "ready", { days: 6, destination: "Dubai" }],
-  ["bookings", "BKG-2081 Sharma Family", "confirmed", { destination: "Dubai", travelDates: "25 Dec - 30 Dec" }],
-  ["operations", "OPS-551 Airport Pickup", "assigned", { supplier: "DXB Prime Cars", due: "25 Dec 08:30" }],
-  ["b2b-agents", "Skyline Travels", "active", { market: "Delhi", creditLimit: 1000000 }],
-  ["suppliers", "Hotel ABC", "active", { type: "Hotel", destination: "Dubai", rating: 4.6 }],
-  ["finance", "BKG-2081 Profit Snapshot", "healthy", { sellingPrice: 129500, supplierCost: 100000, netProfit: 25000 }],
-  ["marketing", "Dubai December Campaign", "active", { channel: "Google Ads", leads: 100, roi: "5.0x" }],
-] as const;
+const BRANCH_ID = 'delhi';
 
 async function main() {
-  const uri = process.env.MONGO_URI ?? "mongodb://localhost:27017/tripos";
+  const uri = process.env.MONGO_URI ?? 'mongodb://localhost:27017/tripos';
   await mongoose.connect(uri);
-  const RecordModel = mongoose.model("TriposRecord", TriposRecordSchema);
-  for (const [moduleKey, title, status, payload] of seedRecords) {
-    await RecordModel.updateOne(
-      { moduleKey, title },
-      { $set: { moduleKey, title, status, priority: "medium", payload } },
-      { upsert: true },
-    );
-  }
+
+  const Tenant = model('Tenant', TenantSchema);
+  const CrmUser = model('CrmUser', CrmUserSchema);
+  const Lead = model('Lead', LeadSchema);
+  const Customer = model('Customer', CustomerSchema);
+  const Quotation = model('Quotation', QuotationSchema);
+  const Itinerary = model('Itinerary', ItinerarySchema);
+  const Booking = model('Booking', BookingSchema);
+  const Supplier = model('Supplier', SupplierSchema);
+  const OperationTask = model('OperationTask', OperationTaskSchema);
+  const B2BAgent = model('B2BAgent', B2BAgentSchema);
+  const Payment = model('Payment', PaymentSchema);
+  const Invoice = model('Invoice', InvoiceSchema);
+  const Destination = model('Destination', DestinationSchema);
+  const TourPackage = model('TourPackage', TourPackageSchema);
+  const TravelDocument = model('TravelDocument', TravelDocumentSchema);
+  const Voucher = model('Voucher', VoucherSchema);
+  const SupportTicket = model('SupportTicket', SupportTicketSchema);
+  const Campaign = model('Campaign', CampaignSchema);
+  const StoredFile = model('StoredFile', StoredFileSchema);
+  const SavedReport = model('SavedReport', SavedReportSchema);
+  const AuditLog = model('AuditLog', AuditLogSchema);
+  const TriposRecord = model('TriposRecord', TriposRecordSchema);
+
+  const tenant = await Tenant.findOneAndUpdate(
+    { code: 'WEBNZA' },
+    {
+      name: 'Webnza Travels Demo',
+      code: 'WEBNZA',
+      dataHostingMode: 'tripos_cloud',
+      branches: [
+        { id: 'delhi', name: 'Delhi HQ', city: 'Delhi' },
+        { id: 'dubai', name: 'Dubai Desk', city: 'Dubai' },
+        { id: 'jaipur', name: 'Jaipur Sales', city: 'Jaipur' },
+      ],
+      syncPolicy: {
+        syncMode: 'realtime',
+        offlineWindowHours: 24,
+        customerManagedStorage: false,
+      },
+      status: 'active',
+    },
+    { returnDocument: 'after', upsert: true },
+  ).exec();
+
+  const organizationId = String(tenant._id);
+  await CrmUser.updateOne(
+    { email: 'admin@tripos.test' },
+    {
+      $set: {
+        name: 'TripOS Admin',
+        email: 'admin@tripos.test',
+        passwordHash: hashPassword('TripOS@123'),
+        tenantId: organizationId,
+        branchId: BRANCH_ID,
+        role: 'tenant_admin',
+        status: 'active',
+        permissions: ['*'],
+      },
+    },
+    { upsert: true },
+  ).exec();
+
+  await upsertMany(Lead, 'phone', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      customerName: 'Sharma Family',
+      email: 'sharma.family@example.com',
+      phone: '+919811110001',
+      source: 'Website',
+      channel: 'b2c',
+      requirement: {
+        destination: 'Dubai',
+        travelDate: '2026-12-25',
+        adults: 2,
+        children: 1,
+        budget: 'INR 1.5L',
+        duration: '5N/6D',
+      },
+      assignedTo: 'Ritika',
+      stage: 'quotation_sent',
+      temperature: 'hot',
+      score: 86,
+      tags: ['family', 'dubai', 'december'],
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      customerName: 'Mehta Corporate Group',
+      email: 'traveldesk@mehtagroup.test',
+      phone: '+919811110002',
+      source: 'B2B Agent',
+      channel: 'corporate',
+      requirement: {
+        destination: 'Singapore',
+        travelDate: '2026-11-18',
+        adults: 14,
+        children: 0,
+        budget: 'INR 9L',
+        duration: '4N/5D',
+      },
+      assignedTo: 'Aman',
+      stage: 'negotiation',
+      temperature: 'hot',
+      score: 78,
+      tags: ['corporate', 'singapore'],
+    },
+  ]);
+
+  await upsertMany(Customer, 'phone', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Rohit Sharma',
+      phone: '+919811110001',
+      email: 'sharma.family@example.com',
+      customerType: 'family',
+      source: 'Website',
+      city: 'Delhi',
+      country: 'India',
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Mehta Corporate Travel Desk',
+      phone: '+919811110002',
+      email: 'traveldesk@mehtagroup.test',
+      customerType: 'corporate',
+      source: 'B2B Agent',
+      city: 'Gurugram',
+      country: 'India',
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Quotation, 'customerName', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      customerName: 'Sharma Family',
+      destination: 'Dubai',
+      travelDates: '25 Dec - 30 Dec 2026',
+      travellers: 3,
+      services: [{ type: 'hotel' }, { type: 'transfer' }, { type: 'activity' }],
+      pricing: {
+        baseCost: 104000,
+        markup: 28000,
+        discount: 2500,
+        total: 129500,
+      },
+      status: 'sent',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      customerName: 'Mehta Corporate Group',
+      destination: 'Singapore',
+      travelDates: '18 Nov - 22 Nov 2026',
+      travellers: 14,
+      services: [{ type: 'hotel' }, { type: 'conference-transfer' }],
+      pricing: {
+        baseCost: 720000,
+        markup: 164000,
+        discount: 20000,
+        total: 864000,
+      },
+      status: 'negotiation',
+    },
+  ]);
+
+  await upsertMany(Itinerary, 'title', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      title: 'Dubai Family 5N',
+      destination: 'Dubai',
+      durationDays: 6,
+      theme: 'Family Luxury',
+      days: [{ day: 1, title: 'Arrival and Marina Dhow' }],
+      status: 'ready',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      title: 'Singapore Corporate 4N',
+      destination: 'Singapore',
+      durationDays: 5,
+      theme: 'MICE',
+      days: [{ day: 1, title: 'Arrival and check-in' }],
+      status: 'ready',
+    },
+  ]);
+
+  await upsertMany(Booking, 'customerName', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      customerName: 'Sharma Family',
+      destination: 'Dubai',
+      travelDates: '25 Dec - 30 Dec 2026',
+      passengers: [
+        { name: 'Rohit Sharma' },
+        { name: 'Neha Sharma' },
+        { name: 'Aarav Sharma' },
+      ],
+      services: [
+        { type: 'hotel', status: 'confirmed' },
+        { type: 'transfer', status: 'assigned' },
+      ],
+      documents: [],
+      paymentSchedule: [{ label: 'Advance', amount: 65000, status: 'paid' }],
+      vouchers: [
+        {
+          supplierName: 'DXB Prime Cars',
+          serviceType: 'transfer',
+          status: 'issued',
+        },
+      ],
+      status: 'confirmed',
+    },
+  ]);
+
+  await upsertMany(Supplier, 'name', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'DXB Prime Cars',
+      type: 'Transporter',
+      destination: 'Dubai',
+      contacts: [{ name: 'Omar', phone: '+971500000001' }],
+      contracts: [{ title: 'Dubai 2026 Transfer Contract', status: 'active' }],
+      rates: [
+        { serviceName: 'Airport sedan', netRate: 220, currencyCode: 'AED' },
+      ],
+      confirmations: [
+        {
+          bookingId: 'BKG-SHARMA-DXB',
+          serviceType: 'transfer',
+          status: 'confirmed',
+        },
+      ],
+      creditLimit: 250000,
+      payable: 42000,
+      rating: 4.7,
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Marina Bay Stay',
+      type: 'Hotel',
+      destination: 'Singapore',
+      contacts: [{ name: 'Lina', email: 'sales@marinabaystay.test' }],
+      contracts: [{ title: 'Singapore Group FIT 2026', status: 'active' }],
+      rates: [
+        { serviceName: 'Deluxe room', netRate: 160, currencyCode: 'SGD' },
+      ],
+      confirmations: [],
+      creditLimit: 500000,
+      payable: 0,
+      rating: 4.5,
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(OperationTask, 'title', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      bookingId: 'BKG-SHARMA-DXB',
+      title: 'Dubai airport pickup confirmation',
+      serviceType: 'transfer',
+      supplierId: 'DXB Prime Cars',
+      assignedTo: 'Ops Team',
+      dueAt: new Date('2026-12-24T10:00:00.000Z'),
+      priority: 'high',
+      slaStatus: 'on_track',
+      payload: { priority: 'high' },
+      timeline: [
+        {
+          type: 'created',
+          note: 'Supplier assigned',
+          at: new Date().toISOString(),
+        },
+      ],
+      status: 'assigned',
+    },
+  ]);
+
+  await upsertMany(B2BAgent, 'agencyName', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      agencyName: 'Skyline Travels',
+      contactName: 'Karan Malhotra',
+      email: 'karan@skylinetravels.test',
+      phone: '+919811110099',
+      market: 'Delhi NCR',
+      creditLimit: 1000000,
+      receivable: 76000,
+      commissionEarned: 18500,
+      kycDocuments: [{ documentType: 'GST', status: 'verified' }],
+      walletLedger: [{ type: 'invoice', amount: 76000, currencyCode: 'INR' }],
+      commissionLedger: [
+        { bookingId: 'BKG-SHARMA-DXB', amount: 18500, currencyCode: 'INR' },
+      ],
+      invoices: [{ invoiceNo: 'AG-0001', amount: 76000, status: 'issued' }],
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Payment, 'partyName', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      bookingId: 'BKG-SHARMA-DXB',
+      type: 'receivable',
+      amount: 129500,
+      currencyCode: 'INR',
+      partyName: 'Sharma Family',
+      dueDate: '2026-11-15',
+      paidAt: '2026-10-01',
+      status: 'partially_paid',
+      metadata: { collected: 65000 },
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      bookingId: 'BKG-SHARMA-DXB',
+      type: 'payable',
+      amount: 42000,
+      currencyCode: 'INR',
+      partyName: 'DXB Prime Cars',
+      dueDate: '2026-12-20',
+      status: 'pending',
+      metadata: {},
+    },
+  ]);
+
+  await Invoice.updateOne(
+    { organizationId, invoiceSeries: 'TRV-', invoiceNo: '0001' },
+    {
+      $set: {
+        organizationId,
+        branchId: BRANCH_ID,
+        invoiceSeries: 'TRV-',
+        invoiceNo: '0001',
+        invoiceDate: new Date().toISOString().slice(0, 10),
+        countryCode: 'IN',
+        currencyCode: 'INR',
+        currencySymbol: 'INR',
+        taxLabel: 'GST',
+        taxRate: 18,
+        provider: { companyName: 'Webnza Travels', taxNo: 'GSTIN-TRIPOS-DEMO' },
+        customer: { companyName: 'Sharma Family' },
+        entries: [
+          {
+            description: 'Dubai family package',
+            qty: 1,
+            qtyType: 'package',
+            rate: 109746,
+            total: 109746,
+          },
+        ],
+        totals: { subtotal: 109746, taxAmount: 19754, totalPayable: 129500 },
+        status: 'draft',
+      },
+    },
+    { upsert: true },
+  ).exec();
+
+  await upsertMany(Destination, 'name', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Dubai',
+      country: 'UAE',
+      region: 'Middle East',
+      bestSeason: 'Nov-Mar',
+      highlights: ['Burj Khalifa', 'Desert Safari'],
+      visaRequirement: 'Tourist visa required',
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Singapore',
+      country: 'Singapore',
+      region: 'Asia',
+      bestSeason: 'Year-round',
+      highlights: ['Sentosa', 'Marina Bay'],
+      visaRequirement: 'Visa as per passport',
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(TourPackage, 'title', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      title: 'Dubai Family Delight',
+      destination: 'Dubai',
+      category: 'Family',
+      durationDays: 6,
+      basePrice: 129500,
+      currency: 'INR',
+      inclusions: ['Hotel', 'Transfers', 'Sightseeing'],
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(TravelDocument, 'documentNumber', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      customerName: 'Rohit Sharma',
+      bookingId: 'BKG-SHARMA-DXB',
+      documentType: 'Passport',
+      documentNumber: 'Z1234567',
+      expiryDate: '2031-09-01',
+      fileUrl: '/storage/demo/passport.pdf',
+      status: 'verified',
+    },
+  ]);
+
+  await upsertMany(Voucher, 'confirmationNumber', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      bookingId: 'BKG-SHARMA-DXB',
+      customerName: 'Sharma Family',
+      voucherType: 'Transfer',
+      supplierName: 'DXB Prime Cars',
+      issueDate: '2026-12-20',
+      confirmationNumber: 'DXB-TRF-8891',
+      status: 'issued',
+    },
+  ]);
+
+  await upsertMany(SupportTicket, 'subject', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      subject: 'Wheelchair assistance request',
+      customerName: 'Sharma Family',
+      bookingId: 'BKG-SHARMA-DXB',
+      channel: 'WhatsApp',
+      priority: 'medium',
+      description: 'Arrange airport assistance for senior traveller.',
+      status: 'open',
+    },
+  ]);
+
+  await upsertMany(Campaign, 'name', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Dubai December Campaign',
+      channel: 'Google Ads',
+      source: 'google',
+      spend: 42000,
+      leads: 100,
+      quotations: 28,
+      bookings: 7,
+      revenue: 906500,
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(StoredFile, 'storageKey', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      entityType: 'booking',
+      entityId: 'BKG-SHARMA-DXB',
+      fileName: 'sharma-passport.pdf',
+      mimeType: 'application/pdf',
+      size: 184000,
+      storageDriver: 'local',
+      storageKey: `${organizationId}/booking/BKG-SHARMA-DXB/sharma-passport.pdf`,
+      url: '/storage/demo/sharma-passport.pdf',
+      status: 'available',
+      metadata: { documentType: 'passport' },
+    },
+  ]);
+
+  await upsertMany(SavedReport, 'name', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Daily Sales Funnel',
+      reportType: 'sales-funnel',
+      filters: {},
+      schedule: { frequency: 'daily', time: '09:00' },
+      recipients: ['ops@webnza.test'],
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Weekly Finance Summary',
+      reportType: 'finance',
+      filters: {},
+      schedule: { frequency: 'weekly', day: 'monday' },
+      recipients: ['finance@webnza.test'],
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(AuditLog, 'action', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      actorId: 'seed',
+      actorRole: 'system',
+      action: 'seed.initial_data',
+      method: 'SEED',
+      path: 'tripos.seed',
+      statusCode: 200,
+      outcome: 'success',
+      metadata: { tenantCode: 'WEBNZA' },
+    },
+  ]);
+
+  await upsertMany(
+    TriposRecord,
+    'title',
+    [
+      [
+        'leads',
+        'Sharma Family',
+        'quotation_sent',
+        { destination: 'Dubai', source: 'Website', owner: 'Ritika' },
+      ],
+      [
+        'bookings',
+        'BKG-SHARMA-DXB',
+        'confirmed',
+        { destination: 'Dubai', travelDates: '25 Dec - 30 Dec 2026' },
+      ],
+      [
+        'finance',
+        'Dubai Profit Snapshot',
+        'healthy',
+        { sellingPrice: 129500, supplierCost: 104000, netProfit: 25500 },
+      ],
+    ].map(([moduleKey, title, status, payload]) => ({
+      organizationId,
+      moduleKey,
+      title,
+      status,
+      priority: 'medium',
+      payload,
+    })),
+  );
+
   await mongoose.disconnect();
-  console.log(`Seeded ${seedRecords.length} TripOS records.`);
+  console.log(
+    `Seeded TripOS initial data for tenant WEBNZA (${organizationId}).`,
+  );
+  console.log(
+    'CRM login: admin@tripos.test / TripOS@123 / tenant WEBNZA / branch delhi',
+  );
+}
+
+function model(name: string, schema: mongoose.Schema) {
+  return mongoose.models[name] ?? mongoose.model(name, schema);
+}
+
+async function upsertMany(
+  modelRef: mongoose.Model<unknown>,
+  uniqueKey: string,
+  rows: Array<Record<string, unknown>>,
+) {
+  for (const row of rows) {
+    await modelRef
+      .updateOne(
+        { [uniqueKey]: row[uniqueKey], organizationId: row.organizationId },
+        { $set: row },
+        { upsert: true },
+      )
+      .exec();
+  }
+}
+
+function hashPassword(password: string) {
+  const salt = randomBytes(16).toString('hex');
+  const hash = scryptSync(password, salt, 64).toString('hex');
+  return `${salt}:${hash}`;
 }
 
 void main().catch((error) => {

@@ -15,8 +15,11 @@
   --accent-soft: #fff2e8;
   --on-brand: #ffffff;
   --good: #0f7b55;
+  --good-soft: #e5f7ef;
   --warn: #9a5b11;
+  --warn-soft: #fff4de;
   --danger: #b42318;
+  --danger-soft: #fde7e5;
   --sidebar-text: #d8f3ed;
   --shadow: 0 14px 36px rgba(19, 35, 33, 0.08);
   --shadow-soft: 0 8px 24px rgba(19, 35, 33, 0.05);
@@ -43,6 +46,12 @@
   --accent: #f3a15d;
   --accent-soft: #3b2819;
   --on-brand: #06201f;
+  --good: #74e3b1;
+  --good-soft: #123b2f;
+  --warn: #ffd28a;
+  --warn-soft: #3a2812;
+  --danger: #ffaaa2;
+  --danger-soft: #3b1d1b;
   --sidebar-text: #cff5ef;
   --shadow: 0 14px 42px rgba(0, 0, 0, 0.3);
   --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.2);
@@ -74,6 +83,12 @@
     --accent: #f3a15d;
     --accent-soft: #3b2819;
     --on-brand: #06201f;
+    --good: #74e3b1;
+    --good-soft: #123b2f;
+    --warn: #ffd28a;
+    --warn-soft: #3a2812;
+    --danger: #ffaaa2;
+    --danger-soft: #3b1d1b;
     --sidebar-text: #cff5ef;
     --shadow: 0 14px 42px rgba(0, 0, 0, 0.3);
     --shadow-soft: 0 8px 28px rgba(0, 0, 0, 0.2);
@@ -714,17 +729,17 @@ tbody tr:nth-child(even) {
 }
 
 .badge.good {
-  background: #e5f7ef;
+  background: var(--good-soft);
   color: var(--good);
 }
 
 .badge.warn {
-  background: #fff4de;
+  background: var(--warn-soft);
   color: var(--warn);
 }
 
 .badge.danger {
-  background: #fde7e5;
+  background: var(--danger-soft);
   color: var(--danger);
 }
 
@@ -874,8 +889,8 @@ tbody tr:nth-child(even) {
 }
 
 .form-error {
-  background: #fde7e5;
-  border: 1px solid #f4b7b1;
+  background: var(--danger-soft);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--danger-soft));
   border-radius: 8px;
   color: var(--danger);
   font-size: 13px;

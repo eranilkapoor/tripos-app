@@ -109,11 +109,20 @@ Database:
 - Keep credentials in `tripos-api-server/.env.development`; this file is ignored by git.
 - Use `tripos-api-server/.env.example` as the safe template.
 
-Seed the MVP module records:
+Seed the initial CRM demo workspace:
 
 ```bash
 npm --prefix tripos-api-server run seed
 ```
+
+The seed is idempotent and creates the `WEBNZA` tenant, Delhi/Dubai/Jaipur branches, an admin login, and realistic travel CRM records across leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, invoices, documents, vouchers, campaigns, storage, saved reports, and audit logs.
+
+Demo CRM login:
+
+- Email: `admin@tripos.test`
+- Password: `TripOS@123`
+- Tenant code: `WEBNZA`
+- Branch: `delhi`
 
 ### Mobile App
 
