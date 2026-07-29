@@ -21,8 +21,8 @@ The current blockers are no longer basic scaffolding. The remaining work is admi
 
 | Application | Current state | Production blockers |
 | --- | --- | --- |
-| `tripos-api-server` | NestJS API builds. Core travel modules, auth, tenants, RBAC, tenant scope, refresh rotation, password reset, invitations, audit list/export, file storage registry, integration health, booking subflows, finance receivables/payables/refunds/profitability/reconciliation, and invoices exist. | Email delivery provider, live storage credentials, PDF rendering templates, provider callbacks, load/security testing, backup evidence. |
-| `tripos-admin-crm` | Next.js CRM shell connects to dedicated APIs with auth, tenant/branch context, module navigation, list/actions, invoice builder, and travel SaaS styling. | Deep edit forms, role/permission management UI, audit UI, workflow-specific screens, desktop/tablet QA. |
+| `tripos-api-server` | NestJS API builds. Core travel modules, auth, tenants, organization aliases, RBAC, tenant scope, refresh rotation, password reset, invitations, audit list/export, file storage registry, integration health, reporting, local AI assistant, booking subflows, finance receivables/payables/refunds/profitability/reconciliation, and invoices exist. | Email delivery provider, live storage credentials, PDF rendering templates, provider callbacks, load/security testing, backup evidence. |
+| `tripos-admin-crm` | Next.js CRM shell connects to dedicated APIs with auth, tenant/branch context, module navigation, list/actions, invoice builder, permissions, audit logs, storage registry, integration health, reporting, and travel SaaS styling. | Deep edit forms for some subflows, desktop/tablet QA, role-policy sign-off. |
 | `tripos-mobile-app` | Expo shell has persisted sessions and separated customer/agent navigation foundations. | Complete customer/agent screens, offline sync, refresh handling, release builds, device QA, push credentials. |
 | `tripos-public-website` | Next.js public site and lead capture foundation exist. | Production domain/SSL, SEO QA, legal pages, analytics consent, package/destination CMS depth. |
 
@@ -39,7 +39,7 @@ The current blockers are no longer basic scaffolding. The remaining work is admi
 
 ## Immediate Next Actions
 
-1. Add admin CRM forms/actions for audit logs, permissions, storage attachments, booking subflows, finance reconciliation, supplier contracts, and B2B agent finance/KYC.
+1. Complete deep edit forms for supplier contracts, B2B agent KYC/finance, operations SLA/escalations, and scheduled reports.
 2. Complete mobile customer/agent screens on top of the secured API, keeping mobile multi-theme and multi-language enabled.
 3. Add generated PDF templates for quotations, itineraries, invoices, and vouchers.
 4. Activate provider credentials/webhooks for email, WhatsApp, SMS, payments, maps, storage, analytics, and monitoring.

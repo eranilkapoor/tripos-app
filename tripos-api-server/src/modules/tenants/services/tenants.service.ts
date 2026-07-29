@@ -6,7 +6,9 @@ import { Tenant } from '../schemas/tenant.schema';
 
 @Injectable()
 export class TenantsService {
-  constructor(@InjectModel(Tenant.name) private readonly model: Model<Tenant>) {}
+  constructor(
+    @InjectModel(Tenant.name) private readonly model: Model<Tenant>,
+  ) {}
 
   create(dto: CreateTenantDto) {
     return this.model.create({
@@ -17,7 +19,9 @@ export class TenantsService {
     });
   }
 
-  list() { return this.model.find().sort({ name: 1 }).lean().exec(); }
+  list() {
+    return this.model.find().sort({ name: 1 }).lean().exec();
+  }
 
   async findOne(id: string) {
     const tenant = await this.model.findById(id).lean().exec();
@@ -27,6 +31,21 @@ export class TenantsService {
 
   async findByCode(code: string) {
     return this.model.findOne({ code: code.toUpperCase() }).lean().exec();
+  }
+
+  async update(id: string, dto: Record<string, unknown>) {
+    const tenant = await this.model
+      .findByIdAndUpdate(
+        id,
+        {
+          $set: sanitizeTenantUpdate(dto),
+        },
+        { new: true },
+      )
+      .lean()
+      .exec();
+    if (!tenant) throw new NotFoundException('Tenant not found');
+    return tenant;
   }
 
   async ensureDemoTenant() {
@@ -40,7 +59,18 @@ export class TenantsService {
         { id: 'delhi', name: 'Delhi HQ', city: 'Delhi' },
         { id: 'dubai', name: 'Dubai Desk', city: 'Dubai' },
       ],
-      syncPolicy: { syncMode: 'realtime', offlineWindowHours: 24, customerManagedStorage: false },
+      syncPolicy: {
+        syncMode: 'realtime',
+        offlineWindowHours: 24,
+        customerManagedStorage: false,
+      },
     });
   }
+}
+
+function sanitizeTenantUpdate(dto: Record<string, unknown>) {
+  const allowed = ['name', 'dataHostingMode', 'branches', 'syncPolicy'];
+  return Object.fromEntries(
+    Object.entries(dto).filter(([key]) => allowed.includes(key)),
+  );
 }

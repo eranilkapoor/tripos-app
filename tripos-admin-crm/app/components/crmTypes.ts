@@ -1,4 +1,5 @@
-export type FieldType = "text" | "number" | "email" | "date" | "select" | "textarea" | "tags";
+export type FieldType =
+  "text" | "number" | "email" | "date" | "select" | "textarea" | "tags";
 
 export type ModuleField = {
   key: string;
@@ -14,6 +15,7 @@ export type CrmModule = {
   title: string;
   group: string;
   endpoint?: string;
+  createEndpoint?: string;
   metricKey?: string;
   description: string;
   columns: string[];

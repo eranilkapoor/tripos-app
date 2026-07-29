@@ -38,6 +38,8 @@ Completed in the repo:
 - Backend permission catalog and scoped CRM user role/permission update APIs.
 - Booking conversion from quotation, passenger capture, payment schedule, and voucher subflows.
 - Finance receivables, payables, refunds, booking profitability, and reconciliation endpoints.
+- Organization-current aliases, reporting overview/funnel/operations/finance APIs, and local/provider-ready AI travel assistant endpoints.
+- Admin CRM navigation and live API screens for users/permissions, audit logs, storage files, integrations, and reporting.
 - Mobile app shell with persisted secure session storage and separate customer/agent navigation foundations.
 - Public website lead capture wired to backend public lead endpoint.
 - API TypeScript configuration synced with Mentora-style Node16 setup.
@@ -48,8 +50,8 @@ Completed in the repo:
 | --- | --- | --- | --- | --- | --- |
 | 1 | Authentication and Sessions | Product Ready | Product Ready | Workflow Ready | MFA/SSO provider and email delivery provider |
 | 2 | Tenant and Branch Management | Product Ready | Workflow Ready | N/A | Tenant onboarding UI depth, storage/sync adapters |
-| 3 | RBAC and Permissions | Product Ready | Workflow Ready | Workflow Ready | Admin permission screens and role QA |
-| 4 | Audit Logs | Product Ready | Foundation | N/A | Audit UI and retention policies |
+| 3 | RBAC and Permissions | Product Ready | Product Ready | Workflow Ready | Role QA and production admin policy sign-off |
+| 4 | Audit Logs | Product Ready | Product Ready | N/A | Retention policies and production export review |
 | 5 | Leads | Product Ready | Product Ready | Agent Workflow Ready | Follow-up tasks, duplicate merge, import/export |
 | 6 | Customers | Workflow Ready | Product Ready | Customer Workflow Ready | Customer timeline, profile edit depth |
 | 7 | Quotations | Workflow Ready | Product Ready | Agent Workflow Ready | PDF rendering/storage, send provider integration |
@@ -67,9 +69,9 @@ Completed in the repo:
 | 19 | Campaigns and Marketing | Workflow Ready | Product Ready | Public Workflow Ready | Email/WhatsApp automation providers |
 | 20 | Public Website | Workflow Ready | N/A | Workflow Ready | Production domain, analytics consent, SEO QA |
 | 21 | Mobile Customer/Agent App | Workflow Ready | N/A | Workflow Ready | Release builds, offline sync, role-specific API depth |
-| 22 | Integrations | Workflow Ready | Foundation | N/A | Live provider credentials, callbacks, and webhook verification |
-| 23 | Reporting and Analytics | Foundation | Foundation | N/A | Saved reports, export jobs, dashboards |
-| 24 | AI Travel Assistant | Foundation | Foundation | N/A | Provider gateway, usage metering, audit prompts |
+| 22 | Integrations | Workflow Ready | Workflow Ready | N/A | Live provider credentials, callbacks, and webhook verification |
+| 23 | Reporting and Analytics | Workflow Ready | Workflow Ready | N/A | Saved report templates, scheduled export jobs, dashboard QA |
+| 24 | AI Travel Assistant | Workflow Ready | Foundation | N/A | Live provider gateway credentials, usage metering, prompt audit policy |
 
 ## Immediate Build-Now Backlog
 
@@ -84,8 +86,8 @@ Completed in the repo:
 | P0 | Done | Complete deep workflow endpoints for leads, quotations, itineraries, bookings, finance, and documents. |
 | P0 | Done | Add password reset and user invitation backend flows. |
 | P0 | Done | Add file storage abstraction for passports, vouchers, tickets, contracts, receipts, and generated PDFs. |
-| P0 | Partial | Add fine-grained module permission map and admin UI permission management. Backend catalog/update APIs are done; CRM screens remain. |
-| P0 | Partial | Add audit-log list/export APIs and admin CRM audit screens. Backend APIs are done; CRM screens remain. |
+| P0 | Done | Add fine-grained module permission map and admin UI permission management. |
+| P0 | Done | Add audit-log list/export APIs and admin CRM audit screens. |
 | P1 | Partial | Add production provider adapters for email, WhatsApp, SMS, payments, maps, storage, and monitoring. Local/log health adapters are done; live credentials/webhooks remain external. |
 | P1 | Partial | Add backup/restore runbook, index audit, load testing, and staging smoke scripts. Runbook is documented; execution evidence remains external. |
 
@@ -93,9 +95,8 @@ Completed in the repo:
 
 The next code-side completion order is:
 
-1. Admin CRM screens for permission management, audit logs, storage attachments, and the new booking/finance actions.
-2. Supplier contracts/rates/confirmations.
-3. B2B agent KYC, credit limits, commissions, wallet, and agent invoices.
-4. Operations SLA, assignment, escalations, and activity timeline.
-5. Reporting exports and dashboard drilldowns.
-6. Provider credentials, production webhooks, and deployment smoke evidence.
+1. Supplier contracts/rates/confirmations.
+2. B2B agent KYC, credit limits, commissions, wallet, and agent invoices.
+3. Operations SLA, assignment, escalations, and activity timeline.
+4. Saved report templates, scheduled export jobs, and dashboard QA.
+5. Provider credentials, production webhooks, and deployment smoke evidence.

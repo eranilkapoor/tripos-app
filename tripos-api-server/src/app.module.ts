@@ -24,6 +24,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
+import { ReportingModule } from './modules/reporting/reporting.module';
+import { AiAssistantModule } from './modules/ai/ai-assistant.module';
 import { TenantContextMiddleware } from './common/middleware/tenant-context.middleware';
 
 @Module({
@@ -67,6 +69,8 @@ import { TenantContextMiddleware } from './common/middleware/tenant-context.midd
     AuditModule,
     StorageModule,
     IntegrationsModule,
+    ReportingModule,
+    AiAssistantModule,
     TriposModule,
   ],
 })

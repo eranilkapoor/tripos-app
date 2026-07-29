@@ -47,11 +47,12 @@
 - `POST /tenants` - implemented
 - `GET /tenants` - implemented
 - `GET /tenants/:id` - implemented
-- `GET /organizations/current` - pending alias
-- `PATCH /organizations/current` - pending
-- `POST /organizations/invitations`
-- `GET /organizations/users`
-- `PATCH /organizations/users/:id`
+- `GET /organizations/current` - implemented
+- `PATCH /organizations/current` - implemented
+- `POST /auth/invitations` - implemented
+- `GET /auth/users` - implemented
+- `PATCH /auth/users/:id/permissions` - implemented
+- `GET /auth/permissions/catalog` - implemented
 
 ### Implemented Travel CRM Modules
 
@@ -103,12 +104,12 @@
 
 All main list endpoints support `page`, `limit`, `search`, and `status` where applicable.
 
-### Pending Deep Workflow Endpoints
+### Deep Workflow Endpoints
 
 - `POST /leads/:id/notes` - implemented
 - `GET /leads/:id/activities` - implemented
 - `POST /leads/:id/activities` - implemented
-- `POST /crm/leads/:id/convert-to-customer`
+- `POST /crm/leads/:id/convert-to-customer` - not required for launch; customer creation and lead won stage are API-backed
 - `POST /quotations/:id/calculate` - implemented
 - `POST /quotations/:id/send` - implemented
 - `POST /quotations/:id/accept` - implemented
@@ -116,18 +117,27 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 - `POST /itineraries/:id/days` - implemented
 - `PATCH /itineraries/:id/days/:dayId` - implemented
 - `POST /itineraries/:id/items` - implemented
-- `PATCH /itineraries/:id/items/:itemId`
-- `POST /bookings/from-quotation/:quotationId`
-- `POST /bookings/:id/passengers`
-- `POST /bookings/:id/payments`
-- `POST /bookings/:id/vouchers`
-- `GET /finance/receivables`
-- `GET /finance/payables`
-- `GET /finance/bookings/:bookingId/profitability`
-- `POST /finance/refunds`
+- `PATCH /itineraries/:id/items/:itemId` - not required for launch; day updates and item append are API-backed
+- `POST /bookings/from-quotation/:quotationId` - implemented
+- `POST /bookings/:id/passengers` - implemented
+- `POST /bookings/:id/payments` - implemented
+- `POST /bookings/:id/vouchers` - implemented
+- `GET /finance/receivables` - implemented
+- `GET /finance/payables` - implemented
+- `GET /finance/bookings/:bookingId/profitability` - implemented
+- `POST /finance/refunds` - implemented
+- `GET /audit-logs` - implemented
+- `GET /audit-logs/export.csv` - implemented
+- `GET /storage/files` - implemented
+- `POST /storage/files/upload-intent` - implemented
+- `GET /integrations/health` - implemented
+- `GET /reporting/overview` - implemented
+- `GET /reporting/sales-funnel` - implemented
+- `GET /reporting/operations` - implemented
+- `GET /reporting/finance` - implemented
 
 ### AI
 
-- `POST /ai/itinerary-drafts`
-- `POST /ai/quotation-assist`
-- `POST /ai/sales-reply`
+- `POST /ai/itinerary-drafts` - implemented with local/provider-ready response
+- `POST /ai/quotation-assist` - implemented with local/provider-ready response
+- `POST /ai/sales-reply` - implemented with local/provider-ready response
