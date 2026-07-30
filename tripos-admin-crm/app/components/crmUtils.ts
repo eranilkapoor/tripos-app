@@ -78,6 +78,7 @@ export function formatDisplayValue(value: string, path = "") {
   const labelOverrides: Record<string, string> = {
     b2b: "B2B",
     b2c: "B2C",
+    tenant_admin: "Organization Admin",
     kyc: "KYC",
     api: "API",
     dmc: "DMC",

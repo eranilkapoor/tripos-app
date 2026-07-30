@@ -2,7 +2,9 @@
 
 ## Core Tables
 
-### Identity and Tenant
+### Identity and Organization
+
+TripOS treats tenant and organization as the same business boundary. The product and UI should use `Organization`; legacy backend names such as `tenants`, `tenantId`, and `x-tenant-id` are compatibility aliases for the same organization record. Every organization can have multiple branches, departments, teams, users, roles, and permission assignments.
 
 - organizations
 - branches
@@ -141,14 +143,14 @@ TripOS uses MongoDB as the primary database. Redis is reserved for cache, queues
 ## Key Modeling Rules
 
 - Prefer UUID primary keys.
-- Every tenant-owned business table includes `organization_id`.
-- Use soft delete only for tenant-facing business records that users may need to restore.
+- Every organization-owned business table includes `organization_id`.
+- Use soft delete only for organization-facing business records that users may need to restore.
 - Use append-only history tables for financial and status-critical changes.
 - Use JSONB for controlled flexible fields, not as a replacement for relational modeling.
 - Store money as integer minor units plus currency code.
 - Store timezone-aware timestamps.
 
-## Tenant Indexing Pattern
+## Organization Indexing Pattern
 
 Most high-volume tables should have composite indexes beginning with `organization_id`.
 

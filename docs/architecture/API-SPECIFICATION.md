@@ -7,7 +7,7 @@
 - JSON request and response bodies.
 - Cursor pagination for large lists.
 - Idempotency keys for payments, booking conversion, and supplier confirmations.
-- Tenant context derived from authenticated user claims and selected organization.
+- Organization context derived from authenticated user claims and selected organization. Legacy tenant headers and routes are compatibility aliases.
 
 ## Base Route Pattern
 
@@ -44,13 +44,14 @@
 
 ### Organizations
 
-- `POST /tenants` - implemented
-- `GET /tenants` - implemented
-- `GET /tenants/:id` - implemented
-- `PATCH /tenants/:id` - implemented
-- `DELETE /tenants/:id` - implemented as inactive status transition
+- `POST /organizations` - implemented
+- `GET /organizations` - implemented
+- `GET /organizations/:id` - implemented
+- `PATCH /organizations/:id` - implemented
+- `DELETE /organizations/:id` - implemented as inactive status transition
 - `GET /organizations/current` - implemented
 - `PATCH /organizations/current` - implemented
+- `/tenants` routes remain implemented as platform compatibility aliases.
 - `POST /auth/invitations` - implemented
 - `GET /auth/users` - implemented
 - `GET /auth/users/:id` - implemented

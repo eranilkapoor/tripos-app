@@ -14,8 +14,8 @@
 Current repo status:
 
 - CRM login/logout/session restore is implemented.
-- CRM users, sessions, tenants, branches, storage mode, and sync policy are Mongo-backed.
-- Admin CRM sends bearer token plus tenant and branch headers.
+- CRM users, sessions, organizations, branches, storage mode, and sync policy are Mongo-backed.
+- Admin CRM sends bearer token plus organization and branch headers. The `x-tenant-id` header remains a compatibility alias for the selected organization.
 - Route protection, RBAC guards, and refresh token rotation are implemented.
 - Basic audit logging for authenticated mutations and sensitive reads is implemented.
 - Password reset and invitation backend flows are implemented.
@@ -31,29 +31,29 @@ Use layered authorization:
 - Ownership filters for sales executives and agent users.
 - Data-level checks for financial reports and sensitive documents.
 
-## Tenant Isolation
+## Organization Isolation
 
-Tenant isolation must be part of the data access layer, not left to UI filters.
+Organization isolation must be part of the data access layer, not left to UI filters. In TripOS, tenant and organization are the same boundary; use Organization in product language and `organizationId` in persisted business data.
 
 Rules:
 
 - All business queries must scope by `organization_id`.
-- Middleware should resolve tenant context from the authenticated session.
-- Repositories must require tenant context.
-- Background jobs must carry tenant context explicitly.
-- Object storage paths must include tenant identifiers.
-- Audit logs must record tenant, actor, action, entity, and IP/device context.
+- Middleware should resolve organization context from the authenticated session.
+- Repositories must require organization context.
+- Background jobs must carry organization context explicitly.
+- Object storage paths must include organization identifiers.
+- Audit logs must record organization, actor, action, entity, and IP/device context.
 
-TripOS tenant storage modes:
+TripOS organization storage modes:
 
 - `tripos_cloud`: standard SaaS storage in TripOS-managed MongoDB.
-- `customer_managed`: tenant stores data in its own system; TripOS needs connector APIs and delayed sync.
+- `customer_managed`: organization stores data in its own system; TripOS needs connector APIs and delayed sync.
 - `hybrid_sync`: TripOS stores operational cache and syncs back to customer-owned storage.
 
 Next implementation step:
 
-- Add a request context resolver that validates the bearer session and exposes `tenantId`, `branchId`, `role`, and `permissions`.
-- Apply this context to every module service so list/create/update operations cannot cross tenants or branches.
+- Add a request context resolver that validates the bearer session and exposes `organizationId`, compatibility `tenantId`, `branchId`, `role`, and `permissions`.
+- Apply this context to every module service so list/create/update operations cannot cross organizations or branches.
 
 ## Sensitive Data
 
@@ -66,4 +66,4 @@ Controls:
 - Separate permission for document download.
 - Redaction in logs.
 - Encryption at rest.
-- Retention policies per tenant.
+- Retention policies per organization.

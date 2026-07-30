@@ -15,14 +15,14 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 - Audit logs
 - Optional mobile OTP/SSO when providers are selected
 
-### Tenant and Organization
+### Organization Management
 
-- Tenant onboarding
+- Organization onboarding
 - Organization profile
 - Branches
 - Departments
 - Teams
-- Tenant settings
+- Organization settings
 - White-label branding
 - Subscription plan metadata
 - Storage mode: TripOS cloud, customer-managed, or hybrid sync
@@ -152,7 +152,7 @@ B2B lives inside `tripos-admin-crm` as restricted role-based views for launch. A
 - Reviews
 - SEO fields
 - Landing pages
-- Tenant website themes
+- Organization website themes
 
 ### Marketing Automation
 

@@ -526,7 +526,7 @@ const modules: CrmModule[] = [
     group: "Control",
     endpoint: "notifications",
     description:
-      "Tenant and branch alerts for sales, operations, finance, support, customers, and agents.",
+      "Organization and branch alerts for sales, operations, finance, support, customers, and agents.",
     columns: ["Title", "Type", "Priority", "Audience", "Module", "Status"],
     rowMap: ["title", "type", "priority", "audience", "module", "status"],
     statusOptions: ["unread", "read", "archived"],
@@ -549,7 +549,13 @@ const modules: CrmModule[] = [
         key: "audience",
         label: "Audience",
         type: "select",
-        options: ["tenant", "branch", "user", "agent", "customer"],
+        options: [
+          { value: "tenant", label: "Organization" },
+          { value: "branch", label: "Branch" },
+          { value: "user", label: "User" },
+          { value: "agent", label: "Agent" },
+          { value: "customer", label: "Customer" },
+        ],
       },
       { key: "module", label: "Module" },
       { key: "recordId", label: "Record ID" },
@@ -601,7 +607,7 @@ const modules: CrmModule[] = [
     group: "Finance",
     endpoint: "reporting/finance",
     description:
-      "Tenant-scoped finance totals across receivables, payables, refunds, commissions, and total movement.",
+      "Organization-scoped finance totals across receivables, payables, refunds, commissions, and total movement.",
     columns: ["Metric", "Value"],
     rowMap: ["key", "value"],
     fields: [],
@@ -663,7 +669,7 @@ const modules: CrmModule[] = [
     group: "Security",
     endpoint: "audit-logs",
     description:
-      "Tenant-scoped audit trail for protected mutations and sensitive reads with export-ready payloads.",
+      "Organization-scoped audit trail for protected mutations and sensitive reads with export-ready payloads.",
     columns: ["Action", "Actor", "Method", "Path", "Outcome", "Status"],
     rowMap: ["action", "actorRole", "method", "path", "outcome", "statusCode"],
     fields: [],
@@ -686,7 +692,7 @@ const modules: CrmModule[] = [
     group: "Security",
     endpoint: "auth/permissions/catalog",
     description:
-      "Module/action permission map used by tenant admins and platform admins.",
+      "Module/action permission map used by organization admins and platform admins.",
     columns: ["Role", "Permissions"],
     rowMap: ["role", "permissions"],
     fields: [],
@@ -1163,14 +1169,16 @@ export default function CrmShell() {
         <header className="topbar">
           <div className="topbar-title">
             <strong>TripOS Admin CRM</strong>
-            <small>{String(session.tenant.name ?? "Tenant Workspace")}</small>
+            <small>
+              {String(session.tenant.name ?? "Organization Workspace")}
+            </small>
           </div>
           <div className="top-actions">
             <div className="header-workspace" aria-label="Workspace context">
               <label>
                 <FontAwesomeIcon aria-hidden icon={faBuilding} />
                 <select
-                  aria-label="Tenant"
+                  aria-label="Organization"
                   onChange={(event) =>
                     updateWorkspace("tenantCode", event.target.value)
                   }
@@ -2596,7 +2604,7 @@ function buildMetrics(
   return [
     ["Records", String(records.length || dashboardTotal), "Current module"],
     ["API", "Dedicated", "No generic records"],
-    ["Tenant", "Demo Org", "Branch scoped"],
+    ["Organization", "Demo Org", "Branch scoped"],
     ["Status", "Ready", "Mongo-backed"],
   ];
 }
