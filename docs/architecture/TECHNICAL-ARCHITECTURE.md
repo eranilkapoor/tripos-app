@@ -58,7 +58,7 @@ quotation/
 - MongoDB text indexes are enough for v1 search.
 - OpenSearch is optional and should be introduced only when MongoDB text indexes are not enough for destination, hotel, activity, supplier, and package search.
 
-## Multi-Tenancy
+## Multi-Organization Architecture
 
 Use shared database with organization isolation for v1.
 

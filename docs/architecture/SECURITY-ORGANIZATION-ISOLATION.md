@@ -1,4 +1,4 @@
-# Security and Multi-Tenancy
+# Security and Organization Isolation
 
 ## Security Baseline
 
