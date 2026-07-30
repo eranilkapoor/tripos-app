@@ -807,15 +807,68 @@ async function upsertMany(
   modelRef: mongoose.Model<unknown>,
   uniqueKey: string,
   rows: Array<Record<string, unknown>>,
-) {
-  for (const row of rows) {
-    await modelRef
-      .updateOne(
-        { [uniqueKey]: row[uniqueKey], organizationId: row.organizationId },
-        { $set: row },
-        { upsert: true },
-      )
-      .exec();
+): Promise<void> {
+  if (rows.length === 0) {
+    return;
+  }
+
+  if (!modelRef.schema.path(uniqueKey)) {
+    throw new Error(
+      `Cannot seed ${modelRef.modelName}: unique key "${uniqueKey}" is not defined in its schema.`,
+    );
+  }
+
+  const isOrganizationScoped = Boolean(
+    modelRef.schema.path('organizationId'),
+  );
+
+  const operations = rows.map((row, index) => {
+    const uniqueValue = row[uniqueKey];
+
+    if (uniqueValue === undefined || uniqueValue === null || uniqueValue === '') {
+      throw new Error(
+        `Cannot seed ${modelRef.modelName}: row ${index + 1} has no value for unique key "${uniqueKey}".`,
+      );
+    }
+
+    const filter: Record<string, unknown> = {
+      [uniqueKey]: uniqueValue,
+    };
+
+    if (isOrganizationScoped) {
+      const organizationId = row.organizationId;
+
+      if (
+        organizationId === undefined ||
+        organizationId === null ||
+        organizationId === ''
+      ) {
+        throw new Error(
+          `Cannot seed organization-scoped model ${modelRef.modelName}: row ${index + 1} has no organizationId.`,
+        );
+      }
+
+      filter.organizationId = organizationId;
+    }
+
+    return {
+      updateOne: {
+        filter,
+        update: { $set: row },
+        upsert: true,
+      },
+    };
+  });
+
+  try {
+    await modelRef.bulkWrite(operations, { ordered: true });
+    console.log(`Seeded ${modelRef.modelName}: ${rows.length} record(s).`);
+  } catch (error) {
+    console.error(`Failed seeding model ${modelRef.modelName}.`, {
+      uniqueKey,
+      isOrganizationScoped,
+    });
+    throw error;
   }
 }
 
