@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { MobileSession } from "./api/triposApi";
 import { readSession } from "./core/session/sessionStorage";
 import { RootNavigator } from "./navigation/RootNavigator";
 import { colors } from "./theme/colors";
 
 export default function App() {
-  const [initialSession, setInitialSession] = useState<MobileSession | null>(null);
+  const [initialSession, setInitialSession] = useState<MobileSession | null>(
+    null,
+  );
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {

@@ -3,7 +3,7 @@
 ## Code Organization
 
 - Prefer domain modules over technical folders.
-- Keep tenant enforcement close to repositories and query builders.
+- Keep organization enforcement close to repositories and query builders.
 - Keep business rules in domain/application services, not controllers.
 - Keep controllers thin.
 - Use shared validation schemas where frontend and backend both need contracts.
@@ -17,14 +17,14 @@
 
 ## Testing
 
-- Unit test pricing, permissions, booking conversion, payment state, and tenant scoping.
+- Unit test pricing, permissions, booking conversion, payment state, and organization scoping.
 - Integration test API flows.
 - Add end-to-end tests for core demo workflows.
 - Regression tests are required for finance and access-control bugs.
 
 ## Review Checklist
 
-- Is every business query tenant-scoped?
+- Is every business query organization-scoped?
 - Are permissions checked server-side?
 - Are money values stored safely?
 - Are status transitions valid?

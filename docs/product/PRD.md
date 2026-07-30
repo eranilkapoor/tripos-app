@@ -2,7 +2,7 @@
 
 ## Vision
 
-TripOS is a white-label, multi-tenant SaaS platform that helps travel agencies, DMCs, tour operators, and travel networks run their business from first enquiry to completed trip.
+TripOS is a white-label, multi-organization SaaS platform that helps travel agencies, DMCs, tour operators, and travel networks run their business from first enquiry to completed trip.
 
 The core promise:
 
@@ -19,8 +19,8 @@ The core promise:
 
 ## Primary Personas
 
-- Platform Super Admin: manages TripOS SaaS tenants, plans, billing, and system settings.
-- Organization Owner: owns a travel business tenant.
+- Platform Super Admin: manages TripOS SaaS organizations, plans, billing, and system settings.
+- Organization Owner: owns a travel business organization.
 - Admin: configures branches, users, permissions, destinations, suppliers, and workflows.
 - Sales Manager: manages pipeline, performance, and quotation quality.
 - Sales Executive: handles leads, follow-ups, quotations, and customer communication.
@@ -35,11 +35,11 @@ The core promise:
 ## Product Principles
 
 - Solve travel business operations first; OTA-style live inventory is a separate integration track after core operations are stable.
-- Build multi-tenant isolation from day one.
+- Build multi-organization isolation from day one.
 - Make quotation and itinerary creation extremely fast.
 - Keep finance focused on travel profitability, not full accounting replacement.
 - Use a modular monolith initially, with service extraction only after real scale.
-- Design every module for white-label branding and tenant-specific workflows.
+- Design every module for white-label branding and organization-specific workflows.
 
 ## Core Workflows
 

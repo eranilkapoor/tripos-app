@@ -15,8 +15,14 @@ export class TravelDocument {
   @Prop({ trim: true }) expiryDate?: string;
   @Prop({ trim: true }) fileUrl?: string;
   @Prop({ trim: true }) notes?: string;
-  @Prop({ enum: ['pending', 'received', 'verified', 'expired', 'rejected'], default: 'pending', index: true }) status!: string;
+  @Prop({
+    enum: ['pending', 'received', 'verified', 'expired', 'rejected'],
+    default: 'pending',
+    index: true,
+  })
+  status!: string;
 }
 
-export const TravelDocumentSchema = SchemaFactory.createForClass(TravelDocument);
+export const TravelDocumentSchema =
+  SchemaFactory.createForClass(TravelDocument);
 TravelDocumentSchema.index({ organizationId: 1, bookingId: 1, status: 1 });

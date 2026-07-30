@@ -6,7 +6,7 @@ TripOS is being built for launch as soon as the product is code-ready and the pr
 
 Status legend:
 
-- `Product Ready`: dedicated backend/API and frontend/mobile surface exist with tenant scoping, auth, and audit-aware operations where applicable.
+- `Product Ready`: dedicated backend/API and frontend/mobile surface exist with organization scoping, auth, and audit-aware operations where applicable.
 - `Workflow Ready`: usable MVP workflow exists, but provider callbacks, production evidence, or advanced QA still need expansion.
 - `Foundation`: schema/module shell exists; needs richer production workflow.
 - `External`: blocked by infrastructure, provider credentials, legal/security review, or live deployment setup.
@@ -17,7 +17,7 @@ Status legend:
 | -------- | -------------------------------------------------------------------------------------------------- | ---------------- |
 | P0       | Production environment, secrets, MongoDB, Redis, S3-compatible storage, strict CORS, seeder policy | External         |
 | P0       | API lint/typecheck/build, admin CRM build, public website build, mobile typecheck                  | Verified locally |
-| P0       | Tenant/branch isolation, authenticated protected routes, RBAC, refresh rotation                    | Product Ready    |
+| P0       | Organization/branch isolation, authenticated protected routes, RBAC, refresh rotation                    | Product Ready    |
 | P0       | Audit logging, scoped audit list API, and CSV export payloads                                      | Product Ready    |
 | P0       | Provider smoke tests for email, WhatsApp, SMS, payments, storage, maps, analytics, monitoring      | External         |
 | P0       | Desktop/tablet CRM QA, mobile Android/iOS QA, public website SEO/legal QA                          | Pending QA       |
@@ -28,11 +28,11 @@ Status legend:
 Completed in the repo:
 
 - Monorepo structure uses product-specific app boundaries for API, CRM, mobile, public website, packages, scripts, and documentation.
-- MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, tenants, auth, finance invoices, and audit logs.
+- MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, organizations, auth, finance invoices, and audit logs.
 - Admin CRM connected to dedicated production APIs with bearer session handling.
-- CRM list pagination, status filtering, server-side search, tenant/branch-scoped create/detail/update/delete, and status mutation scoping.
-- Tenant, branch, CRM user CRUD, login, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only tenant management.
-- Basic audit logging for authenticated mutations and sensitive finance/payment/document/tenant reads, with scoped list and CSV export APIs.
+- CRM list pagination, status filtering, server-side search, organization/branch-scoped create/detail/update/delete, and status mutation scoping.
+- Organization, branch, CRM user CRUD, login, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only organization management.
+- Basic audit logging for authenticated mutations and sensitive finance/payment/document/organization reads, with scoped list and CSV export APIs.
 - Local/log provider configuration for email, SMS, WhatsApp, payments, maps, AI, monitoring, and local/S3-style file storage.
 - File upload-intent registry for passports, vouchers, tickets, contracts, receipts, and generated document references.
 - Backend permission catalog and scoped CRM user detail/update/delete APIs.
@@ -50,7 +50,7 @@ Completed in the repo:
 | #   | Module                       | API status     | Admin CRM status | Mobile/Public status    | Remaining production work                                              |
 | --- | ---------------------------- | -------------- | ---------------- | ----------------------- | ---------------------------------------------------------------------- |
 | 1   | Authentication and Sessions  | Product Ready  | Product Ready    | Workflow Ready          | MFA/SSO provider and email delivery provider                           |
-| 2   | Tenant and Branch Management | Product Ready  | Workflow Ready   | N/A                     | Tenant onboarding UI depth, storage/sync adapters                      |
+| 2   | Organization and Branch Management | Product Ready  | Workflow Ready   | N/A                     | Organization onboarding UI depth, storage/sync adapters                      |
 | 3   | RBAC and Permissions         | Product Ready  | Product Ready    | Workflow Ready          | Role QA and production admin policy sign-off                           |
 | 4   | Audit Logs                   | Product Ready  | Product Ready    | N/A                     | Retention policies and production export review                        |
 | 5   | Leads                        | Product Ready  | Product Ready    | Agent Workflow Ready    | Follow-up tasks, duplicate merge, import/export                        |
@@ -79,8 +79,8 @@ Completed in the repo:
 | Priority | Status  | Task                                                                                                                                                                               |
 | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | P0       | Done    | Protect CRM routes with bearer auth by default.                                                                                                                                    |
-| P0       | Done    | Enforce tenant/branch scope for create, list, detail, update, delete, and status mutation paths.                                                                                   |
-| P0       | Done    | Add RBAC decorators/guard and platform-only tenant management.                                                                                                                     |
+| P0       | Done    | Enforce organization/branch scope for create, list, detail, update, delete, and status mutation paths.                                                                                   |
+| P0       | Done    | Add RBAC decorators/guard and platform-only organization management.                                                                                                                     |
 | P0       | Done    | Add refresh-session rotation.                                                                                                                                                      |
 | P0       | Done    | Add basic backend audit logging.                                                                                                                                                   |
 | P0       | Done    | Sync TripOS API `tsconfig.json` with Node16 module/moduleResolution settings for production NestJS builds.                                                                         |

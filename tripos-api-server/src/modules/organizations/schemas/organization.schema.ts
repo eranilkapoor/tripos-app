@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { COLLECTION_NAMES } from '../../../common/constants/collection-names.constants';
 
-export type TenantDocument = HydratedDocument<Tenant>;
+export type OrganizationDocument = HydratedDocument<Organization>;
 
-@Schema({ collection: COLLECTION_NAMES.TENANT, timestamps: true })
-export class Tenant {
+@Schema({ collection: COLLECTION_NAMES.ORGANIZATION, timestamps: true })
+export class Organization {
   @Prop({ required: true, trim: true }) name!: string;
   @Prop({
     required: true,
@@ -39,4 +39,4 @@ export class Tenant {
   status!: string;
 }
 
-export const TenantSchema = SchemaFactory.createForClass(Tenant);
+export const OrganizationSchema = SchemaFactory.createForClass(Organization);

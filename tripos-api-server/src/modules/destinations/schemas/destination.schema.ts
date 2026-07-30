@@ -13,7 +13,8 @@ export class Destination {
   @Prop({ trim: true }) bestSeason?: string;
   @Prop({ type: [String], default: [] }) highlights!: string[];
   @Prop({ trim: true }) visaRequirement?: string;
-  @Prop({ enum: ['active', 'inactive'], default: 'active', index: true }) status!: string;
+  @Prop({ enum: ['active', 'inactive'], default: 'active', index: true })
+  status!: string;
 }
 
 export const DestinationSchema = SchemaFactory.createForClass(Destination);

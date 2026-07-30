@@ -5,4 +5,3 @@ export class StatusUpdateDto {
   @MinLength(2)
   status!: string;
 }
-

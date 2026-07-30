@@ -24,7 +24,7 @@ const LEGACY_COLLECTIONS: Array<[legacy: string, current: string]> = [
   ['tripos_vouchers', COLLECTION_NAMES.VOUCHER],
   ['tripos_support_tickets', COLLECTION_NAMES.SUPPORT_TICKET],
   ['tripos_campaigns', COLLECTION_NAMES.CAMPAIGN],
-  ['tripos_tenants', COLLECTION_NAMES.TENANT],
+  ['tripos_organizations', COLLECTION_NAMES.ORGANIZATION],
   ['tripos_crm_users', COLLECTION_NAMES.CRM_USER],
   ['tripos_user_sessions', COLLECTION_NAMES.USER_SESSION],
   ['tripos_audit_logs', COLLECTION_NAMES.AUDIT_LOG],

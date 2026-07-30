@@ -13,9 +13,9 @@ import { Request } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
-  tenantScopedBody,
-  tenantScopedQuery,
-} from '../../../common/utils/tenant-scope.util';
+  organizationScopedBody,
+  organizationScopedQuery,
+} from '../../../common/utils/organization-scope.util';
 import { CreateInvoiceDto } from '../dto/invoice.dto';
 import { InvoicesService } from '../services/invoices.service';
 
@@ -26,7 +26,7 @@ export class InvoicesController {
 
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.invoicesService.list(tenantScopedQuery(query, request));
+    return this.invoicesService.list(organizationScopedQuery(query, request));
   }
 
   @Get('next-number/:series')
@@ -37,13 +37,13 @@ export class InvoicesController {
   ) {
     return this.invoicesService.nextInvoiceNumber(
       series,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
   @Post()
   create(@Body() dto: CreateInvoiceDto, @Req() request: Request) {
-    return this.invoicesService.create(tenantScopedBody(dto, request));
+    return this.invoicesService.create(organizationScopedBody(dto, request));
   }
 
   @Get(':id')
@@ -52,7 +52,10 @@ export class InvoicesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.invoicesService.findOne(id, tenantScopedQuery(query, request));
+    return this.invoicesService.findOne(
+      id,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Patch(':id')
@@ -65,7 +68,7 @@ export class InvoicesController {
     return this.invoicesService.update(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -75,7 +78,10 @@ export class InvoicesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.invoicesService.document(id, tenantScopedQuery(query, request));
+    return this.invoicesService.document(
+      id,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Delete(':id')
@@ -84,6 +90,9 @@ export class InvoicesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.invoicesService.remove(id, tenantScopedQuery(query, request));
+    return this.invoicesService.remove(
+      id,
+      organizationScopedQuery(query, request),
+    );
   }
 }

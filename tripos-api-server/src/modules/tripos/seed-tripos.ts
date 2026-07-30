@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { config } from 'dotenv';
 import mongoose from 'mongoose';
 import { randomBytes, scryptSync } from 'node:crypto';
-import { TenantSchema } from '../tenants/schemas/tenant.schema';
+import { OrganizationSchema } from '../organizations/schemas/organization.schema';
 import { CrmUserSchema } from '../auth/schemas/crm-user.schema';
 import { LeadSchema } from '../leads/schemas/leads.schema';
 import { CustomerSchema } from '../customers/schemas/customer.schema';
@@ -33,7 +33,7 @@ async function main() {
   const uri = process.env.MONGO_URI ?? 'mongodb://localhost:27017/tripos';
   await mongoose.connect(uri);
 
-  const Tenant = model('Tenant', TenantSchema);
+  const Organization = model('Organization', OrganizationSchema);
   const CrmUser = model('CrmUser', CrmUserSchema);
   const Lead = model('Lead', LeadSchema);
   const Customer = model('Customer', CustomerSchema);
@@ -55,7 +55,7 @@ async function main() {
   const SavedReport = model('SavedReport', SavedReportSchema);
   const AuditLog = model('AuditLog', AuditLogSchema);
 
-  const tenant = await Tenant.findOneAndUpdate(
+  const organization = await Organization.findOneAndUpdate(
     { code: 'WEBNZA' },
     {
       name: 'Webnza Travels Demo',
@@ -76,7 +76,7 @@ async function main() {
     { returnDocument: 'after', upsert: true },
   ).exec();
 
-  const organizationId = String(tenant._id);
+  const organizationId = String(organization._id);
   await CrmUser.updateOne(
     { email: 'admin@tripos.test' },
     {
@@ -84,9 +84,9 @@ async function main() {
         name: 'TripOS Admin',
         email: 'admin@tripos.test',
         passwordHash: hashPassword('TripOS@123'),
-        tenantId: organizationId,
+        organizationId: organizationId,
         branchId: BRANCH_ID,
-        role: 'tenant_admin',
+        role: 'organization_admin',
         status: 'active',
         permissions: ['*'],
       },
@@ -555,16 +555,16 @@ async function main() {
       path: 'tripos.seed',
       statusCode: 200,
       outcome: 'success',
-      metadata: { tenantCode: 'WEBNZA' },
+      metadata: { organizationCode: 'WEBNZA' },
     },
   ]);
 
   await mongoose.disconnect();
   console.log(
-    `Seeded TripOS initial data for tenant WEBNZA (${organizationId}).`,
+    `Seeded TripOS initial data for organization WEBNZA (${organizationId}).`,
   );
   console.log(
-    'CRM login: admin@tripos.test / TripOS@123 / tenant WEBNZA / branch delhi',
+    'CRM login: admin@tripos.test / TripOS@123 / organization WEBNZA / branch delhi',
   );
 }
 

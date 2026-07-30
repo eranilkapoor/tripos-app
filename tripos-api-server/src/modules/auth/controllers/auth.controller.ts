@@ -16,7 +16,7 @@ import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { Public } from '../../../common/decorators/public.decorator';
 import { Roles } from '../../../common/decorators/roles.decorator';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import { organizationScopedQuery } from '../../../common/utils/organization-scope.util';
 import {
   AcceptInvitationDto,
   ForgotPasswordDto,
@@ -56,20 +56,22 @@ export class AuthController {
     return this.service.acceptInvitation(dto);
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Post('register-crm-user')
   register(
     @Body() dto: RegisterCrmUserDto,
-    @Req() request: Request & { user?: { tenantId?: unknown; role?: string } },
+    @Req()
+    request: Request & { user?: { organizationId?: unknown; role?: string } },
   ) {
     return this.service.register(dto, request.user);
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Post('invitations')
   inviteUser(
     @Body() dto: InviteCrmUserDto,
-    @Req() request: Request & { user?: { tenantId?: unknown; role?: string } },
+    @Req()
+    request: Request & { user?: { organizationId?: unknown; role?: string } },
   ) {
     return this.service.inviteUser(dto, request.user);
   }
@@ -84,29 +86,29 @@ export class AuthController {
     return this.service.logout(extractBearer(authorization));
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Get('permissions/catalog')
   permissionsCatalog() {
     return this.service.permissionsCatalog();
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Get('users')
   users(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.listUsers(tenantScopedQuery(query, request));
+    return this.service.listUsers(organizationScopedQuery(query, request));
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Get('users/:id')
   findUser(
     @Param('id') id: string,
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.findUser(id, tenantScopedQuery(query, request));
+    return this.service.findUser(id, organizationScopedQuery(query, request));
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Patch('users/:id')
   updateUser(
     @Param('id') id: string,
@@ -115,10 +117,14 @@ export class AuthController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.updateUser(id, dto, tenantScopedQuery(query, request));
+    return this.service.updateUser(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Patch('users/:id/permissions')
   updateUserPermissions(
     @Param('id') id: string,
@@ -129,18 +135,18 @@ export class AuthController {
     return this.service.updateUserPermissions(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
-  @Roles('platform_admin', 'tenant_admin')
+  @Roles('platform_admin', 'organization_admin')
   @Delete('users/:id')
   removeUser(
     @Param('id') id: string,
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.removeUser(id, tenantScopedQuery(query, request));
+    return this.service.removeUser(id, organizationScopedQuery(query, request));
   }
 }
 

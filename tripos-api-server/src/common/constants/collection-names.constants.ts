@@ -17,7 +17,7 @@ export const COLLECTION_NAMES = {
   SUPPORT_TICKET: 'support_tickets',
   NOTIFICATION: 'notifications',
   CAMPAIGN: 'campaigns',
-  TENANT: 'tenants',
+  ORGANIZATION: 'organizations',
   CRM_USER: 'crm_users',
   USER_SESSION: 'user_sessions',
   AUDIT_LOG: 'audit_logs',

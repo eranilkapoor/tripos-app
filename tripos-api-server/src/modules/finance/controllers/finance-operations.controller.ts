@@ -2,12 +2,12 @@ import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import { organizationScopedQuery } from '../../../common/utils/organization-scope.util';
 import { CreateRefundDto } from '../dto/finance-operations.dto';
 import { FinanceOperationsService } from '../services/finance-operations.service';
 
-type TenantRequest = Request & {
-  user?: { tenantId?: unknown; branchId?: unknown };
+type OrganizationRequest = Request & {
+  user?: { organizationId?: unknown; branchId?: unknown };
 };
 
 @ApiTags('finance')
@@ -17,19 +17,24 @@ export class FinanceOperationsController {
 
   @Get('receivables')
   receivables(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.receivables(tenantScopedQuery(query, request));
+    return this.service.receivables(organizationScopedQuery(query, request));
   }
 
   @Get('payables')
   payables(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.payables(tenantScopedQuery(query, request));
+    return this.service.payables(organizationScopedQuery(query, request));
   }
 
   @Post('refunds')
-  createRefund(@Body() dto: CreateRefundDto, @Req() request: TenantRequest) {
+  createRefund(
+    @Body() dto: CreateRefundDto,
+    @Req() request: OrganizationRequest,
+  ) {
     return this.service.createRefund({
       ...dto,
-      organizationId: String(request.user?.tenantId ?? dto.organizationId),
+      organizationId: String(
+        request.user?.organizationId ?? dto.organizationId,
+      ),
       branchId: String(request.user?.branchId ?? dto.branchId ?? ''),
     });
   }
@@ -42,12 +47,12 @@ export class FinanceOperationsController {
   ) {
     return this.service.profitability(
       bookingId,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
   @Get('reconciliation')
   reconciliation(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.reconciliation(tenantScopedQuery(query, request));
+    return this.service.reconciliation(organizationScopedQuery(query, request));
   }
 }

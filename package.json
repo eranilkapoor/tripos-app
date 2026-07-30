@@ -36,7 +36,7 @@
     "b2b",
     "b2c",
     "saas",
-    "multi-tenant"
+    "multi-organization"
   ],
   "license": "UNLICENSED",
   "devDependencies": {

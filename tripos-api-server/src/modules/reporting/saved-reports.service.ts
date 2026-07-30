@@ -55,7 +55,9 @@ export class SavedReportsService {
       query,
       {
         ...dto,
-        ...(dto.schedule ? { nextRunAt: calculateNextRun(dto.schedule, new Date()) } : {}),
+        ...(dto.schedule
+          ? { nextRunAt: calculateNextRun(dto.schedule, new Date()) }
+          : {}),
       },
       'Saved report not found',
     );
@@ -182,7 +184,12 @@ export class SavedReportsService {
   }
 
   remove(id: string, query: CrmListQueryDto) {
-    return deleteScopedCrmRecord(this.model, id, query, 'Saved report not found');
+    return deleteScopedCrmRecord(
+      this.model,
+      id,
+      query,
+      'Saved report not found',
+    );
   }
 
   private resolveReport(reportType: string, query: CrmListQueryDto) {

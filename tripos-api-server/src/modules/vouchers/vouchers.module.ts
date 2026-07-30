@@ -5,7 +5,9 @@ import { Voucher, VoucherSchema } from './schemas/voucher.schema';
 import { VouchersService } from './services/vouchers.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Voucher.name, schema: VoucherSchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: Voucher.name, schema: VoucherSchema }]),
+  ],
   controllers: [VouchersController],
   providers: [VouchersService],
   exports: [VouchersService],

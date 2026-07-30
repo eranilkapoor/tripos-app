@@ -37,5 +37,5 @@ export type ApiRecord = Record<string, unknown> & {
 export type CrmSession = {
   token: string;
   user: Record<string, unknown>;
-  tenant: Record<string, unknown>;
+  organization: Record<string, unknown>;
 };

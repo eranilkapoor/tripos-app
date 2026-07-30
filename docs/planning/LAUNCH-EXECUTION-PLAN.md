@@ -20,7 +20,7 @@ TripOS can be marked production-live only after:
 - `npm run verify` passes from a clean checkout.
 - API, CRM, mobile, and public website production builds pass.
 - Production environment uses live MongoDB, Redis, S3-compatible storage, strict CORS, and no demo secrets.
-- Tenant admin, branch manager, sales, operations, finance, B2B agent, and customer roles pass access-control QA.
+- Organization admin, branch manager, sales, operations, finance, B2B agent, and customer roles pass access-control QA.
 - Provider smoke tests pass or the provider-backed feature is explicitly disabled.
 - Backup/restore and monitoring alerts are tested.
 - Legal, privacy, refund, cancellation, and data-retention pages are published.

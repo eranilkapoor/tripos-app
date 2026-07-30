@@ -2,7 +2,12 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LeadsController } from './controllers/leads.controller';
 import { PublicLeadsController } from './controllers/public-leads.controller';
-import { Lead, LeadActivity, LeadActivitySchema, LeadSchema } from './schemas/leads.schema';
+import {
+  Lead,
+  LeadActivity,
+  LeadActivitySchema,
+  LeadSchema,
+} from './schemas/leads.schema';
 import { LeadsService } from './services/leads.service';
 
 @Module({
@@ -17,4 +22,3 @@ import { LeadsService } from './services/leads.service';
   exports: [LeadsService],
 })
 export class LeadsModule {}
-

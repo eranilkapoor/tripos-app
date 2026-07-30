@@ -16,19 +16,19 @@ export class CrmUser {
   })
   email!: string;
   @Prop({ required: true }) passwordHash!: string;
-  @Prop({ required: true, index: true }) tenantId!: string;
+  @Prop({ required: true, index: true }) organizationId!: string;
   @Prop({ default: 'main', index: true }) branchId!: string;
   @Prop({
     enum: [
       'platform_admin',
-      'tenant_admin',
+      'organization_admin',
       'branch_manager',
       'sales',
       'operations',
       'finance',
       'agent',
     ],
-    default: 'tenant_admin',
+    default: 'organization_admin',
     index: true,
   })
   role!: string;

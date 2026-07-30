@@ -23,7 +23,7 @@ import {
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { CrmUser } from '../schemas/crm-user.schema';
 import { UserSession } from '../schemas/user-session.schema';
-import { TenantsService } from '../../tenants/services/tenants.service';
+import { OrganizationsService } from '../../organizations/services/organizations.service';
 
 @Injectable()
 export class AuthService {
@@ -31,24 +31,25 @@ export class AuthService {
     @InjectModel(CrmUser.name) private readonly userModel: Model<CrmUser>,
     @InjectModel(UserSession.name)
     private readonly sessionModel: Model<UserSession>,
-    private readonly tenantsService: TenantsService,
+    private readonly organizationsService: OrganizationsService,
   ) {}
 
   async register(
     dto: RegisterCrmUserDto,
-    actor?: { tenantId?: unknown; role?: string },
+    actor?: { organizationId?: unknown; role?: string },
   ) {
-    const tenantId =
+    const organizationId =
       actor?.role === 'platform_admin'
-        ? dto.tenantId
-        : String(actor?.tenantId ?? '');
-    if (!tenantId) throw new ForbiddenException('Tenant context is required');
+        ? dto.organizationId
+        : String(actor?.organizationId ?? '');
+    if (!organizationId)
+      throw new ForbiddenException('Organization context is required');
     const user = await this.userModel.create({
       ...dto,
-      tenantId,
+      organizationId,
       email: dto.email.toLowerCase(),
       branchId: dto.branchId ?? 'main',
-      role: dto.role ?? 'tenant_admin',
+      role: dto.role ?? 'organization_admin',
       passwordHash: hashPassword(dto.password),
     });
     return sanitizeUser(user.toObject());
@@ -56,13 +57,14 @@ export class AuthService {
 
   async inviteUser(
     dto: InviteCrmUserDto,
-    actor?: { tenantId?: unknown; role?: string },
+    actor?: { organizationId?: unknown; role?: string },
   ) {
-    const tenantId =
+    const organizationId =
       actor?.role === 'platform_admin'
-        ? String(dto.tenantId ?? '')
-        : String(actor?.tenantId ?? '');
-    if (!tenantId) throw new ForbiddenException('Tenant context is required');
+        ? String(dto.organizationId ?? '')
+        : String(actor?.organizationId ?? '');
+    if (!organizationId)
+      throw new ForbiddenException('Organization context is required');
     const invitationToken = randomBytes(32).toString('hex');
     const user = await this.userModel
       .findOneAndUpdate(
@@ -71,7 +73,7 @@ export class AuthService {
           $set: {
             email: dto.email.toLowerCase(),
             name: dto.name,
-            tenantId,
+            organizationId,
             branchId: dto.branchId ?? 'main',
             role: dto.role ?? 'sales',
             status: 'invited',
@@ -104,23 +106,25 @@ export class AuthService {
       .exec();
     if (!user || !verifyPassword(dto.password, user.passwordHash))
       throw new UnauthorizedException('Invalid email or password');
-    const tenant = await this.tenantsService.findOne(String(user.tenantId));
+    const organization = await this.organizationsService.findOne(
+      String(user.organizationId),
+    );
     if (
-      dto.tenantCode &&
-      String((tenant as { code?: string }).code).toUpperCase() !==
-        dto.tenantCode.toUpperCase()
+      dto.organizationCode &&
+      String((organization as { code?: string }).code).toUpperCase() !==
+        dto.organizationCode.toUpperCase()
     )
-      throw new UnauthorizedException('Tenant does not match user');
+      throw new UnauthorizedException('Organization does not match user');
     const branchId = dto.branchId ?? user.branchId;
     const token = randomBytes(32).toString('hex');
     await this.sessionModel.create({
       tokenHash: hashToken(token),
       userId: String((user as { _id: unknown })._id),
-      tenantId: user.tenantId,
+      organizationId: user.organizationId,
       branchId,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 12),
     });
-    return { token, user: sanitizeUser({ ...user, branchId }), tenant };
+    return { token, user: sanitizeUser({ ...user, branchId }), organization };
   }
 
   async me(token: string) {
@@ -135,10 +139,12 @@ export class AuthService {
     if (!session) throw new UnauthorizedException('Session expired');
     const user = await this.userModel.findById(session.userId).lean().exec();
     if (!user) throw new UnauthorizedException('User not found');
-    const tenant = await this.tenantsService.findOne(String(session.tenantId));
+    const organization = await this.organizationsService.findOne(
+      String(session.organizationId),
+    );
     return {
       user: sanitizeUser({ ...user, branchId: session.branchId }),
-      tenant,
+      organization,
     };
   }
 
@@ -155,7 +161,9 @@ export class AuthService {
     const user = await this.userModel.findById(session.userId).lean().exec();
     if (!user || user.status !== 'active')
       throw new UnauthorizedException('User not found');
-    const tenant = await this.tenantsService.findOne(String(session.tenantId));
+    const organization = await this.organizationsService.findOne(
+      String(session.organizationId),
+    );
     const nextToken = randomBytes(32).toString('hex');
     await Promise.all([
       this.sessionModel
@@ -164,7 +172,7 @@ export class AuthService {
       this.sessionModel.create({
         tokenHash: hashToken(nextToken),
         userId: session.userId,
-        tenantId: session.tenantId,
+        organizationId: session.organizationId,
         branchId: session.branchId,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 12),
       }),
@@ -172,7 +180,7 @@ export class AuthService {
     return {
       token: nextToken,
       user: sanitizeUser({ ...user, branchId: session.branchId }),
-      tenant,
+      organization,
     };
   }
 
@@ -276,7 +284,7 @@ export class AuthService {
       ),
       roleDefaults: {
         platform_admin: ['*'],
-        tenant_admin: ['*'],
+        organization_admin: ['*'],
         branch_manager: modules.flatMap((module) =>
           ['read', 'create', 'update', 'export'].map(
             (action) => `${module}:${action}`,
@@ -417,14 +425,15 @@ export class AuthService {
       .findOne({ email: 'admin@tripos.test' })
       .exec();
     if (existing) return;
-    const tenant = await this.tenantsService.ensureDemoTenant();
+    const organization =
+      await this.organizationsService.ensureDemoOrganization();
     await this.userModel.create({
       name: 'TripOS Admin',
       email: 'admin@tripos.test',
       passwordHash: hashPassword('TripOS@123'),
-      tenantId: String(tenant._id),
+      organizationId: String(organization._id),
       branchId: 'delhi',
-      role: 'tenant_admin',
+      role: 'organization_admin',
       permissions: ['*'],
     });
   }
@@ -459,7 +468,7 @@ function userScopeFilter(
 ) {
   const filter: Record<string, unknown> = {
     ...extra,
-    tenantId: query.organizationId ?? 'demo-org',
+    organizationId: query.organizationId ?? 'demo-org',
   };
   if (query.branchId) filter.branchId = query.branchId;
   return filter;

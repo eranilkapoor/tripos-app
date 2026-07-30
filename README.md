@@ -1,6 +1,6 @@
 # TripOS
 
-TripOS is a multi-tenant Travel Operating System for tour operators, travel agencies, DMCs, B2B travel networks, and B2C holiday brands.
+TripOS is a multi-organization Travel Operating System for tour operators, travel agencies, DMCs, B2B travel networks, and B2C holiday brands.
 
 The product goal is to digitize the complete travel business lifecycle:
 
@@ -23,7 +23,7 @@ tripos-app/
     api-contract/    OpenAPI snapshot and generated API types
   scripts/           Repository-level automation scripts
   docs/
-    product/         PRD, modules, roles, tenant model
+    product/         PRD, modules, roles, organization model
     architecture/    Technical architecture, database, APIs, security
     planning/        Roadmap, MVP scope, execution plans
     operations/      Deployment, runbooks, support model
@@ -99,7 +99,7 @@ Useful endpoints:
 Database:
 
 - TripOS uses its own MongoDB database named `tripos`.
-- Collections use clean domain names such as `tenants`, `leads`, `quotations`, `bookings`, `invoices`, and `audit_logs`. Product prefixes are not needed inside the dedicated TripOS database.
+- Collections use clean domain names such as `organizations`, `leads`, `quotations`, `bookings`, `invoices`, and `audit_logs`. Product prefixes are not needed inside the dedicated TripOS database.
 - Redis is planned for cache, queues, rate limits, locks, and short-lived session acceleration.
 - Keep credentials in `tripos-api-server/.env.development`; this file is ignored by git.
 - Use `tripos-api-server/.env.example` as the safe template.
@@ -118,13 +118,13 @@ Seed the initial CRM demo workspace:
 npm --prefix tripos-api-server run seed
 ```
 
-The seed is idempotent and creates the `WEBNZA` tenant, Delhi/Dubai/Jaipur branches, an admin login, and realistic travel CRM records across leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, invoices, documents, vouchers, campaigns, storage, saved reports, and audit logs.
+The seed is idempotent and creates the `WEBNZA` organization, Delhi/Dubai/Jaipur branches, an admin login, and realistic travel CRM records across leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, invoices, documents, vouchers, campaigns, storage, saved reports, and audit logs.
 
 Demo CRM login:
 
 - Email: `admin@tripos.test`
 - Password: `TripOS@123`
-- Tenant code: `WEBNZA`
+- Organization code: `WEBNZA`
 - Branch: `delhi`
 
 ### Mobile App

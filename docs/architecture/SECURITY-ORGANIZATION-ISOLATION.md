@@ -15,7 +15,7 @@ Current repo status:
 
 - CRM login/logout/session restore is implemented.
 - CRM users, sessions, organizations, branches, storage mode, and sync policy are Mongo-backed.
-- Admin CRM sends bearer token plus organization and branch headers. The `x-tenant-id` header remains a compatibility alias for the selected organization.
+- Admin CRM sends bearer token plus organization and branch headers. The `x-organization-id` header remains a compatibility alias for the selected organization.
 - Route protection, RBAC guards, and refresh token rotation are implemented.
 - Basic audit logging for authenticated mutations and sensitive reads is implemented.
 - Password reset and invitation backend flows are implemented.
@@ -33,7 +33,7 @@ Use layered authorization:
 
 ## Organization Isolation
 
-Organization isolation must be part of the data access layer, not left to UI filters. In TripOS, tenant and organization are the same boundary; use Organization in product language and `organizationId` in persisted business data.
+Organization isolation must be part of the data access layer, not left to UI filters. In TripOS, organization and organization are the same boundary; use Organization in product language and `organizationId` in persisted business data.
 
 Rules:
 
@@ -52,7 +52,7 @@ TripOS organization storage modes:
 
 Next implementation step:
 
-- Add a request context resolver that validates the bearer session and exposes `organizationId`, compatibility `tenantId`, `branchId`, `role`, and `permissions`.
+- Add a request context resolver that validates the bearer session and exposes `organizationId`, compatibility `organizationId`, `branchId`, `role`, and `permissions`.
 - Apply this context to every module service so list/create/update operations cannot cross organizations or branches.
 
 ## Sensitive Data

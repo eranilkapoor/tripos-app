@@ -11,21 +11,21 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from '../../../common/decorators/roles.decorator';
-import { CreateTenantDto } from '../dto/tenant.dto';
-import { TenantsService } from '../services/tenants.service';
+import { CreateOrganizationDto } from '../dto/organization.dto';
+import { OrganizationsService } from '../services/organizations.service';
 
-type TenantRequest = Request & {
-  user?: { tenantId?: unknown };
+type OrganizationRequest = Request & {
+  user?: { organizationId?: unknown };
 };
 
 @ApiTags('organizations')
 @Controller('organizations')
 export class OrganizationsController {
-  constructor(private readonly service: TenantsService) {}
+  constructor(private readonly service: OrganizationsService) {}
 
   @Post()
   @Roles('platform_admin')
-  create(@Body() dto: CreateTenantDto) {
+  create(@Body() dto: CreateOrganizationDto) {
     return this.service.create(dto);
   }
 
@@ -36,16 +36,16 @@ export class OrganizationsController {
   }
 
   @Get('current')
-  current(@Req() request: TenantRequest) {
-    return this.service.findOne(String(request.user?.tenantId ?? ''));
+  current(@Req() request: OrganizationRequest) {
+    return this.service.findOne(String(request.user?.organizationId ?? ''));
   }
 
   @Patch('current')
   updateCurrent(
     @Body() dto: Record<string, unknown>,
-    @Req() request: TenantRequest,
+    @Req() request: OrganizationRequest,
   ) {
-    return this.service.update(String(request.user?.tenantId ?? ''), dto);
+    return this.service.update(String(request.user?.organizationId ?? ''), dto);
   }
 
   @Get(':id')

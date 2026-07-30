@@ -12,10 +12,20 @@ export class SupportTicket {
   @Prop({ required: true, trim: true, index: true }) customerName!: string;
   @Prop({ index: true }) bookingId?: string;
   @Prop({ trim: true, index: true }) channel?: string;
-  @Prop({ enum: ['low', 'medium', 'high', 'urgent'], default: 'medium', index: true }) priority!: string;
+  @Prop({
+    enum: ['low', 'medium', 'high', 'urgent'],
+    default: 'medium',
+    index: true,
+  })
+  priority!: string;
   @Prop({ trim: true, index: true }) assignedTo?: string;
   @Prop({ trim: true }) description?: string;
-  @Prop({ enum: ['open', 'in_progress', 'waiting_customer', 'resolved', 'closed'], default: 'open', index: true }) status!: string;
+  @Prop({
+    enum: ['open', 'in_progress', 'waiting_customer', 'resolved', 'closed'],
+    default: 'open',
+    index: true,
+  })
+  status!: string;
 }
 
 export const SupportTicketSchema = SchemaFactory.createForClass(SupportTicket);

@@ -17,7 +17,12 @@ export class Campaign {
   @Prop({ default: 0 }) bookings!: number;
   @Prop({ default: 0 }) revenue!: number;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
-  @Prop({ enum: ['draft', 'active', 'paused', 'completed', 'archived'], default: 'draft', index: true }) status!: string;
+  @Prop({
+    enum: ['draft', 'active', 'paused', 'completed', 'archived'],
+    default: 'draft',
+    index: true,
+  })
+  status!: string;
 }
 
 export const CampaignSchema = SchemaFactory.createForClass(Campaign);

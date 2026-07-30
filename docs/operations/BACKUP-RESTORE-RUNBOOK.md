@@ -23,7 +23,7 @@ TripOS uses MongoDB as the system of record and Redis for cache, queues, locks, 
 1. Create a temporary restore database.
 2. Restore the latest MongoDB backup into the temporary database.
 3. Point a staging API instance at the temporary database.
-4. Verify login, tenant scoping, leads, quotations, bookings, payments, documents, and audit logs.
+4. Verify login, organization scoping, leads, quotations, bookings, payments, documents, and audit logs.
 5. Verify storage object access for a known uploaded file reference.
 6. Record backup timestamp, restore duration, data checks, API build version, and operator name.
 

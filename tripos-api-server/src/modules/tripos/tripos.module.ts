@@ -25,7 +25,10 @@ import {
 } from '../b2b-agents/schemas/b2b-agent.schema';
 import { Payment, PaymentSchema } from '../payments/schemas/payment.schema';
 import { Invoice, InvoiceSchema } from '../finance/schemas/invoice.schema';
-import { Tenant, TenantSchema } from '../tenants/schemas/tenant.schema';
+import {
+  Organization,
+  OrganizationSchema,
+} from '../organizations/schemas/organization.schema';
 import { AuditLog, AuditLogSchema } from '../audit/schemas/audit-log.schema';
 
 @Module({
@@ -41,7 +44,7 @@ import { AuditLog, AuditLogSchema } from '../audit/schemas/audit-log.schema';
       { name: B2BAgent.name, schema: B2BAgentSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: Invoice.name, schema: InvoiceSchema },
-      { name: Tenant.name, schema: TenantSchema },
+      { name: Organization.name, schema: OrganizationSchema },
       { name: AuditLog.name, schema: AuditLogSchema },
     ]),
   ],

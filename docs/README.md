@@ -10,7 +10,7 @@
 - [Technical Architecture](architecture/TECHNICAL-ARCHITECTURE.md)
 - [Database Model](architecture/DATABASE-MODEL.md)
 - [API Specification](architecture/API-SPECIFICATION.md)
-- [Security and Multi-Tenancy](architecture/SECURITY-MULTITENANCY.md)
+- [Security and Organization Isolation](architecture/SECURITY-ORGANIZATION-ISOLATION.md)
 
 ## Planning
 

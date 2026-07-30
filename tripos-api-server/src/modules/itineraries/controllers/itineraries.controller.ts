@@ -14,9 +14,9 @@ import { Request } from 'express';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
-  tenantScopedBody,
-  tenantScopedQuery,
-} from '../../../common/utils/tenant-scope.util';
+  organizationScopedBody,
+  organizationScopedQuery,
+} from '../../../common/utils/organization-scope.util';
 import {
   CreateItineraryDto,
   UpsertItineraryDayDto,
@@ -29,18 +29,18 @@ import { ItinerariesService } from '../services/itineraries.service';
 export class ItinerariesController {
   constructor(private readonly service: ItinerariesService) {}
   @Post() create(@Body() dto: CreateItineraryDto, @Req() request: Request) {
-    return this.service.create(tenantScopedBody(dto, request));
+    return this.service.create(organizationScopedBody(dto, request));
   }
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.list(tenantScopedQuery(query, request));
+    return this.service.list(organizationScopedQuery(query, request));
   }
   @Get(':id') findOne(
     @Param('id') id: string,
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.findOne(id, tenantScopedQuery(query, request));
+    return this.service.findOne(id, organizationScopedQuery(query, request));
   }
   @Patch(':id')
   update(
@@ -49,7 +49,11 @@ export class ItinerariesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.update(id, dto, tenantScopedQuery(query, request));
+    return this.service.update(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
   @Post(':id/pdf')
   document(
@@ -57,7 +61,7 @@ export class ItinerariesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.document(id, tenantScopedQuery(query, request));
+    return this.service.document(id, organizationScopedQuery(query, request));
   }
   @Patch(':id/status') updateStatus(
     @Param('id') id: string,
@@ -68,7 +72,7 @@ export class ItinerariesController {
     return this.service.updateStatus(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
   @Delete(':id')
@@ -77,7 +81,7 @@ export class ItinerariesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.remove(id, tenantScopedQuery(query, request));
+    return this.service.remove(id, organizationScopedQuery(query, request));
   }
 
   @Post(':id/days')
@@ -87,7 +91,11 @@ export class ItinerariesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.addDay(id, dto, tenantScopedQuery(query, request));
+    return this.service.addDay(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Patch(':id/days/:dayId')
@@ -102,7 +110,7 @@ export class ItinerariesController {
       id,
       dayId,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -113,6 +121,10 @@ export class ItinerariesController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.addItem(id, dto, tenantScopedQuery(query, request));
+    return this.service.addItem(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 }

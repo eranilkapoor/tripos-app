@@ -8,7 +8,7 @@ export type UserSessionDocument = HydratedDocument<UserSession>;
 export class UserSession {
   @Prop({ required: true, unique: true, index: true }) tokenHash!: string;
   @Prop({ required: true, index: true }) userId!: string;
-  @Prop({ required: true, index: true }) tenantId!: string;
+  @Prop({ required: true, index: true }) organizationId!: string;
   @Prop({ required: true, index: true }) branchId!: string;
   @Prop({ required: true }) expiresAt!: Date;
   @Prop({ index: true }) revokedAt?: Date;

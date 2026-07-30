@@ -11,7 +11,7 @@ import { AuditLogService } from '../services/audit-log.service';
 type AuthenticatedUser = {
   _id?: unknown;
   id?: unknown;
-  tenantId?: unknown;
+  organizationId?: unknown;
   branchId?: unknown;
   role?: string;
 };
@@ -66,7 +66,7 @@ export class AuditLogInterceptor implements NestInterceptor {
       statusCode,
       outcome,
       organizationId: stringOrUndefined(
-        user?.tenantId ?? request.query.organizationId,
+        user?.organizationId ?? request.query.organizationId,
       ),
       branchId: stringOrUndefined(user?.branchId ?? request.query.branchId),
       actorId: stringOrUndefined(user?._id ?? user?.id),
@@ -88,7 +88,7 @@ function shouldAudit(request: Request & { user?: AuthenticatedUser }) {
     '/api/v1/finance',
     '/api/v1/payments',
     '/api/v1/travel-documents',
-    '/api/v1/tenants',
+    '/api/v1/organizations',
   ].some((prefix) => request.path.startsWith(prefix));
 }
 

@@ -14,9 +14,9 @@ import { Request } from 'express';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
-  tenantScopedBody,
-  tenantScopedQuery,
-} from '../../../common/utils/tenant-scope.util';
+  organizationScopedBody,
+  organizationScopedQuery,
+} from '../../../common/utils/organization-scope.util';
 import { CreateQuotationDto } from '../dto/quotation.dto';
 import { QuotationsService } from '../services/quotations.service';
 
@@ -25,18 +25,18 @@ import { QuotationsService } from '../services/quotations.service';
 export class QuotationsController {
   constructor(private readonly service: QuotationsService) {}
   @Post() create(@Body() dto: CreateQuotationDto, @Req() request: Request) {
-    return this.service.create(tenantScopedBody(dto, request));
+    return this.service.create(organizationScopedBody(dto, request));
   }
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.list(tenantScopedQuery(query, request));
+    return this.service.list(organizationScopedQuery(query, request));
   }
   @Get(':id') findOne(
     @Param('id') id: string,
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.findOne(id, tenantScopedQuery(query, request));
+    return this.service.findOne(id, organizationScopedQuery(query, request));
   }
   @Patch(':id')
   update(
@@ -45,7 +45,11 @@ export class QuotationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.update(id, dto, tenantScopedQuery(query, request));
+    return this.service.update(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
   @Patch(':id/status') updateStatus(
     @Param('id') id: string,
@@ -56,7 +60,7 @@ export class QuotationsController {
     return this.service.updateStatus(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
   @Delete(':id')
@@ -65,7 +69,7 @@ export class QuotationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.remove(id, tenantScopedQuery(query, request));
+    return this.service.remove(id, organizationScopedQuery(query, request));
   }
 
   @Post(':id/calculate')
@@ -74,7 +78,7 @@ export class QuotationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.calculate(id, tenantScopedQuery(query, request));
+    return this.service.calculate(id, organizationScopedQuery(query, request));
   }
 
   @Post(':id/send')
@@ -83,7 +87,7 @@ export class QuotationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.send(id, tenantScopedQuery(query, request));
+    return this.service.send(id, organizationScopedQuery(query, request));
   }
 
   @Post(':id/accept')
@@ -92,7 +96,7 @@ export class QuotationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.accept(id, tenantScopedQuery(query, request));
+    return this.service.accept(id, organizationScopedQuery(query, request));
   }
 
   @Post(':id/pdf')
@@ -101,6 +105,6 @@ export class QuotationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.pdf(id, tenantScopedQuery(query, request));
+    return this.service.pdf(id, organizationScopedQuery(query, request));
   }
 }

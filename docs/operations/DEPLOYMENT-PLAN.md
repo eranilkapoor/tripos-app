@@ -37,7 +37,7 @@ Recommended first production architecture:
 - Background workers deploy with API version compatibility.
 - Rollbacks must include migration strategy.
 - Feature flags protect incomplete modules.
-- Staging must use production-like tenant data structure.
+- Staging must use production-like organization data structure.
 
 ## Later Scale Path
 

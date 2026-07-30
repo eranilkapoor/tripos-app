@@ -7,12 +7,12 @@ Build a sellable internal travel CRM and quotation operating system for small an
 The MVP should prove that TripOS can manage:
 
 ```text
-Tenant -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Bookings -> Payments -> Basic Operations
+Organization -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Bookings -> Payments -> Basic Operations
 ```
 
 ## Must Have
 
-- Tenant onboarding - backend tenant model completed
+- Organization onboarding - backend organization model completed
 - User login/logout - completed for CRM session foundation
 - User invitation - backend flow implemented; email delivery provider pending
 - Roles and permissions - RBAC guard/decorators implemented; admin permission UI pending
@@ -52,11 +52,11 @@ Tenant -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Bookings -
 - Full native mobile production release
 - Kubernetes
 - Kafka
-- Multi-database tenancy
+- Multi-database organization isolation
 
 ## First Demo Script
 
-1. Create a tenant for a travel agency.
+1. Create a organization for a travel agency.
 2. Invite sales and operations users.
 3. Create a Dubai family holiday lead.
 4. Assign lead to a sales executive.
@@ -77,12 +77,12 @@ Built:
 
 - Admin CRM login/logout with demo CRM admin.
 - Dedicated APIs for core travel CRM, operations, finance, support, and marketing modules.
-- Multi-tenant tenant/branch data model with storage and sync policy fields.
+- Multi-organization organization/branch data model with storage and sync policy fields.
 - Mobile app scaffold exists and is now promoted into the MVP track for customer and B2B agent views.
 
 Remaining before production:
 
-- Enforce authenticated tenant/branch scoping across all module queries.
+- Enforce authenticated organization/branch scoping across all module queries.
 - Add RBAC guards and permission checks.
 - Add password reset, invitations, refresh/session rotation, and audit logging.
 - Replace mobile static data with authenticated API-backed customer/agent dashboards.

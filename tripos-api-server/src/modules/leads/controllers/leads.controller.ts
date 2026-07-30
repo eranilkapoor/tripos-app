@@ -12,9 +12,9 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import {
-  tenantScopedBody,
-  tenantScopedQuery,
-} from '../../../common/utils/tenant-scope.util';
+  organizationScopedBody,
+  organizationScopedQuery,
+} from '../../../common/utils/organization-scope.util';
 import {
   AssignLeadDto,
   AddLeadActivityDto,
@@ -31,12 +31,12 @@ export class LeadsController {
 
   @Post()
   create(@Body() dto: CreateLeadDto, @Req() request: Request) {
-    return this.leadsService.create(tenantScopedBody(dto, request));
+    return this.leadsService.create(organizationScopedBody(dto, request));
   }
 
   @Get()
   list(@Query() query: LeadListQueryDto, @Req() request: Request) {
-    return this.leadsService.list(tenantScopedQuery(query, request));
+    return this.leadsService.list(organizationScopedQuery(query, request));
   }
 
   @Get(':id')
@@ -45,7 +45,10 @@ export class LeadsController {
     @Query() query: LeadListQueryDto,
     @Req() request: Request,
   ) {
-    return this.leadsService.findOne(id, tenantScopedQuery(query, request));
+    return this.leadsService.findOne(
+      id,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Patch(':id')
@@ -55,7 +58,11 @@ export class LeadsController {
     @Query() query: LeadListQueryDto,
     @Req() request: Request,
   ) {
-    return this.leadsService.update(id, dto, tenantScopedQuery(query, request));
+    return this.leadsService.update(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Patch(':id/assign')
@@ -65,7 +72,11 @@ export class LeadsController {
     @Query() query: LeadListQueryDto,
     @Req() request: Request,
   ) {
-    return this.leadsService.assign(id, dto, tenantScopedQuery(query, request));
+    return this.leadsService.assign(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Patch(':id/stage')
@@ -78,7 +89,7 @@ export class LeadsController {
     return this.leadsService.updateStage(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -88,7 +99,10 @@ export class LeadsController {
     @Query() query: LeadListQueryDto,
     @Req() request: Request,
   ) {
-    return this.leadsService.activities(id, tenantScopedQuery(query, request));
+    return this.leadsService.activities(
+      id,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Post(':id/notes')
@@ -101,7 +115,7 @@ export class LeadsController {
     return this.leadsService.addActivity(
       id,
       { ...dto, type: 'note_added' },
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -115,7 +129,7 @@ export class LeadsController {
     return this.leadsService.addActivity(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -125,6 +139,9 @@ export class LeadsController {
     @Query() query: LeadListQueryDto,
     @Req() request: Request,
   ) {
-    return this.leadsService.remove(id, tenantScopedQuery(query, request));
+    return this.leadsService.remove(
+      id,
+      organizationScopedQuery(query, request),
+    );
   }
 }

@@ -11,11 +11,21 @@ export class Customer {
   @Prop({ required: true, trim: true, index: true }) name!: string;
   @Prop({ trim: true, lowercase: true, index: true }) email?: string;
   @Prop({ trim: true, index: true }) phone?: string;
-  @Prop({ enum: ['b2c', 'corporate', 'family', 'repeat'], default: 'b2c', index: true }) customerType!: string;
+  @Prop({
+    enum: ['b2c', 'corporate', 'family', 'repeat'],
+    default: 'b2c',
+    index: true,
+  })
+  customerType!: string;
   @Prop({ trim: true }) source?: string;
   @Prop({ trim: true }) city?: string;
   @Prop({ trim: true }) country?: string;
-  @Prop({ enum: ['active', 'inactive', 'blocked'], default: 'active', index: true }) status!: string;
+  @Prop({
+    enum: ['active', 'inactive', 'blocked'],
+    default: 'active',
+    index: true,
+  })
+  status!: string;
 }
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);

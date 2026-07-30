@@ -14,9 +14,9 @@ import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
-  tenantScopedBody,
-  tenantScopedQuery,
-} from '../../../common/utils/tenant-scope.util';
+  organizationScopedBody,
+  organizationScopedQuery,
+} from '../../../common/utils/organization-scope.util';
 import { CreateNotificationDto } from '../dto/notification.dto';
 import { NotificationsService } from '../services/notifications.service';
 
@@ -27,12 +27,12 @@ export class NotificationsController {
 
   @Post()
   create(@Body() dto: CreateNotificationDto, @Req() request: Request) {
-    return this.service.create(tenantScopedBody(dto, request));
+    return this.service.create(organizationScopedBody(dto, request));
   }
 
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.list(tenantScopedQuery(query, request));
+    return this.service.list(organizationScopedQuery(query, request));
   }
 
   @Get(':id')
@@ -41,7 +41,7 @@ export class NotificationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.findOne(id, tenantScopedQuery(query, request));
+    return this.service.findOne(id, organizationScopedQuery(query, request));
   }
 
   @Patch(':id')
@@ -51,7 +51,11 @@ export class NotificationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.update(id, dto, tenantScopedQuery(query, request));
+    return this.service.update(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Patch(':id/status')
@@ -64,7 +68,7 @@ export class NotificationsController {
     return this.service.updateStatus(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -74,6 +78,6 @@ export class NotificationsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.remove(id, tenantScopedQuery(query, request));
+    return this.service.remove(id, organizationScopedQuery(query, request));
   }
 }

@@ -5,10 +5,13 @@ import { Quotation, QuotationSchema } from './schemas/quotation.schema';
 import { QuotationsService } from './services/quotations.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Quotation.name, schema: QuotationSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Quotation.name, schema: QuotationSchema },
+    ]),
+  ],
   controllers: [QuotationsController],
   providers: [QuotationsService],
   exports: [QuotationsService],
 })
 export class QuotationsModule {}
-

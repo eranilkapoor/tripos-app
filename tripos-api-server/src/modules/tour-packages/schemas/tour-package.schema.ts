@@ -16,8 +16,15 @@ export class TourPackage {
   @Prop({ default: 'INR', trim: true }) currency!: string;
   @Prop({ type: [String], default: [] }) inclusions!: string[];
   @Prop({ type: [String], default: [] }) exclusions!: string[];
-  @Prop({ type: [Object], default: [] }) itinerary!: Array<Record<string, unknown>>;
-  @Prop({ enum: ['draft', 'active', 'inactive', 'archived'], default: 'draft', index: true }) status!: string;
+  @Prop({ type: [Object], default: [] }) itinerary!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({
+    enum: ['draft', 'active', 'inactive', 'archived'],
+    default: 'draft',
+    index: true,
+  })
+  status!: string;
 }
 
 export const TourPackageSchema = SchemaFactory.createForClass(TourPackage);

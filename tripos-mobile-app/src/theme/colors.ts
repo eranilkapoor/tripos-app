@@ -12,4 +12,3 @@ export const colors = {
   good: "#0f7b55",
   warning: "#9a5b11",
 };
-

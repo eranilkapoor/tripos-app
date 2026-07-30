@@ -6,7 +6,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateTenantDto {
+export class CreateOrganizationDto {
   @IsString() @MinLength(2) name!: string;
   @IsString() @MinLength(2) code!: string;
   @IsOptional() @IsString() dataHostingMode?: string;

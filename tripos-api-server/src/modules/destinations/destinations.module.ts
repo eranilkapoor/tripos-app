@@ -5,7 +5,11 @@ import { Destination, DestinationSchema } from './schemas/destination.schema';
 import { DestinationsService } from './services/destinations.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Destination.name, schema: DestinationSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Destination.name, schema: DestinationSchema },
+    ]),
+  ],
   controllers: [DestinationsController],
   providers: [DestinationsService],
   exports: [DestinationsService],

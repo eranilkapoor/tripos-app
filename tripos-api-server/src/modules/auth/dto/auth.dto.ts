@@ -9,7 +9,7 @@ import {
 export class LoginDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(6) password!: string;
-  @IsOptional() @IsString() tenantCode?: string;
+  @IsOptional() @IsString() organizationCode?: string;
   @IsOptional() @IsString() branchId?: string;
 }
 
@@ -17,7 +17,7 @@ export class RegisterCrmUserDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(6) password!: string;
   @IsString() @MinLength(2) name!: string;
-  @IsString() tenantId!: string;
+  @IsString() organizationId!: string;
   @IsOptional() @IsString() branchId?: string;
   @IsOptional() @IsString() role?: string;
 }
@@ -34,7 +34,7 @@ export class ResetPasswordDto {
 export class InviteCrmUserDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(2) name!: string;
-  @IsOptional() @IsString() tenantId?: string;
+  @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
   @IsOptional() @IsString() role?: string;
 }

@@ -13,11 +13,17 @@ export class Quotation {
   @Prop({ required: true, trim: true, index: true }) destination!: string;
   @Prop({ trim: true }) travelDates?: string;
   @Prop({ default: 1 }) travellers!: number;
-  @Prop({ type: [Object], default: [] }) services!: Array<Record<string, unknown>>;
+  @Prop({ type: [Object], default: [] }) services!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: Object, required: true }) pricing!: Record<string, number>;
-  @Prop({ enum: ['draft', 'sent', 'negotiation', 'accepted', 'rejected'], default: 'draft', index: true }) status!: string;
+  @Prop({
+    enum: ['draft', 'sent', 'negotiation', 'accepted', 'rejected'],
+    default: 'draft',
+    index: true,
+  })
+  status!: string;
 }
 
 export const QuotationSchema = SchemaFactory.createForClass(Quotation);
 QuotationSchema.index({ organizationId: 1, destination: 1, status: 1 });
-

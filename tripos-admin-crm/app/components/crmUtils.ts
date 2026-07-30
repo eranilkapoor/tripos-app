@@ -78,7 +78,7 @@ export function formatDisplayValue(value: string, path = "") {
   const labelOverrides: Record<string, string> = {
     b2b: "B2B",
     b2c: "B2C",
-    tenant_admin: "Organization Admin",
+    organization_admin: "Organization Admin",
     kyc: "KYC",
     api: "API",
     dmc: "DMC",
@@ -208,7 +208,8 @@ export function statusClass(value: string) {
 export function sessionHeaders(token?: string, user?: Record<string, unknown>) {
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
-  if (user?.tenantId) headers["x-tenant-id"] = String(user.tenantId);
+  if (user?.organizationId)
+    headers["x-organization-id"] = String(user.organizationId);
   if (user?.branchId) headers["x-branch-id"] = String(user.branchId);
   return headers;
 }

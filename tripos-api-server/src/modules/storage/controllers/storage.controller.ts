@@ -13,14 +13,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
-  tenantScopedBody,
-  tenantScopedQuery,
-} from '../../../common/utils/tenant-scope.util';
+  organizationScopedBody,
+  organizationScopedQuery,
+} from '../../../common/utils/organization-scope.util';
 import { CreateStoredFileDto } from '../dto/storage.dto';
 import { StorageService } from '../services/storage.service';
 
-type TenantRequest = Request & {
-  user?: { tenantId?: unknown; branchId?: unknown };
+type OrganizationRequest = Request & {
+  user?: { organizationId?: unknown; branchId?: unknown };
 };
 
 @ApiTags('storage')
@@ -31,9 +31,11 @@ export class StorageController {
   @Post('upload-intent')
   createUploadIntent(
     @Body() dto: CreateStoredFileDto,
-    @Req() request: TenantRequest,
+    @Req() request: OrganizationRequest,
   ) {
-    return this.service.createUploadIntent(tenantScopedBody(dto, request));
+    return this.service.createUploadIntent(
+      organizationScopedBody(dto, request),
+    );
   }
 
   @Get()
@@ -42,7 +44,7 @@ export class StorageController {
     query: CrmListQueryDto & { entityType?: string; entityId?: string },
     @Req() request: Request,
   ) {
-    return this.service.list(tenantScopedQuery(query, request));
+    return this.service.list(organizationScopedQuery(query, request));
   }
 
   @Get(':id')
@@ -51,7 +53,7 @@ export class StorageController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.findOne(id, tenantScopedQuery(query, request));
+    return this.service.findOne(id, organizationScopedQuery(query, request));
   }
 
   @Patch(':id')
@@ -62,7 +64,11 @@ export class StorageController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.update(id, dto, tenantScopedQuery(query, request));
+    return this.service.update(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Delete(':id')
@@ -71,6 +77,6 @@ export class StorageController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.remove(id, tenantScopedQuery(query, request));
+    return this.service.remove(id, organizationScopedQuery(query, request));
   }
 }

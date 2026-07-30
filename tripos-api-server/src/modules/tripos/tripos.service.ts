@@ -13,7 +13,7 @@ import { OperationTask } from '../operations/schemas/operation-task.schema';
 import { Payment } from '../payments/schemas/payment.schema';
 import { Quotation } from '../quotations/schemas/quotation.schema';
 import { Supplier } from '../suppliers/schemas/supplier.schema';
-import { Tenant } from '../tenants/schemas/tenant.schema';
+import { Organization } from '../organizations/schemas/organization.schema';
 
 type ScopedFilter = {
   organizationId: string;
@@ -37,7 +37,8 @@ export class TriposService {
     private readonly b2bAgentModel: Model<B2BAgent>,
     @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
     @InjectModel(Invoice.name) private readonly invoiceModel: Model<Invoice>,
-    @InjectModel(Tenant.name) private readonly tenantModel: Model<Tenant>,
+    @InjectModel(Organization.name)
+    private readonly organizationModel: Model<Organization>,
     @InjectModel(AuditLog.name) private readonly auditLogModel: Model<AuditLog>,
     private readonly appService: AppService,
   ) {}
@@ -58,7 +59,7 @@ export class TriposService {
     const organizationScope = { organizationId: scope.organizationId };
 
     const [
-      tenant,
+      organization,
       leadTotal,
       newLeads,
       hotLeads,
@@ -78,7 +79,7 @@ export class TriposService {
       invoiced,
       recentAuditLogs,
     ] = await Promise.all([
-      this.tenantModel.findById(scope.organizationId).lean().exec(),
+      this.organizationModel.findById(scope.organizationId).lean().exec(),
       this.leadModel.countDocuments(scope).exec(),
       this.leadModel.countDocuments({ ...scope, stage: 'new' }).exec(),
       this.leadModel.countDocuments({ ...scope, temperature: 'hot' }).exec(),
@@ -135,8 +136,8 @@ export class TriposService {
     ]);
 
     return {
-      tenant: tenant?.name ?? 'TripOS Workspace',
-      branch: this.branchName(tenant?.branches ?? [], query.branchId),
+      organization: organization?.name ?? 'TripOS Workspace',
+      branch: this.branchName(organization?.branches ?? [], query.branchId),
       metrics: [
         {
           label: 'Total Leads',
@@ -191,7 +192,7 @@ export class TriposService {
   modules() {
     return [
       { key: 'identity', status: 'active', owner: 'platform' },
-      { key: 'tenant', status: 'active', owner: 'platform' },
+      { key: 'organization', status: 'active', owner: 'platform' },
       { key: 'crm', status: 'active', owner: 'sales' },
       { key: 'quotation', status: 'active', owner: 'sales' },
       { key: 'itinerary', status: 'active', owner: 'product' },

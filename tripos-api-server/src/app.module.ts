@@ -21,14 +21,14 @@ import { SupportTicketsModule } from './modules/support-tickets/support-tickets.
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { BatchJobsModule } from './modules/batch-jobs/batch-jobs.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
-import { TenantsModule } from './modules/tenants/tenants.module';
+import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
 import { AiAssistantModule } from './modules/ai/ai-assistant.module';
-import { TenantContextMiddleware } from './common/middleware/tenant-context.middleware';
+import { OrganizationContextMiddleware } from './common/middleware/organization-context.middleware';
 import { AppStateModule } from './app-state.module';
 
 @Module({
@@ -70,7 +70,7 @@ import { AppStateModule } from './app-state.module';
     NotificationsModule,
     BatchJobsModule,
     CampaignsModule,
-    TenantsModule,
+    OrganizationsModule,
     AuthModule,
     AuditModule,
     StorageModule,
@@ -82,6 +82,6 @@ import { AppStateModule } from './app-state.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(TenantContextMiddleware).forRoutes('{*path}');
+    consumer.apply(OrganizationContextMiddleware).forRoutes('{*path}');
   }
 }

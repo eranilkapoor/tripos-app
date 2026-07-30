@@ -13,9 +13,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import {
-  tenantScopedBody,
-  tenantScopedQuery,
-} from '../../../common/utils/tenant-scope.util';
+  organizationScopedBody,
+  organizationScopedQuery,
+} from '../../../common/utils/organization-scope.util';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import {
   AddB2BAgentCommissionDto,
@@ -32,18 +32,18 @@ import { B2BAgentsService } from '../services/b2b-agents.service';
 export class B2BAgentsController {
   constructor(private readonly service: B2BAgentsService) {}
   @Post() create(@Body() dto: CreateB2BAgentDto, @Req() request: Request) {
-    return this.service.create(tenantScopedBody(dto, request));
+    return this.service.create(organizationScopedBody(dto, request));
   }
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.list(tenantScopedQuery(query, request));
+    return this.service.list(organizationScopedQuery(query, request));
   }
   @Get(':id') findOne(
     @Param('id') id: string,
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.findOne(id, tenantScopedQuery(query, request));
+    return this.service.findOne(id, organizationScopedQuery(query, request));
   }
   @Patch(':id')
   update(
@@ -52,7 +52,11 @@ export class B2BAgentsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.update(id, dto, tenantScopedQuery(query, request));
+    return this.service.update(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
   @Patch(':id/status') updateStatus(
     @Param('id') id: string,
@@ -63,7 +67,7 @@ export class B2BAgentsController {
     return this.service.updateStatus(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
   @Delete(':id')
@@ -72,7 +76,7 @@ export class B2BAgentsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.remove(id, tenantScopedQuery(query, request));
+    return this.service.remove(id, organizationScopedQuery(query, request));
   }
 
   @Post(':id/kyc-documents')
@@ -85,7 +89,7 @@ export class B2BAgentsController {
     return this.service.addKycDocument(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -99,7 +103,7 @@ export class B2BAgentsController {
     return this.service.updateCredit(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -113,7 +117,7 @@ export class B2BAgentsController {
     return this.service.addCommission(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -127,7 +131,7 @@ export class B2BAgentsController {
     return this.service.addWalletEntry(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -141,7 +145,7 @@ export class B2BAgentsController {
     return this.service.createInvoice(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 }

@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
-import { tenantScopedQuery } from '../../../common/utils/tenant-scope.util';
+import { organizationScopedQuery } from '../../../common/utils/organization-scope.util';
 import {
   CreateSavedReportDto,
   RunDueSavedReportsDto,
@@ -21,8 +21,8 @@ import {
 } from '../dto/saved-report.dto';
 import { SavedReportsService } from '../saved-reports.service';
 
-type TenantRequest = Request & {
-  user?: { tenantId?: unknown; branchId?: unknown };
+type OrganizationRequest = Request & {
+  user?: { organizationId?: unknown; branchId?: unknown };
 };
 
 @ApiTags('saved-reports')
@@ -31,17 +31,22 @@ export class SavedReportsController {
   constructor(private readonly service: SavedReportsService) {}
 
   @Post()
-  create(@Body() dto: CreateSavedReportDto, @Req() request: TenantRequest) {
+  create(
+    @Body() dto: CreateSavedReportDto,
+    @Req() request: OrganizationRequest,
+  ) {
     return this.service.create({
       ...dto,
-      organizationId: String(request.user?.tenantId ?? dto.organizationId),
+      organizationId: String(
+        request.user?.organizationId ?? dto.organizationId,
+      ),
       branchId: String(request.user?.branchId ?? dto.branchId ?? ''),
     });
   }
 
   @Get()
   list(@Query() query: CrmListQueryDto, @Req() request: Request) {
-    return this.service.list(tenantScopedQuery(query, request));
+    return this.service.list(organizationScopedQuery(query, request));
   }
 
   @Get(':id')
@@ -50,7 +55,7 @@ export class SavedReportsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.findOne(id, tenantScopedQuery(query, request));
+    return this.service.findOne(id, organizationScopedQuery(query, request));
   }
 
   @Patch(':id')
@@ -60,7 +65,11 @@ export class SavedReportsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.update(id, dto, tenantScopedQuery(query, request));
+    return this.service.update(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
   }
 
   @Post('run-due')
@@ -69,7 +78,7 @@ export class SavedReportsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.runDue(dto, tenantScopedQuery(query, request));
+    return this.service.runDue(dto, organizationScopedQuery(query, request));
   }
 
   @Post(':id/run')
@@ -79,7 +88,7 @@ export class SavedReportsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.run(id, dto, tenantScopedQuery(query, request));
+    return this.service.run(id, dto, organizationScopedQuery(query, request));
   }
 
   @Patch(':id/status')
@@ -92,7 +101,7 @@ export class SavedReportsController {
     return this.service.updateStatus(
       id,
       dto,
-      tenantScopedQuery(query, request),
+      organizationScopedQuery(query, request),
     );
   }
 
@@ -102,6 +111,6 @@ export class SavedReportsController {
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
-    return this.service.remove(id, tenantScopedQuery(query, request));
+    return this.service.remove(id, organizationScopedQuery(query, request));
   }
 }

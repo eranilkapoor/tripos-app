@@ -5,7 +5,11 @@ import { Campaign, CampaignSchema } from './schemas/campaign.schema';
 import { CampaignsService } from './services/campaigns.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Campaign.name, schema: CampaignSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Campaign.name, schema: CampaignSchema },
+    ]),
+  ],
   controllers: [CampaignsController],
   providers: [CampaignsService],
   exports: [CampaignsService],

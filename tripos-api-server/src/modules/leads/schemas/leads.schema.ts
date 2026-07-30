@@ -129,4 +129,3 @@ export class LeadActivity {
 
 export const LeadActivitySchema = SchemaFactory.createForClass(LeadActivity);
 LeadActivitySchema.index({ organizationId: 1, leadId: 1, createdAt: -1 });
-

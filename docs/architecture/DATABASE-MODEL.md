@@ -4,7 +4,7 @@
 
 ### Identity and Organization
 
-TripOS treats tenant and organization as the same business boundary. The product and UI should use `Organization`; legacy backend names such as `tenants`, `tenantId`, and `x-tenant-id` are compatibility aliases for the same organization record. Every organization can have multiple branches, departments, teams, users, roles, and permission assignments.
+TripOS treats organization and organization as the same business boundary. The product and UI should use `Organization`; legacy backend names such as `organizations`, `organizationId`, and `x-organization-id` are compatibility aliases for the same organization record. Every organization can have multiple branches, departments, teams, users, roles, and permission assignments.
 
 - organizations
 - branches

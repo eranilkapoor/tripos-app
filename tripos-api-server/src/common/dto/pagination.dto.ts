@@ -19,4 +19,3 @@ export class PaginationDto {
   @IsString()
   search?: string;
 }
-

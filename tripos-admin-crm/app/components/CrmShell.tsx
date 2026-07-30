@@ -550,7 +550,7 @@ const modules: CrmModule[] = [
         label: "Audience",
         type: "select",
         options: [
-          { value: "tenant", label: "Organization" },
+          { value: "organization", label: "Organization" },
           { value: "branch", label: "Branch" },
           { value: "user", label: "User" },
           { value: "agent", label: "Agent" },
@@ -833,7 +833,7 @@ const themeIcons = {
   dark: faMoon,
 };
 
-const tenantOptions = [
+const organizationOptions = [
   { value: "WEBNZA", label: "Webnza Travel Group" },
   { value: "TRIPOS", label: "TripOS Demo Company" },
   { value: "DMC", label: "DMC Operations" },
@@ -1081,14 +1081,17 @@ export default function CrmShell() {
   const isModuleLoading = isLoading && loadingModuleId === selected.id;
   const notificationCount = buildNotificationCount(dashboard, records);
 
-  function updateWorkspace(field: "tenantCode" | "branchId", value: string) {
+  function updateWorkspace(
+    field: "organizationCode" | "branchId",
+    value: string,
+  ) {
     if (!session) return;
     const nextSession: CrmSession = {
       ...session,
-      tenant:
-        field === "tenantCode"
-          ? { ...session.tenant, code: value }
-          : session.tenant,
+      organization:
+        field === "organizationCode"
+          ? { ...session.organization, code: value }
+          : session.organization,
       user: { ...session.user, [field]: value },
     };
     setSession(nextSession);
@@ -1170,7 +1173,7 @@ export default function CrmShell() {
           <div className="topbar-title">
             <strong>TripOS Admin CRM</strong>
             <small>
-              {String(session.tenant.name ?? "Organization Workspace")}
+              {String(session.organization.name ?? "Organization Workspace")}
             </small>
           </div>
           <div className="top-actions">
@@ -1180,13 +1183,15 @@ export default function CrmShell() {
                 <select
                   aria-label="Organization"
                   onChange={(event) =>
-                    updateWorkspace("tenantCode", event.target.value)
+                    updateWorkspace("organizationCode", event.target.value)
                   }
                   value={String(
-                    session.tenant.code ?? session.user.tenantCode ?? "WEBNZA",
+                    session.organization.code ??
+                      session.user.organizationCode ??
+                      "WEBNZA",
                   )}
                 >
-                  {tenantOptions.map((item) => (
+                  {organizationOptions.map((item) => (
                     <option key={item.value} value={item.value}>
                       {item.label}
                     </option>
@@ -1217,7 +1222,7 @@ export default function CrmShell() {
                 <strong>{String(session.user.name ?? "TripOS Admin")}</strong>
                 <small>
                   {formatDisplayValue(
-                    String(session.user.role ?? "tenant_admin"),
+                    String(session.user.role ?? "organization_admin"),
                   )}
                 </small>
               </div>
@@ -1754,7 +1759,7 @@ function LoginScreen({
         body: JSON.stringify({
           email,
           password,
-          tenantCode: "WEBNZA",
+          organizationCode: "WEBNZA",
           branchId: "delhi",
         }),
         headers: { "Content-Type": "application/json" },
@@ -1825,7 +1830,7 @@ function DashboardPanel({
       <div className="table-head">
         <div>
           <span className="eyebrow">Live Dashboard API</span>
-          <h2>{String(dashboard?.tenant ?? "TripOS Workspace")}</h2>
+          <h2>{String(dashboard?.organization ?? "TripOS Workspace")}</h2>
         </div>
         <strong>{String(dashboard?.branch ?? "All Branches")}</strong>
       </div>

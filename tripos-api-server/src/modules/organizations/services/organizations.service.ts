@@ -1,16 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateTenantDto } from '../dto/tenant.dto';
-import { Tenant } from '../schemas/tenant.schema';
+import { CreateOrganizationDto } from '../dto/organization.dto';
+import { Organization } from '../schemas/organization.schema';
 
 @Injectable()
-export class TenantsService {
+export class OrganizationsService {
   constructor(
-    @InjectModel(Tenant.name) private readonly model: Model<Tenant>,
+    @InjectModel(Organization.name) private readonly model: Model<Organization>,
   ) {}
 
-  create(dto: CreateTenantDto) {
+  create(dto: CreateOrganizationDto) {
     return this.model.create({
       ...dto,
       code: dto.code.toUpperCase(),
@@ -24,9 +24,9 @@ export class TenantsService {
   }
 
   async findOne(id: string) {
-    const tenant = await this.model.findById(id).lean().exec();
-    if (!tenant) throw new NotFoundException('Tenant not found');
-    return tenant;
+    const organization = await this.model.findById(id).lean().exec();
+    if (!organization) throw new NotFoundException('Organization not found');
+    return organization;
   }
 
   async findByCode(code: string) {
@@ -34,30 +34,30 @@ export class TenantsService {
   }
 
   async update(id: string, dto: Record<string, unknown>) {
-    const tenant = await this.model
+    const organization = await this.model
       .findByIdAndUpdate(
         id,
         {
-          $set: sanitizeTenantUpdate(dto),
+          $set: sanitizeOrganizationUpdate(dto),
         },
         { new: true },
       )
       .lean()
       .exec();
-    if (!tenant) throw new NotFoundException('Tenant not found');
-    return tenant;
+    if (!organization) throw new NotFoundException('Organization not found');
+    return organization;
   }
 
   async remove(id: string) {
-    const tenant = await this.model
+    const organization = await this.model
       .findByIdAndUpdate(id, { status: 'inactive' }, { new: true })
       .lean()
       .exec();
-    if (!tenant) throw new NotFoundException('Tenant not found');
-    return tenant;
+    if (!organization) throw new NotFoundException('Organization not found');
+    return organization;
   }
 
-  async ensureDemoTenant() {
+  async ensureDemoOrganization() {
     const existing = await this.model.findOne({ code: 'WEBNZA' }).exec();
     if (existing) return existing;
     return this.model.create({
@@ -77,7 +77,7 @@ export class TenantsService {
   }
 }
 
-function sanitizeTenantUpdate(dto: Record<string, unknown>) {
+function sanitizeOrganizationUpdate(dto: Record<string, unknown>) {
   const allowed = ['name', 'dataHostingMode', 'branches', 'syncPolicy'];
   return Object.fromEntries(
     Object.entries(dto).filter(([key]) => allowed.includes(key)),

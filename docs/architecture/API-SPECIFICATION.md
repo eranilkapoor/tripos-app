@@ -7,7 +7,7 @@
 - JSON request and response bodies.
 - Cursor pagination for large lists.
 - Idempotency keys for payments, booking conversion, and supplier confirmations.
-- Organization context derived from authenticated user claims and selected organization. Legacy tenant headers and routes are compatibility aliases.
+- Organization context derived from authenticated user claims and selected organization. Legacy organization headers and routes are compatibility aliases.
 
 ## Base Route Pattern
 
@@ -51,7 +51,7 @@
 - `DELETE /organizations/:id` - implemented as inactive status transition
 - `GET /organizations/current` - implemented
 - `PATCH /organizations/current` - implemented
-- `/tenants` routes remain implemented as platform compatibility aliases.
+- `/organizations` routes remain implemented as platform compatibility aliases.
 - `POST /auth/invitations` - implemented
 - `GET /auth/users` - implemented
 - `GET /auth/users/:id` - implemented
@@ -109,7 +109,7 @@
 - `GET /finance/invoices/next-number/:series`
 - `POST /finance/invoices/:id/pdf`
 
-All main list endpoints support `page`, `limit`, `search`, and `status` where applicable. Tenant-scoped domain modules expose enterprise CRUD with `POST /module`, `GET /module`, `GET /module/:id`, `PATCH /module/:id`, `PATCH /module/:id/status` where status applies, and `DELETE /module/:id`.
+All main list endpoints support `page`, `limit`, `search`, and `status` where applicable. Organization-scoped domain modules expose enterprise CRUD with `POST /module`, `GET /module`, `GET /module/:id`, `PATCH /module/:id`, `PATCH /module/:id/status` where status applies, and `DELETE /module/:id`.
 
 ### Deep Workflow Endpoints
 

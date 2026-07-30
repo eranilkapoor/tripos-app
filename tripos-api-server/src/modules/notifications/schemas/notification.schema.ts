@@ -23,8 +23,8 @@ export class Notification {
   })
   priority!: string;
   @Prop({
-    enum: ['tenant', 'branch', 'user', 'agent', 'customer'],
-    default: 'tenant',
+    enum: ['organization', 'branch', 'user', 'agent', 'customer'],
+    default: 'organization',
     index: true,
   })
   audience!: string;

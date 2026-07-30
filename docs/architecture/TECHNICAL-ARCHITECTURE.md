@@ -16,7 +16,7 @@ B2C Web        Admin CRM        Mobile App
           NestJS Modular Monolith
                     |
   ------------------------------------------------
-  Auth  Tenant  CRM  Sales  Itinerary  Booking
+  Auth  Organization  CRM  Sales  Itinerary  Booking
   Supplier  Operations  Finance  Marketing  AI
   Communication  CMS  Reporting  Integrations
   ------------------------------------------------
@@ -60,9 +60,9 @@ quotation/
 
 ## Multi-Tenancy
 
-Use shared database with tenant isolation for v1.
+Use shared database with organization isolation for v1.
 
-Every tenant-owned business document must include:
+Every organization-owned business document must include:
 
 - `organizationId`
 - `branchId` where branch-level access applies
@@ -71,7 +71,7 @@ Every tenant-owned business document must include:
 - `createdAt`
 - `updatedAt`
 
-Tenant enforcement should happen in:
+Organization enforcement should happen in:
 
 - Authentication claims
 - API guards
@@ -81,8 +81,8 @@ Tenant enforcement should happen in:
 
 Enterprise upgrade path:
 
-- Shared MongoDB database for standard tenants
-- Dedicated database for high-value enterprise tenants
+- Shared MongoDB database for standard organizations
+- Dedicated database for high-value enterprise organizations
 - Dedicated infrastructure only for strict compliance or scale requirements
 
 ## Event Model
@@ -129,11 +129,11 @@ AI gateway responsibilities:
 - Prompt templates
 - Model routing
 - Tool/function calling
-- Tenant-specific settings
+- Organization-specific settings
 - Usage metering
 - Prompt and response audit logs
 - Safety checks
-- RAG over TripOS inventory and tenant content
+- RAG over TripOS inventory and organization content
 
 Initial AI use cases:
 

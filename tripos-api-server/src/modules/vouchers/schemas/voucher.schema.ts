@@ -14,8 +14,15 @@ export class Voucher {
   @Prop({ trim: true, index: true }) supplierName?: string;
   @Prop({ trim: true }) issueDate?: string;
   @Prop({ trim: true, index: true }) confirmationNumber?: string;
-  @Prop({ type: [Object], default: [] }) lineItems!: Array<Record<string, unknown>>;
-  @Prop({ enum: ['draft', 'issued', 'sent', 'cancelled'], default: 'draft', index: true }) status!: string;
+  @Prop({ type: [Object], default: [] }) lineItems!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({
+    enum: ['draft', 'issued', 'sent', 'cancelled'],
+    default: 'draft',
+    index: true,
+  })
+  status!: string;
 }
 
 export const VoucherSchema = SchemaFactory.createForClass(Voucher);

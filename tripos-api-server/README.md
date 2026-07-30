@@ -5,7 +5,7 @@ NestJS modular monolith backend.
 Initial modules:
 
 - auth
-- tenant
+- organization
 - users
 - crm
 - quotations

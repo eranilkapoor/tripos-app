@@ -31,7 +31,7 @@ export class SessionAuthGuard implements CanActivate {
     const token = extractBearer(request.headers.authorization);
     const session = await this.authService.me(token);
     const user = session.user as Record<string, unknown>;
-    const organizationId = String(user.tenantId);
+    const organizationId = String(user.organizationId);
     const branchId = String(user.branchId);
     request.user = session.user;
     request.query.organizationId = organizationId;
