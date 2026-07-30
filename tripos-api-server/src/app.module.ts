@@ -22,6 +22,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { BatchJobsModule } from './modules/batch-jobs/batch-jobs.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
+import { IdentityModule } from './modules/identity/identity.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -71,6 +72,7 @@ import { AppStateModule } from './app-state.module';
     BatchJobsModule,
     CampaignsModule,
     OrganizationsModule,
+    IdentityModule,
     AuthModule,
     AuditModule,
     StorageModule,

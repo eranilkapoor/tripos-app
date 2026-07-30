@@ -18,6 +18,9 @@ export class CrmUser {
   @Prop({ required: true }) passwordHash!: string;
   @Prop({ required: true, index: true }) organizationId!: string;
   @Prop({ default: 'main', index: true }) branchId!: string;
+  @Prop({ type: [String], default: [] }) branchIds!: string[];
+  @Prop({ type: [String], default: [] }) departmentIds!: string[];
+  @Prop({ type: [String], default: [] }) teamIds!: string[];
   @Prop({
     enum: [
       'platform_admin',

@@ -7,13 +7,14 @@
 - JSON request and response bodies.
 - Cursor pagination for large lists.
 - Idempotency keys for payments, booking conversion, and supplier confirmations.
-- Organization context derived from authenticated user claims and selected organization. Legacy organization headers and routes are compatibility aliases.
+- Organization context is derived from authenticated user claims and selected branch access.
 
 ## Base Route Pattern
 
 ```text
 /api/v1/auth
 /api/v1/organizations
+/api/v1/identity
 /api/v1/crm
 /api/v1/sales
 /api/v1/itineraries
@@ -59,6 +60,50 @@
 - `PATCH /auth/users/:id/permissions` - implemented
 - `DELETE /auth/users/:id` - implemented as inactive status transition and session revocation
 - `GET /auth/permissions/catalog` - implemented
+
+### Identity and Access
+
+- `POST /identity/branches` - implemented
+- `GET /identity/branches` - implemented
+- `GET /identity/branches/:id` - implemented
+- `PATCH /identity/branches/:id` - implemented
+- `PATCH /identity/branches/:id/status` - implemented
+- `DELETE /identity/branches/:id` - implemented as inactive status transition
+- `POST /identity/departments` - implemented
+- `GET /identity/departments` - implemented
+- `GET /identity/departments/:id` - implemented
+- `PATCH /identity/departments/:id` - implemented
+- `DELETE /identity/departments/:id` - implemented as inactive status transition
+- `POST /identity/teams` - implemented
+- `GET /identity/teams` - implemented
+- `GET /identity/teams/:id` - implemented
+- `PATCH /identity/teams/:id` - implemented
+- `DELETE /identity/teams/:id` - implemented as inactive status transition
+- `POST /identity/roles` - implemented
+- `GET /identity/roles` - implemented
+- `GET /identity/roles/:id` - implemented
+- `PATCH /identity/roles/:id` - implemented
+- `DELETE /identity/roles/:id` - implemented as inactive status transition
+- `POST /identity/permissions` - implemented
+- `GET /identity/permissions` - implemented
+- `GET /identity/permissions/:id` - implemented
+- `PATCH /identity/permissions/:id` - implemented
+- `PATCH /identity/permissions/:id/status` - implemented
+- `DELETE /identity/permissions/:id` - implemented as inactive status transition
+- `POST /identity/user-roles` - implemented
+- `GET /identity/user-roles` - implemented
+- `GET /identity/user-roles/:id` - implemented
+- `PATCH /identity/user-roles/:id` - implemented
+- `DELETE /identity/user-roles/:id` - implemented as inactive status transition
+- `POST /identity/role-permissions` - implemented
+- `GET /identity/role-permissions` - implemented
+- `GET /identity/role-permissions/:id` - implemented
+- `PATCH /identity/role-permissions/:id` - implemented
+- `DELETE /identity/role-permissions/:id` - implemented as inactive status transition
+- `GET /identity/invitations` - implemented
+- `GET /identity/invitations/:id` - implemented
+- `PATCH /identity/invitations/:id` - implemented
+- `DELETE /identity/invitations/:id` - implemented as revoked status transition
 
 ### Implemented Travel CRM Modules
 

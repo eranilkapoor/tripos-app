@@ -24,6 +24,7 @@ import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { CrmUser } from '../schemas/crm-user.schema';
 import { UserSession } from '../schemas/user-session.schema';
 import { OrganizationsService } from '../../organizations/services/organizations.service';
+import { IdentityService } from '../../identity/services/identity.service';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +33,7 @@ export class AuthService {
     @InjectModel(UserSession.name)
     private readonly sessionModel: Model<UserSession>,
     private readonly organizationsService: OrganizationsService,
+    private readonly identityService: IdentityService,
   ) {}
 
   async register(
@@ -49,6 +51,9 @@ export class AuthService {
       organizationId,
       email: dto.email.toLowerCase(),
       branchId: dto.branchId ?? 'main',
+      branchIds: normalizeAccessIds(dto.branchIds, dto.branchId),
+      departmentIds: dto.departmentIds ?? [],
+      teamIds: dto.teamIds ?? [],
       role: dto.role ?? 'organization_admin',
       passwordHash: hashPassword(dto.password),
     });
@@ -66,6 +71,7 @@ export class AuthService {
     if (!organizationId)
       throw new ForbiddenException('Organization context is required');
     const invitationToken = randomBytes(32).toString('hex');
+    const invitationExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
     const user = await this.userModel
       .findOneAndUpdate(
         { email: dto.email.toLowerCase() },
@@ -75,10 +81,13 @@ export class AuthService {
             name: dto.name,
             organizationId,
             branchId: dto.branchId ?? 'main',
+            branchIds: normalizeAccessIds(dto.branchIds, dto.branchId),
+            departmentIds: dto.departmentIds ?? [],
+            teamIds: dto.teamIds ?? [],
             role: dto.role ?? 'sales',
             status: 'invited',
             invitationTokenHash: hashToken(invitationToken),
-            invitationExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+            invitationExpiresAt,
           },
           $setOnInsert: {
             passwordHash: hashPassword(randomBytes(24).toString('hex')),
@@ -88,6 +97,17 @@ export class AuthService {
         { new: true, upsert: true },
       )
       .exec();
+    await this.identityService.recordInvitation({
+      organizationId,
+      branchId: dto.branchId ?? 'main',
+      email: dto.email,
+      name: dto.name,
+      role: dto.role ?? 'sales',
+      branchIds: normalizeAccessIds(dto.branchIds, dto.branchId),
+      tokenHash: hashToken(invitationToken),
+      expiresAt: invitationExpiresAt,
+      invitedBy: String(actor?.role ?? 'system'),
+    });
     return withDevelopmentToken(
       {
         message: 'CRM user invitation created.',
@@ -115,7 +135,12 @@ export class AuthService {
         dto.organizationCode.toUpperCase()
     )
       throw new UnauthorizedException('Organization does not match user');
-    const branchId = dto.branchId ?? user.branchId;
+    const branchId = assertBranchAccess(dto.branchId ?? user.branchId, user);
+    const access = await this.identityService.permissionsForUser(
+      String(user.organizationId),
+      String((user as { _id: unknown })._id),
+    );
+    const permissions = mergePermissions(user.permissions, access.permissions);
     const token = randomBytes(32).toString('hex');
     await this.sessionModel.create({
       tokenHash: hashToken(token),
@@ -124,7 +149,16 @@ export class AuthService {
       branchId,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 12),
     });
-    return { token, user: sanitizeUser({ ...user, branchId }), organization };
+    return {
+      token,
+      user: sanitizeUser({
+        ...user,
+        branchId,
+        branchIds: mergeAccessIds(user.branchIds, access.branchIds, branchId),
+        permissions,
+      }),
+      organization,
+    };
   }
 
   async me(token: string) {
@@ -142,8 +176,21 @@ export class AuthService {
     const organization = await this.organizationsService.findOne(
       String(session.organizationId),
     );
+    const access = await this.identityService.permissionsForUser(
+      String(session.organizationId),
+      String((user as { _id: unknown })._id),
+    );
     return {
-      user: sanitizeUser({ ...user, branchId: session.branchId }),
+      user: sanitizeUser({
+        ...user,
+        branchId: session.branchId,
+        branchIds: mergeAccessIds(
+          user.branchIds,
+          access.branchIds,
+          session.branchId,
+        ),
+        permissions: mergePermissions(user.permissions, access.permissions),
+      }),
       organization,
     };
   }
@@ -177,9 +224,22 @@ export class AuthService {
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 12),
       }),
     ]);
+    const access = await this.identityService.permissionsForUser(
+      String(session.organizationId),
+      String((user as { _id: unknown })._id),
+    );
     return {
       token: nextToken,
-      user: sanitizeUser({ ...user, branchId: session.branchId }),
+      user: sanitizeUser({
+        ...user,
+        branchId: session.branchId,
+        branchIds: mergeAccessIds(
+          user.branchIds,
+          access.branchIds,
+          session.branchId,
+        ),
+        permissions: mergePermissions(user.permissions, access.permissions),
+      }),
       organization,
     };
   }
@@ -247,6 +307,7 @@ export class AuthService {
       .exec();
     if (!user)
       throw new UnauthorizedException('Invalid or expired invitation token');
+    await this.identityService.markInvitationAccepted(hashToken(dto.token));
     return sanitizeUser(user.toObject());
   }
 
@@ -371,6 +432,10 @@ export class AuthService {
     if (dto.role) update.role = dto.role;
     if (dto.status) update.status = dto.status;
     if (dto.branchId) update.branchId = dto.branchId;
+    if (dto.branchIds)
+      update.branchIds = normalizeAccessIds(dto.branchIds, dto.branchId);
+    if (dto.departmentIds) update.departmentIds = dto.departmentIds;
+    if (dto.teamIds) update.teamIds = dto.teamIds;
     if (dto.permissions) update.permissions = dto.permissions;
     const user = await this.userModel
       .findOneAndUpdate(userScopeFilter(query, { _id: id }), update, {
@@ -392,6 +457,10 @@ export class AuthService {
     if (dto.role) update.role = dto.role;
     if (dto.status) update.status = dto.status;
     if (dto.branchId) update.branchId = dto.branchId;
+    if (dto.branchIds)
+      update.branchIds = normalizeAccessIds(dto.branchIds, dto.branchId);
+    if (dto.departmentIds) update.departmentIds = dto.departmentIds;
+    if (dto.teamIds) update.teamIds = dto.teamIds;
     if (dto.permissions) update.permissions = dto.permissions;
     const user = await this.userModel
       .findOneAndUpdate(userScopeFilter(query, { _id: id }), update, {
@@ -433,6 +502,9 @@ export class AuthService {
       passwordHash: hashPassword('TripOS@123'),
       organizationId: String(organization._id),
       branchId: 'delhi',
+      branchIds: ['delhi', 'dubai'],
+      departmentIds: [],
+      teamIds: [],
       role: 'organization_admin',
       permissions: ['*'],
     });
@@ -460,6 +532,46 @@ function sanitizeUser<T extends { passwordHash?: string }>(user: T) {
   const safeUser = { ...user };
   delete safeUser.passwordHash;
   return safeUser;
+}
+
+function assertBranchAccess<
+  T extends { branchId?: string; branchIds?: string[] },
+>(requestedBranchId: string, user: T) {
+  const branchId = requestedBranchId || user.branchId || 'main';
+  const branchIds = normalizeAccessIds(user.branchIds, user.branchId);
+  if (branchIds.length && !branchIds.includes(branchId)) {
+    throw new UnauthorizedException('Branch is not assigned to user');
+  }
+  return branchId;
+}
+
+function normalizeAccessIds(ids?: string[], fallback?: string) {
+  return [
+    ...new Set(
+      [...(ids ?? []), fallback].filter(Boolean).map((id) => String(id)),
+    ),
+  ];
+}
+
+function mergeAccessIds(
+  directIds?: string[],
+  assignedIds?: string[],
+  currentBranchId?: string,
+) {
+  return normalizeAccessIds(
+    [...(directIds ?? []), ...(assignedIds ?? [])],
+    currentBranchId,
+  );
+}
+
+function mergePermissions(
+  directPermissions?: string[],
+  rolePermissions?: string[],
+) {
+  if (directPermissions?.includes('*')) return ['*'];
+  return [
+    ...new Set([...(directPermissions ?? []), ...(rolePermissions ?? [])]),
+  ];
 }
 
 function userScopeFilter(

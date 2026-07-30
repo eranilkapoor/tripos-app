@@ -19,6 +19,9 @@ export class RegisterCrmUserDto {
   @IsString() @MinLength(2) name!: string;
   @IsString() organizationId!: string;
   @IsOptional() @IsString() branchId?: string;
+  @IsOptional() @IsArray() branchIds?: string[];
+  @IsOptional() @IsArray() departmentIds?: string[];
+  @IsOptional() @IsArray() teamIds?: string[];
   @IsOptional() @IsString() role?: string;
 }
 
@@ -36,6 +39,9 @@ export class InviteCrmUserDto {
   @IsString() @MinLength(2) name!: string;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
+  @IsOptional() @IsArray() branchIds?: string[];
+  @IsOptional() @IsArray() departmentIds?: string[];
+  @IsOptional() @IsArray() teamIds?: string[];
   @IsOptional() @IsString() role?: string;
 }
 
@@ -48,5 +54,8 @@ export class UpdateCrmUserPermissionsDto {
   @IsOptional() @IsString() role?: string;
   @IsOptional() @IsString() status?: string;
   @IsOptional() @IsString() branchId?: string;
+  @IsOptional() @IsArray() branchIds?: string[];
+  @IsOptional() @IsArray() departmentIds?: string[];
+  @IsOptional() @IsArray() teamIds?: string[];
   @IsOptional() @IsArray() permissions?: string[];
 }

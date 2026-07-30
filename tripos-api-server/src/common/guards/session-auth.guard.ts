@@ -32,7 +32,14 @@ export class SessionAuthGuard implements CanActivate {
     const session = await this.authService.me(token);
     const user = session.user as Record<string, unknown>;
     const organizationId = String(user.organizationId);
-    const branchId = String(user.branchId);
+    const selectedBranchId = String(request.query.branchId ?? user.branchId);
+    const branchIds = Array.isArray(user.branchIds)
+      ? user.branchIds.map((branchId) => String(branchId))
+      : [];
+    if (branchIds.length && !branchIds.includes(selectedBranchId)) {
+      throw new UnauthorizedException('Branch is not assigned to user');
+    }
+    const branchId = selectedBranchId;
     request.user = session.user;
     request.query.organizationId = organizationId;
     request.query.branchId = branchId;

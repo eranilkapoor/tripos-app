@@ -23,6 +23,15 @@ import { CampaignSchema } from '../campaigns/schemas/campaign.schema';
 import { StoredFileSchema } from '../storage/schemas/stored-file.schema';
 import { SavedReportSchema } from '../reporting/schemas/saved-report.schema';
 import { AuditLogSchema } from '../audit/schemas/audit-log.schema';
+import {
+  BranchSchema,
+  DepartmentSchema,
+  PermissionSchema,
+  RolePermissionSchema,
+  RoleSchema,
+  TeamSchema,
+  UserRoleSchema,
+} from '../identity/schemas/identity.schema';
 
 config({ path: '.env.development' });
 config();
@@ -54,6 +63,13 @@ async function main() {
   const StoredFile = model('StoredFile', StoredFileSchema);
   const SavedReport = model('SavedReport', SavedReportSchema);
   const AuditLog = model('AuditLog', AuditLogSchema);
+  const Branch = model('Branch', BranchSchema);
+  const Department = model('Department', DepartmentSchema);
+  const Team = model('Team', TeamSchema);
+  const Role = model('Role', RoleSchema);
+  const Permission = model('Permission', PermissionSchema);
+  const UserRole = model('UserRole', UserRoleSchema);
+  const RolePermission = model('RolePermission', RolePermissionSchema);
 
   const organization = await Organization.findOneAndUpdate(
     { code: 'WEBNZA' },
@@ -86,6 +102,9 @@ async function main() {
         passwordHash: hashPassword('TripOS@123'),
         organizationId: organizationId,
         branchId: BRANCH_ID,
+        branchIds: ['delhi', 'dubai', 'jaipur'],
+        departmentIds: [],
+        teamIds: [],
         role: 'organization_admin',
         status: 'active',
         permissions: ['*'],
@@ -93,6 +112,218 @@ async function main() {
     },
     { upsert: true },
   ).exec();
+
+  const adminUser = await CrmUser.findOne({ email: 'admin@tripos.test' })
+    .lean()
+    .exec();
+
+  await upsertMany(Branch, 'code', [
+    {
+      organizationId,
+      name: 'Delhi HQ',
+      code: 'delhi',
+      city: 'Delhi',
+      country: 'India',
+      timezone: 'Asia/Kolkata',
+      phone: '+911140001111',
+      email: 'delhi@webnza.test',
+      status: 'active',
+    },
+    {
+      organizationId,
+      name: 'Dubai Desk',
+      code: 'dubai',
+      city: 'Dubai',
+      country: 'UAE',
+      timezone: 'Asia/Dubai',
+      phone: '+97140001111',
+      email: 'dubai@webnza.test',
+      status: 'active',
+    },
+    {
+      organizationId,
+      name: 'Jaipur Sales',
+      code: 'jaipur',
+      city: 'Jaipur',
+      country: 'India',
+      timezone: 'Asia/Kolkata',
+      phone: '+911414001111',
+      email: 'jaipur@webnza.test',
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Department, 'code', [
+    {
+      organizationId,
+      branchId: 'delhi',
+      name: 'Sales',
+      code: 'sales',
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: 'delhi',
+      name: 'Operations',
+      code: 'operations',
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: 'delhi',
+      name: 'Finance',
+      code: 'finance',
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Team, 'code', [
+    {
+      organizationId,
+      branchId: 'delhi',
+      departmentId: 'sales',
+      name: 'B2C Sales',
+      code: 'b2c-sales',
+      memberUserIds: adminUser ? [String(adminUser._id)] : [],
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: 'delhi',
+      departmentId: 'operations',
+      name: 'DMC Operations',
+      code: 'dmc-ops',
+      memberUserIds: adminUser ? [String(adminUser._id)] : [],
+      status: 'active',
+    },
+  ]);
+
+  const permissionModules = [
+    'leads',
+    'customers',
+    'quotations',
+    'itineraries',
+    'bookings',
+    'suppliers',
+    'operations',
+    'b2b-agents',
+    'payments',
+    'finance',
+    'documents',
+    'campaigns',
+    'support',
+    'audit',
+    'settings',
+    'identity',
+  ];
+  const permissionActions = [
+    'read',
+    'create',
+    'update',
+    'delete',
+    'approve',
+    'export',
+  ];
+  await upsertMany(
+    Permission,
+    'code',
+    permissionModules.flatMap((moduleName) =>
+      permissionActions.map((action) => ({
+        module: moduleName,
+        action,
+        code: `${moduleName}:${action}`,
+        label: `${titleCase(moduleName)} ${titleCase(action)}`,
+        status: 'active',
+      })),
+    ),
+  );
+
+  await upsertMany(Role, 'code', [
+    {
+      organizationId,
+      name: 'Organization Admin',
+      code: 'organization_admin',
+      roleType: 'system',
+      defaultBranchIds: ['delhi', 'dubai', 'jaipur'],
+      status: 'active',
+    },
+    {
+      organizationId,
+      name: 'Branch Manager',
+      code: 'branch_manager',
+      roleType: 'system',
+      defaultBranchIds: ['delhi'],
+      status: 'active',
+    },
+    {
+      organizationId,
+      name: 'Sales Consultant',
+      code: 'sales',
+      roleType: 'system',
+      defaultBranchIds: ['delhi'],
+      status: 'active',
+    },
+    {
+      organizationId,
+      name: 'Operations Executive',
+      code: 'operations',
+      roleType: 'system',
+      defaultBranchIds: ['delhi'],
+      status: 'active',
+    },
+    {
+      organizationId,
+      name: 'Finance Executive',
+      code: 'finance',
+      roleType: 'system',
+      defaultBranchIds: ['delhi'],
+      status: 'active',
+    },
+  ]);
+
+  const adminRole = await Role.findOne({
+    organizationId,
+    code: 'organization_admin',
+  })
+    .lean()
+    .exec();
+  if (adminRole && adminUser) {
+    await UserRole.updateOne(
+      {
+        organizationId,
+        userId: String(adminUser._id),
+        roleId: String(adminRole._id),
+      },
+      {
+        $set: {
+          organizationId,
+          userId: String(adminUser._id),
+          roleId: String(adminRole._id),
+          branchIds: ['delhi', 'dubai', 'jaipur'],
+          departmentIds: [],
+          teamIds: [],
+          status: 'active',
+        },
+      },
+      { upsert: true },
+    ).exec();
+    await RolePermission.updateOne(
+      {
+        organizationId,
+        roleId: String(adminRole._id),
+        permissionCode: '*',
+      },
+      {
+        $set: {
+          organizationId,
+          roleId: String(adminRole._id),
+          permissionCode: '*',
+          status: 'active',
+        },
+      },
+      { upsert: true },
+    ).exec();
+  }
 
   await upsertMany(Lead, 'phone', [
     {
@@ -592,6 +823,13 @@ function hashPassword(password: string) {
   const salt = randomBytes(16).toString('hex');
   const hash = scryptSync(password, salt, 64).toString('hex');
   return `${salt}:${hash}`;
+}
+
+function titleCase(value: string) {
+  return value
+    .split(/[-_]/g)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 void main().catch((error) => {

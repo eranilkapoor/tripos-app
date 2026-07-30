@@ -4,13 +4,13 @@
 
 ### Identity and Organization
 
-TripOS treats organization and organization as the same business boundary. The product and UI should use `Organization`; legacy backend names such as `organizations`, `organizationId`, and `x-organization-id` are compatibility aliases for the same organization record. Every organization can have multiple branches, departments, teams, users, roles, and permission assignments.
+TripOS uses `Organization` as the business isolation boundary. Every organization can have multiple branches, departments, teams, users, roles, and permission assignments. Organization-owned MongoDB documents use `organizationId`; branch-scoped documents use `branchId`.
 
 - organizations
 - branches
 - departments
 - teams
-- users
+- crm_users
 - roles
 - permissions
 - user_roles
@@ -143,7 +143,7 @@ TripOS uses MongoDB as the primary database. Redis is reserved for cache, queues
 ## Key Modeling Rules
 
 - Prefer UUID primary keys.
-- Every organization-owned business table includes `organization_id`.
+- Every organization-owned business collection includes `organizationId`.
 - Use soft delete only for organization-facing business records that users may need to restore.
 - Use append-only history tables for financial and status-critical changes.
 - Use JSONB for controlled flexible fields, not as a replacement for relational modeling.
@@ -152,11 +152,11 @@ TripOS uses MongoDB as the primary database. Redis is reserved for cache, queues
 
 ## Organization Indexing Pattern
 
-Most high-volume tables should have composite indexes beginning with `organization_id`.
+Most high-volume collections should have composite indexes beginning with `organizationId`.
 
 Examples:
 
-- `leads(organization_id, assigned_to, status, created_at)`
-- `quotations(organization_id, lead_id, status, created_at)`
-- `bookings(organization_id, travel_start_date, status)`
-- `payments(organization_id, booking_id, status, due_date)`
+- `leads(organizationId, assignedTo, status, createdAt)`
+- `quotations(organizationId, destination, status)`
+- `bookings(organizationId, destination, status, createdAt)`
+- `payments(organizationId, type, status, dueDate)`
