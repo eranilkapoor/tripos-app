@@ -1,6 +1,6 @@
 {
   "name": "tripos-app",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Repository-level tooling for TripOS API, mobile, public website, and admin CRM applications.",
   "scripts": {
@@ -26,8 +26,7 @@
     "contracts:generate": "openapi-typescript packages/api-contract/openapi.json --output packages/api-contract/src/generated.ts --immutable --alphabetize",
     "contracts:check": "npm run contracts:generate -- --check",
     "verify": "npm run lint && npm run typecheck:api && npm run typecheck:mobile && npm run build:api",
-    "ci": "npm run verify && npm run test:api && npm run test:mobile",
-    "docs:check": "echo \"TripOS documentation scaffold ready\""
+    "ci": "npm run verify && npm run test:api && npm run test:mobile"
   },
   "keywords": [
     "travel",
