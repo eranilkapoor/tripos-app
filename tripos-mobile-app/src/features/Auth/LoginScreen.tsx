@@ -16,10 +16,10 @@ export function LoginScreen({
 }: {
   onLogin: (session: MobileSession) => void;
 }) {
-  const [email, setEmail] = useState("admin@tripos.test");
-  const [password, setPassword] = useState("TripOS@123");
-  const [organizationCode, setOrganizationCode] = useState("WEBNZA");
-  const [branchId, setBranchId] = useState("delhi");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [organizationCode, setOrganizationCode] = useState("");
+  const [branchId, setBranchId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -47,19 +47,31 @@ export function LoginScreen({
             Customer and agent travel workspace for trips, vouchers, payments,
             leads, and support.
           </Text>
-          <Field label="Email" value={email} onChange={setEmail} />
+          <Field
+            label="Email"
+            placeholder="admin@tripos.test"
+            value={email}
+            onChange={setEmail}
+          />
           <Field
             label="Password"
+            placeholder="Password"
             secure
             value={password}
             onChange={setPassword}
           />
           <Field
             label="Organization"
+            placeholder="e.g. WEBNZA"
             value={organizationCode}
             onChange={setOrganizationCode}
           />
-          <Field label="Branch" value={branchId} onChange={setBranchId} />
+          <Field
+            label="Branch"
+            placeholder="e.g. delhi"
+            value={branchId}
+            onChange={setBranchId}
+          />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <TouchableOpacity
             disabled={loading}

@@ -11,7 +11,6 @@ export class CrmUser {
     required: true,
     lowercase: true,
     trim: true,
-    unique: true,
     index: true,
   })
   email!: string;
@@ -49,3 +48,5 @@ export class CrmUser {
 }
 
 export const CrmUserSchema = SchemaFactory.createForClass(CrmUser);
+
+CrmUserSchema.index({ organizationId: 1, email: 1 }, { unique: true });

@@ -1,4 +1,4 @@
-import { ApiRecord, MobileSession } from "../api/triposApi";
+import { ApiRecord, MobileSession, SessionRefreshedHandler } from "../api/triposApi";
 
 export type AppMode = "customer" | "agent";
 
@@ -8,6 +8,7 @@ export type AppScreenProps = {
   activeTrip?: ApiRecord;
   mode: AppMode;
   onRefresh: () => Promise<void>;
+  onSessionRefreshed: SessionRefreshedHandler;
   records: TripOSData;
   session: MobileSession;
 };

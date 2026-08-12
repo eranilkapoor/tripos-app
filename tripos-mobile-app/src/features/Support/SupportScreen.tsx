@@ -8,6 +8,7 @@ import { styles } from "./supportStyles";
 export function SupportScreen({
   activeTrip,
   onRefresh,
+  onSessionRefreshed,
   session,
 }: AppScreenProps) {
   const [subject, setSubject] = useState("Need travel support");
@@ -22,6 +23,7 @@ export function SupportScreen({
         description || "Mobile support request",
         String(activeTrip?.customerName ?? session.user.name ?? "Mobile User"),
         String(activeTrip?._id ?? ""),
+        onSessionRefreshed,
       );
       setStatus("Support ticket created");
       setDescription("");

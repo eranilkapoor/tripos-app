@@ -1,10 +1,11 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AppService } from './app.service';
+import { buildOpenApiConfig } from './openapi.config';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 
@@ -68,14 +69,7 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle('TripOS API')
-    .setDescription(
-      'Travel CRM, quotation, booking, operations, B2B, and finance MVP API.',
-    )
-    .setVersion('0.1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, buildOpenApiConfig());
   SwaggerModule.setup('api/docs', app, document);
 
   const shutdownSignals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM'];

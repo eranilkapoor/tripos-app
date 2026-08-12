@@ -13,6 +13,8 @@ export type ApiRecord = Record<string, unknown> & {
 const apiBaseUrl =
   process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
 
+export type SessionRefreshedHandler = (session: MobileSession) => void;
+
 export async function login(
   email: string,
   password: string,
@@ -28,18 +30,63 @@ export async function login(
   return response.json() as Promise<MobileSession>;
 }
 
+export async function refreshSession(session: MobileSession) {
+  const response = await fetch(`${apiBaseUrl}/auth/refresh`, {
+    headers: sessionHeaders(session),
+    method: "POST",
+  });
+  if (!response.ok) throw new Error("Session refresh failed");
+  return response.json() as Promise<MobileSession>;
+}
+
+// Coalesces concurrent 401s (e.g. a Promise.all fan-out across endpoints)
+// into a single refresh call so the second caller doesn't retry with a
+// token the first caller has already rotated and revoked server-side.
+let pendingRefresh: Promise<MobileSession> | null = null;
+
+function getOrRefreshSession(session: MobileSession) {
+  if (!pendingRefresh) {
+    pendingRefresh = refreshSession(session).finally(() => {
+      pendingRefresh = null;
+    });
+  }
+  return pendingRefresh;
+}
+
+async function authorizedFetch(
+  session: MobileSession,
+  input: string,
+  init: RequestInit,
+  onSessionRefreshed?: SessionRefreshedHandler,
+) {
+  const attempt = (activeSession: MobileSession) =>
+    fetch(input, {
+      ...init,
+      headers: { ...init.headers, ...sessionHeaders(activeSession) },
+    });
+
+  let response = await attempt(session);
+  if (response.status === 401) {
+    const refreshed = await getOrRefreshSession(session);
+    onSessionRefreshed?.(refreshed);
+    response = await attempt(refreshed);
+  }
+  return response;
+}
+
 export async function loadRecords(
   endpoint: string,
   session: MobileSession,
   search = "",
+  onSessionRefreshed?: SessionRefreshedHandler,
 ) {
   const params = new URLSearchParams({ limit: "20" });
   if (search.trim()) params.set("search", search.trim());
-  const response = await fetch(
+  const response = await authorizedFetch(
+    session,
     `${apiBaseUrl}/${endpoint}?${params.toString()}`,
-    {
-      headers: sessionHeaders(session),
-    },
+    {},
+    onSessionRefreshed,
   );
   if (!response.ok) throw new Error(`${endpoint} unavailable`);
   const payload = await response.json();
@@ -55,19 +102,25 @@ export async function createSupportTicket(
   description: string,
   customerName: string,
   bookingId?: string,
+  onSessionRefreshed?: SessionRefreshedHandler,
 ) {
-  const response = await fetch(`${apiBaseUrl}/support-tickets`, {
-    body: JSON.stringify({
-      subject,
-      description,
-      customerName,
-      bookingId,
-      channel: "mobile",
-      priority: "medium",
-    }),
-    headers: { "Content-Type": "application/json", ...sessionHeaders(session) },
-    method: "POST",
-  });
+  const response = await authorizedFetch(
+    session,
+    `${apiBaseUrl}/support-tickets`,
+    {
+      body: JSON.stringify({
+        subject,
+        description,
+        customerName,
+        bookingId,
+        channel: "mobile",
+        priority: "medium",
+      }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    },
+    onSessionRefreshed,
+  );
   if (!response.ok) throw new Error("Support ticket failed");
   return response.json() as Promise<ApiRecord>;
 }

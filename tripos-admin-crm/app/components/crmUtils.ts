@@ -2,11 +2,9 @@ import type {
   ApiRecord,
   CrmModule,
   ModuleField,
+  ModuleRow,
   SelectOption,
 } from "./crmTypes";
-
-export const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
 
 export function getRecordId(record: ApiRecord) {
   return String(record._id ?? record.id ?? "");
@@ -205,11 +203,149 @@ export function statusClass(value: string) {
   return "neutral";
 }
 
-export function sessionHeaders(token?: string, user?: Record<string, unknown>) {
-  const headers: Record<string, string> = {};
-  if (token) headers.Authorization = `Bearer ${token}`;
-  if (user?.organizationId)
-    headers["x-organization-id"] = String(user.organizationId);
-  if (user?.branchId) headers["x-branch-id"] = String(user.branchId);
-  return headers;
+export function csvToRecords(csv: string, columns: string[], rowMap: string[]) {
+  const lines = csv
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const [, ...body] = lines;
+  return body.map((line) => {
+    const values = parseCsvLine(line);
+    return values.reduce<Record<string, unknown>>((record, value, index) => {
+      const key = rowMap[index] ?? columns[index];
+      if (!key) return record;
+      setNestedValue(record, key, value);
+      return record;
+    }, {});
+  });
+}
+
+function parseCsvLine(line: string) {
+  const values: string[] = [];
+  let current = "";
+  let quoted = false;
+  for (const char of line) {
+    if (char === '"') {
+      quoted = !quoted;
+      continue;
+    }
+    if (char === "," && !quoted) {
+      values.push(current);
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  values.push(current);
+  return values;
+}
+
+function setNestedValue(
+  target: Record<string, unknown>,
+  path: string,
+  value: unknown,
+) {
+  const parts = path.split(".");
+  let cursor = target;
+  parts.forEach((part, index) => {
+    if (index === parts.length - 1) {
+      cursor[part] = value;
+      return;
+    }
+    const next = cursor[part];
+    if (!next || typeof next !== "object") cursor[part] = {};
+    cursor = cursor[part] as Record<string, unknown>;
+  });
+}
+
+export function csvEscape(value: string) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+export function downloadBlob(fileName: string, content: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+export function exportRecords(
+  title: string,
+  columns: string[],
+  rows: ModuleRow[],
+  format: "csv" | "json",
+) {
+  const safeName = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  if (format === "json") {
+    downloadBlob(
+      `${safeName}.json`,
+      JSON.stringify(
+        rows.map(({ record }) => record),
+        null,
+        2,
+      ),
+      "application/json",
+    );
+    return;
+  }
+  const csv = [
+    columns.map(csvEscape).join(","),
+    ...rows.map(({ row }) => row.map(csvEscape).join(",")),
+  ].join("\n");
+  downloadBlob(`${safeName}.csv`, csv, "text/csv");
+}
+
+export function buildMetrics(
+  records: ApiRecord[],
+  dashboard: Record<string, unknown> | null,
+): [string, string, string][] {
+  if (Array.isArray(dashboard?.metrics)) {
+    return dashboard.metrics.map((metric) => {
+      const item = metric as Record<string, unknown>;
+      return [
+        String(item.label ?? "Metric"),
+        String(item.value ?? "0"),
+        String(item.helper ?? "Live"),
+      ];
+    });
+  }
+
+  const dashboardTotal =
+    typeof dashboard?.totalRecords === "number"
+      ? String(dashboard.totalRecords)
+      : "Live";
+  return [
+    ["Records", String(records.length || dashboardTotal), "Current module"],
+    ["API", "Dedicated", "No generic records"],
+    ["Organization", "Demo Org", "Branch scoped"],
+    ["Status", "Ready", "Mongo-backed"],
+  ];
+}
+
+export function buildNotificationCount(
+  dashboard: Record<string, unknown> | null,
+  records: ApiRecord[],
+) {
+  const explicitCount = dashboard?.notificationsCount ?? dashboard?.alertsCount;
+  if (typeof explicitCount === "number") return explicitCount;
+
+  return records.filter((record) => {
+    const status = String(
+      record.status ?? record.stage ?? record.priority ?? "",
+    ).toLowerCase();
+    return [
+      "urgent",
+      "overdue",
+      "pending",
+      "blocked",
+      "failed",
+      "due",
+      "high",
+    ].some((signal) => status.includes(signal));
+  }).length;
 }

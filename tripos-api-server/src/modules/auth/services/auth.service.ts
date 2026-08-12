@@ -74,7 +74,7 @@ export class AuthService {
     const invitationExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
     const user = await this.userModel
       .findOneAndUpdate(
-        { email: dto.email.toLowerCase() },
+        { email: dto.email.toLowerCase(), organizationId },
         {
           $set: {
             email: dto.email.toLowerCase(),
@@ -120,21 +120,21 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     await this.ensureDemoAdmin();
+    const organization = await this.organizationsService.findByCode(
+      dto.organizationCode,
+    );
+    if (!organization)
+      throw new UnauthorizedException('Invalid email or password');
     const user = await this.userModel
-      .findOne({ email: dto.email.toLowerCase(), status: 'active' })
+      .findOne({
+        email: dto.email.toLowerCase(),
+        organizationId: String((organization as { _id: unknown })._id),
+        status: 'active',
+      })
       .lean()
       .exec();
     if (!user || !verifyPassword(dto.password, user.passwordHash))
       throw new UnauthorizedException('Invalid email or password');
-    const organization = await this.organizationsService.findOne(
-      String(user.organizationId),
-    );
-    if (
-      dto.organizationCode &&
-      String((organization as { code?: string }).code).toUpperCase() !==
-        dto.organizationCode.toUpperCase()
-    )
-      throw new UnauthorizedException('Organization does not match user');
     const branchId = assertBranchAccess(dto.branchId ?? user.branchId, user);
     const access = await this.identityService.permissionsForUser(
       String(user.organizationId),
@@ -246,11 +246,21 @@ export class AuthService {
 
   async forgotPassword(dto: ForgotPasswordDto) {
     const resetToken = randomBytes(32).toString('hex');
+    // organizationCode is optional here: without it the lookup can match one
+    // of several same-email accounts across organizations, but that is
+    // acceptable because the reset token (not the lookup) is what grants
+    // account access, and only the matched account's token is issued.
+    const organization = dto.organizationCode
+      ? await this.organizationsService.findByCode(dto.organizationCode)
+      : undefined;
     const user = await this.userModel
       .findOneAndUpdate(
         {
           email: dto.email.toLowerCase(),
           status: { $in: ['active', 'locked'] },
+          ...(organization
+            ? { organizationId: String((organization as { _id: unknown })._id) }
+            : {}),
         },
         {
           resetTokenHash: hashToken(resetToken),

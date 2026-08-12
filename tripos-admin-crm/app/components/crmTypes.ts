@@ -34,6 +34,8 @@ export type ApiRecord = Record<string, unknown> & {
   stage?: string;
 };
 
+export type ModuleRow = { record: ApiRecord; row: string[] };
+
 export type CrmSession = {
   token: string;
   user: Record<string, unknown>;

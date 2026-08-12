@@ -20,6 +20,8 @@
     "build:admin": "npm --prefix tripos-admin-crm run build",
     "typecheck:api": "npm --prefix tripos-api-server run typecheck",
     "typecheck:mobile": "npm --prefix tripos-mobile-app run typecheck",
+    "typecheck:website": "npm --prefix tripos-public-website run typecheck",
+    "typecheck:admin": "npm --prefix tripos-admin-crm run typecheck",
     "test:api": "npm --prefix tripos-api-server run test -- --runInBand",
     "test:mobile": "npm --prefix tripos-mobile-app run test",
     "contracts:snapshot": "node scripts/snapshot-openapi.mjs",

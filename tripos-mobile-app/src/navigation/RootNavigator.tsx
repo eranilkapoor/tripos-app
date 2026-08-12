@@ -51,6 +51,11 @@ export function RootNavigator({
     void refresh();
   }, [session, mode]);
 
+  async function persistRefreshedSession(nextSession: MobileSession) {
+    setSession(nextSession);
+    await saveSession(nextSession);
+  }
+
   async function refresh() {
     if (!session) return;
     setLoading(true);
@@ -69,7 +74,12 @@ export function RootNavigator({
       const loaded = await Promise.all(
         endpoints.map(
           async (endpoint) =>
-            [endpoint, await loadRecords(endpoint, session)] as const,
+            [
+              endpoint,
+              await loadRecords(endpoint, session, "", (nextSession) =>
+                void persistRefreshedSession(nextSession),
+              ),
+            ] as const,
         ),
       );
       setRecords(Object.fromEntries(loaded));
@@ -104,6 +114,8 @@ export function RootNavigator({
     activeTrip,
     mode,
     onRefresh: refresh,
+    onSessionRefreshed: (nextSession) =>
+      void persistRefreshedSession(nextSession),
     records,
     session,
   };

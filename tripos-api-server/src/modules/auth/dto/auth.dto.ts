@@ -9,7 +9,7 @@ import {
 export class LoginDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(6) password!: string;
-  @IsOptional() @IsString() organizationCode?: string;
+  @IsString() organizationCode!: string;
   @IsOptional() @IsString() branchId?: string;
 }
 
@@ -27,6 +27,7 @@ export class RegisterCrmUserDto {
 
 export class ForgotPasswordDto {
   @IsEmail() email!: string;
+  @IsOptional() @IsString() organizationCode?: string;
 }
 
 export class ResetPasswordDto {

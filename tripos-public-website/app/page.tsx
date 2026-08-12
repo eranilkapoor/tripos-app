@@ -1,6 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { CookieConsent } from "./components/CookieConsent";
+import { SiteFooter } from "./components/SiteFooter";
+import { SiteHeader } from "./components/SiteHeader";
 
 const modules = [
   ["Travel CRM", "Leads, customers, follow-ups, sales owners, source tracking, and conversion reporting."],
@@ -17,8 +20,6 @@ const plans = [
   ["Enterprise DMC", "Multi-branch, white-label, multi-currency, API integrations, advanced analytics, and AI."],
 ];
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
-
 export default function HomePage() {
   const [status, setStatus] = useState("Ready to capture travel SaaS demo requests.");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,28 +35,14 @@ export default function HomePage() {
       phone: String(formData.get("phone") ?? ""),
       businessType: String(formData.get("businessType") ?? ""),
       monthlyBookings: String(formData.get("monthlyBookings") ?? ""),
+      website: String(formData.get("website") ?? ""),
     };
 
     try {
       setIsSubmitting(true);
       setStatus("Sending demo request...");
-      const response = await fetch(`${apiBaseUrl}/public/leads`, {
-        body: JSON.stringify({
-          customerName: payload.companyName,
-          email: payload.email,
-          phone: payload.phone,
-          source: "public-website",
-          channel: payload.businessType === "B2B Travel Network" ? "b2b" : "b2c",
-          requirement: {
-            budget: payload.monthlyBookings
-              ? `${payload.monthlyBookings} monthly bookings`
-              : undefined,
-          },
-          metadata: {
-            contactName: payload.contactName,
-            businessType: payload.businessType,
-          },
-        }),
+      const response = await fetch("/api/demo-request", {
+        body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" },
         method: "POST",
       });
@@ -72,17 +59,7 @@ export default function HomePage() {
 
   return (
     <>
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="TripOS home">
-          <span>T</span>
-          <strong>TripOS</strong>
-        </a>
-        <nav aria-label="Primary navigation">
-          <a href="#modules">Modules</a>
-          <a href="#plans">Plans</a>
-          <a href="#demo">Demo</a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main id="top">
         <section className="hero">
@@ -186,6 +163,15 @@ export default function HomePage() {
               <option>B2B Travel Network</option>
             </select>
             <input name="monthlyBookings" placeholder="Monthly bookings" />
+            <div className="honeypot-field" aria-hidden="true">
+              <label htmlFor="website">Leave this field empty</label>
+              <input
+                id="website"
+                name="website"
+                autoComplete="off"
+                tabIndex={-1}
+              />
+            </div>
             <button className="button primary" disabled={isSubmitting} type="submit">
               {isSubmitting ? "Sending..." : "Request demo"}
             </button>
@@ -193,6 +179,10 @@ export default function HomePage() {
           </form>
         </section>
       </main>
+
+      <SiteFooter />
+
+      <CookieConsent />
     </>
   );
 }

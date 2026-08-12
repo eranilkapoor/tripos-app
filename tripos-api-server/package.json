@@ -20,7 +20,8 @@
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node -r tsconfig-paths/register src/modules/tripos/seed-tripos.ts",
-    "migrate:collection-names": "ts-node -r tsconfig-paths/register src/modules/tripos/migrate-collection-names.ts"
+    "migrate:collection-names": "ts-node -r tsconfig-paths/register src/modules/tripos/migrate-collection-names.ts",
+    "contracts:generate-spec": "ts-node -r tsconfig-paths/register src/modules/tripos/generate-openapi.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",

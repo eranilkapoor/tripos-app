@@ -12,11 +12,13 @@ import { colors } from "../theme/colors";
 export function Field({
   label,
   onChange,
+  placeholder,
   secure,
   value,
 }: {
   label: string;
   onChange: (value: string) => void;
+  placeholder?: string;
   secure?: boolean;
   value: string;
 }) {
@@ -24,6 +26,8 @@ export function Field({
     <View style={styles.field}>
       <Text style={styles.fieldLabel}>{label}</Text>
       <TextInput
+        placeholder={placeholder}
+        placeholderTextColor={colors.muted}
         secureTextEntry={secure}
         style={styles.input}
         value={value}
