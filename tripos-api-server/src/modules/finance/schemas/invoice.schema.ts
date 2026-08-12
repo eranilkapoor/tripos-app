@@ -48,6 +48,9 @@ export class Invoice {
   @Prop({ type: Object, required: true })
   totals!: Record<string, number>;
 
+  @Prop({ type: Object, required: true })
+  totalsMinor!: Record<string, number>;
+
   @Prop({ default: 'draft', index: true })
   status!: string;
 

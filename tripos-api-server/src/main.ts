@@ -61,6 +61,7 @@ async function bootstrap() {
     origin: configService.get<string[]>('cors.origins'),
     maxAge: configService.get<number>('cors.maxAgeSeconds'),
   });
+  app.use(rateLimitAuthAndPublicPaths());
   app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -80,6 +81,38 @@ async function bootstrap() {
   }
 
   await app.listen(configService.get<number>('port') ?? 4000);
+}
+
+function rateLimitAuthAndPublicPaths() {
+  const buckets = new Map<string, { count: number; resetAt: number }>();
+  const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60_000);
+  const max = Number(process.env.RATE_LIMIT_MAX ?? 60);
+
+  return (
+    req: { ip?: string; originalUrl?: string },
+    res: { status: (code: number) => { json: (body: unknown) => void } },
+    next: () => void,
+  ) => {
+    const url = String(req.originalUrl ?? '');
+    if (!url.includes('/auth/') && !url.includes('/public/')) {
+      next();
+      return;
+    }
+    const now = Date.now();
+    const key = `${req.ip ?? 'unknown'}:${url.split('?')[0]}`;
+    const bucket = buckets.get(key);
+    if (!bucket || bucket.resetAt <= now) {
+      buckets.set(key, { count: 1, resetAt: now + windowMs });
+      next();
+      return;
+    }
+    bucket.count += 1;
+    if (bucket.count > max) {
+      res.status(429).json({ message: 'Too many requests' });
+      return;
+    }
+    next();
+  };
 }
 
 bootstrap().catch((err: unknown) => {

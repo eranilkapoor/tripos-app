@@ -11,6 +11,7 @@ export class CreatePaymentDto {
   @IsOptional() @IsString() agentId?: string;
   @IsString() @MinLength(2) type!: string;
   @IsNumber() amount!: number;
+  @IsOptional() @IsNumber() amountMinor?: number;
   @IsOptional() @IsString() currencyCode?: string;
   @IsOptional() @IsString() partyName?: string;
   @IsOptional() @IsString() dueDate?: string;

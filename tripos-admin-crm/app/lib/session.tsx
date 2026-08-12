@@ -10,8 +10,6 @@ import {
 import type { CrmSession } from "../components/crmTypes";
 import { apiGet, apiPost } from "./apiClient";
 
-const SESSION_STORAGE_KEY = "tripos-crm-session";
-
 type SessionContextValue = {
   session: CrmSession | null;
   authReady: boolean;
@@ -20,7 +18,7 @@ type SessionContextValue = {
   updateWorkspace: (
     field: "organizationCode" | "branchId",
     value: string,
-  ) => void;
+  ) => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -30,35 +28,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    const raw = window.localStorage.getItem(SESSION_STORAGE_KEY);
-    if (!raw) {
-      setAuthReady(true);
-      return;
-    }
-    try {
-      const stored = JSON.parse(raw) as CrmSession;
-      setSession(stored);
-      void apiGet<Record<string, unknown>>("auth/me", {
-        session: stored,
-        errorMessage: "Session expired",
-      })
-        .then((nextSession) => setSession({ ...stored, ...nextSession }))
-        .catch(() => {
-          window.localStorage.removeItem(SESSION_STORAGE_KEY);
-          setSession(null);
-        })
-        .finally(() => setAuthReady(true));
-    } catch {
-      window.localStorage.removeItem(SESSION_STORAGE_KEY);
-      setAuthReady(true);
-    }
+    setAuthReady(true);
   }, []);
 
   function login(nextSession: CrmSession) {
-    window.localStorage.setItem(
-      SESSION_STORAGE_KEY,
-      JSON.stringify(nextSession),
-    );
     setSession(nextSession);
   }
 
@@ -68,16 +41,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         () => undefined,
       );
     }
-    window.localStorage.removeItem(SESSION_STORAGE_KEY);
     setSession(null);
   }
 
-  function updateWorkspace(
+  async function updateWorkspace(
     field: "organizationCode" | "branchId",
     value: string,
   ) {
     if (!session) return;
-    const nextSession: CrmSession = {
+    const candidateSession: CrmSession = {
       ...session,
       organization:
         field === "organizationCode"
@@ -85,11 +57,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           : session.organization,
       user: { ...session.user, [field]: value },
     };
-    setSession(nextSession);
-    window.localStorage.setItem(
-      SESSION_STORAGE_KEY,
-      JSON.stringify(nextSession),
-    );
+    const confirmed = await apiGet<Partial<CrmSession>>("auth/me", {
+      session: candidateSession,
+      errorMessage: "Workspace access denied.",
+    });
+    setSession({ ...candidateSession, ...confirmed });
   }
 
   return (

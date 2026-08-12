@@ -30,5 +30,70 @@ jobs:
       - name: Install repository tooling
         run: npm ci
 
-      - name: Run repository documentation check
-        run: npm run docs:check
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: tripos-api-server
+
+      - name: Install admin CRM dependencies
+        run: npm ci
+        working-directory: tripos-admin-crm
+
+      - name: Install mobile dependencies
+        run: npm ci
+        working-directory: tripos-mobile-app
+
+      - name: Install public website dependencies
+        run: npm ci
+        working-directory: tripos-public-website
+
+      - name: Lint API
+        run: npm run lint:check
+        working-directory: tripos-api-server
+
+      - name: Typecheck API
+        run: npm run typecheck
+        working-directory: tripos-api-server
+
+      - name: Test API
+        run: npm run test -- --runInBand
+        working-directory: tripos-api-server
+
+      - name: Build API
+        run: npm run build
+        working-directory: tripos-api-server
+
+      - name: Lint admin CRM
+        run: npm run lint
+        working-directory: tripos-admin-crm
+
+      - name: Typecheck admin CRM
+        run: npm run typecheck
+        working-directory: tripos-admin-crm
+
+      - name: Build admin CRM
+        run: npm run build
+        working-directory: tripos-admin-crm
+
+      - name: Lint public website
+        run: npm run lint
+        working-directory: tripos-public-website
+
+      - name: Typecheck public website
+        run: npm run typecheck
+        working-directory: tripos-public-website
+
+      - name: Build public website
+        run: npm run build
+        working-directory: tripos-public-website
+
+      - name: Lint mobile
+        run: npm run lint
+        working-directory: tripos-mobile-app
+
+      - name: Typecheck mobile
+        run: npm run typecheck
+        working-directory: tripos-mobile-app
+
+      - name: Test mobile
+        run: npm run test -- --runInBand
+        working-directory: tripos-mobile-app

@@ -17,6 +17,7 @@ export class Payment {
   })
   type!: string;
   @Prop({ required: true }) amount!: number;
+  @Prop({ required: true, index: true }) amountMinor!: number;
   @Prop({ default: 'INR' }) currencyCode!: string;
   @Prop({ trim: true }) partyName?: string;
   @Prop({ trim: true }) dueDate?: string;

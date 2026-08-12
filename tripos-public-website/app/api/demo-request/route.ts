@@ -27,6 +27,7 @@ const triposApiUrl =
   process.env.TRIPOS_API_URL ??
   process.env.NEXT_PUBLIC_API_URL ??
   "http://localhost:4000/api/v1";
+const publicLeadIntakeToken = process.env.PUBLIC_LEAD_INTAKE_TOKEN;
 
 export async function POST(request: NextRequest) {
   const ip = clientIp(request);
@@ -78,7 +79,12 @@ export async function POST(request: NextRequest) {
         businessType: payload.businessType,
       },
     }),
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(publicLeadIntakeToken
+        ? { "x-public-intake-token": publicLeadIntakeToken }
+        : {}),
+    },
     method: "POST",
   });
 

@@ -121,13 +121,17 @@ function CrmShellContent() {
     router.push(id === "dashboard" ? "/" : `/${id}`);
   }
 
-  function handleWorkspaceChange(
+  async function handleWorkspaceChange(
     field: "organizationCode" | "branchId",
     value: string,
   ) {
-    updateWorkspace(field, value);
-    setToast("Workspace context updated.");
-    window.setTimeout(() => void refetch(), 0);
+    try {
+      await updateWorkspace(field, value);
+      setToast("Workspace context updated.");
+      await refetch();
+    } catch {
+      setToast("Workspace access denied.");
+    }
   }
 
   async function handleLogout() {
@@ -225,7 +229,10 @@ function CrmShellContent() {
                 <select
                   aria-label="Organization"
                   onChange={(event) =>
-                    handleWorkspaceChange("organizationCode", event.target.value)
+                    void handleWorkspaceChange(
+                      "organizationCode",
+                      event.target.value,
+                    )
                   }
                   value={String(
                     session.organization.code ??
@@ -245,7 +252,7 @@ function CrmShellContent() {
                 <select
                   aria-label="Branch"
                   onChange={(event) =>
-                    handleWorkspaceChange("branchId", event.target.value)
+                    void handleWorkspaceChange("branchId", event.target.value)
                   }
                   value={String(session.user.branchId ?? "delhi")}
                 >

@@ -9,6 +9,11 @@ import {
   updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
 import { buildDocumentTemplate } from '../../../common/utils/document-template.util';
+import {
+  calculateTaxMinor,
+  fromMinorUnits,
+  toMinorUnits,
+} from '../../../common/utils/money.util';
 import { CreateInvoiceDto } from '../dto/invoice.dto';
 import { Invoice } from '../schemas/invoice.schema';
 
@@ -50,7 +55,8 @@ export class InvoicesService {
     const totals = calculateInvoiceTotals(dto.entries, dto.taxRate);
     const invoice = await this.invoiceModel.create({
       ...dto,
-      totals,
+      totals: totals.display,
+      totalsMinor: totals.minor,
       status: dto.status ?? 'draft',
       locked: dto.locked ?? false,
     });
@@ -81,7 +87,11 @@ export class InvoicesService {
             totals: calculateInvoiceTotals(
               dto.entries ?? [],
               Number(dto.taxRate ?? 0),
-            ),
+            ).display,
+            totalsMinor: calculateInvoiceTotals(
+              dto.entries ?? [],
+              Number(dto.taxRate ?? 0),
+            ).minor,
           }
         : dto;
     return updateScopedCrmRecord(
@@ -153,15 +163,24 @@ export function calculateInvoiceTotals(
   entries: Array<Record<string, unknown>>,
   taxRate: number,
 ) {
-  const subtotal = entries.reduce(
-    (sum, entry) => sum + Number(entry.total ?? 0),
+  const subtotalMinor = entries.reduce(
+    (sum, entry) => sum + toMinorUnits(entry.total),
     0,
   );
-  const taxAmount = subtotal * (Number(taxRate || 0) / 100);
+  const taxAmountMinor = calculateTaxMinor(subtotalMinor, taxRate);
+  const totalPayableMinor = subtotalMinor + taxAmountMinor;
   return {
-    subtotal,
-    taxAmount,
-    taxBasis: subtotal,
-    totalPayable: subtotal + taxAmount,
+    display: {
+      subtotal: fromMinorUnits(subtotalMinor),
+      taxAmount: fromMinorUnits(taxAmountMinor),
+      taxBasis: fromMinorUnits(subtotalMinor),
+      totalPayable: fromMinorUnits(totalPayableMinor),
+    },
+    minor: {
+      subtotalMinor,
+      taxAmountMinor,
+      taxBasisMinor: subtotalMinor,
+      totalPayableMinor,
+    },
   };
 }

@@ -344,6 +344,7 @@ export class AuthService {
       'campaigns',
       'support',
       'audit',
+      'reports',
       'settings',
     ];
     const actions = ['read', 'create', 'update', 'delete', 'approve', 'export'];
@@ -500,6 +501,7 @@ export class AuthService {
   }
 
   private async ensureDemoAdmin() {
+    if (!isDemoBootstrapEnabled()) return;
     const existing = await this.userModel
       .findOne({ email: 'admin@tripos.test' })
       .exec();
@@ -519,6 +521,13 @@ export class AuthService {
       permissions: ['*'],
     });
   }
+}
+
+function isDemoBootstrapEnabled() {
+  return (
+    process.env.NODE_ENV !== 'production' &&
+    process.env.TRIPOS_ENABLE_DEMO_ADMIN === 'true'
+  );
 }
 
 function hashPassword(password: string) {

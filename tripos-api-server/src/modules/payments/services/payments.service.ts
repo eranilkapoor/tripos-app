@@ -10,6 +10,7 @@ import {
   scopeFilter,
   updateScopedCrmRecord,
 } from '../../../common/utils/crm-list.util';
+import { fromMinorUnits, toMinorUnits } from '../../../common/utils/money.util';
 import { CreatePaymentDto } from '../dto/payment.dto';
 import { Payment } from '../schemas/payment.schema';
 
@@ -21,6 +22,7 @@ export class PaymentsService {
   create(dto: CreatePaymentDto) {
     return this.model.create({
       ...dto,
+      amountMinor: dto.amountMinor ?? toMinorUnits(dto.amount),
       currencyCode: dto.currencyCode ?? 'INR',
       metadata: dto.metadata ?? {},
     });
@@ -38,7 +40,9 @@ export class PaymentsService {
     return rows.reduce(
       (summary, row) => {
         const key = `${row.type}_${row.status}`;
-        summary[key] = (summary[key] ?? 0) + Number(row.amount ?? 0);
+        summary[key] =
+          (summary[key] ?? 0) +
+          fromMinorUnits(row.amountMinor ?? toMinorUnits(row.amount));
         return summary;
       },
       {} as Record<string, number>,
@@ -48,11 +52,18 @@ export class PaymentsService {
     return findScopedCrmRecord(this.model, id, query, 'Payment not found');
   }
   update(id: string, dto: Partial<CreatePaymentDto>, query: CrmListQueryDto) {
+    const update =
+      dto.amount !== undefined || dto.amountMinor !== undefined
+        ? {
+            ...dto,
+            amountMinor: dto.amountMinor ?? toMinorUnits(dto.amount),
+          }
+        : dto;
     return updateScopedCrmRecord(
       this.model,
       id,
       query,
-      dto,
+      update,
       'Payment not found',
     );
   }

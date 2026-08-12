@@ -11,7 +11,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { downloadBlob } from "./crmUtils";
 import { apiGet, apiPost } from "../lib/apiClient";
-import { invoiceSchema, type InvoiceFormValues } from "../validation/invoiceSchema";
+import {
+  invoiceSchema,
+  type InvoiceFormValues,
+} from "../validation/invoiceSchema";
 
 const countryPresets = {
   IN: {
@@ -238,7 +241,9 @@ export default function InvoiceBuilder({ onSaved }: { onSaved: () => void }) {
             Provider Tax No
             <input {...register("provider.taxNo")} />
             {errors.provider?.taxNo ? (
-              <span className="form-error">{errors.provider.taxNo.message}</span>
+              <span className="form-error">
+                {errors.provider.taxNo.message}
+              </span>
             ) : null}
           </label>
           <label>
@@ -440,10 +445,10 @@ function buildInvoiceDocument({
     .map(
       (entry) => `
         <tr>
-          <td>${entry.dateProvided}</td>
-          <td>${entry.description}</td>
-          <td>${entry.qty}</td>
-          <td>${entry.qtyType}</td>
+          <td>${escapeHtml(entry.dateProvided)}</td>
+          <td>${escapeHtml(entry.description)}</td>
+          <td>${escapeHtml(entry.qty)}</td>
+          <td>${escapeHtml(entry.qtyType)}</td>
           <td>${currencySymbol} ${Number(entry.rate || 0).toFixed(2)}</td>
           <td>${currencySymbol} ${Number(entry.total || 0).toFixed(2)}</td>
         </tr>`,
@@ -453,7 +458,7 @@ function buildInvoiceDocument({
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>${series}${invoiceNo}</title>
+    <title>${escapeHtml(`${series}${invoiceNo}`)}</title>
     <style>
       body { color: #132321; font-family: Arial, sans-serif; margin: 32px; }
       header { border-bottom: 2px solid #0f766e; display: flex; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; }
@@ -469,15 +474,15 @@ function buildInvoiceDocument({
   <body>
     <header>
       <div>
-        <h1>${series}${invoiceNo}</h1>
-        <p>${country} / ${invoiceDate}</p>
+        <h1>${escapeHtml(`${series}${invoiceNo}`)}</h1>
+        <p>${escapeHtml(country)} / ${escapeHtml(invoiceDate)}</p>
       </div>
       <div>
-        <strong>${providerName}</strong>
-        <p>${providerTaxNo}</p>
+        <strong>${escapeHtml(providerName)}</strong>
+        <p>${escapeHtml(providerTaxNo)}</p>
       </div>
     </header>
-    <p><strong>Bill To:</strong> ${customerName}</p>
+    <p><strong>Bill To:</strong> ${escapeHtml(customerName)}</p>
     <table>
       <thead>
         <tr><th>Date</th><th>Description</th><th>Qty</th><th>Unit</th><th>Rate</th><th>Total</th></tr>
@@ -486,9 +491,18 @@ function buildInvoiceDocument({
     </table>
     <section class="totals">
       <div><span>Subtotal</span><strong>${currencySymbol} ${subtotal.toFixed(2)}</strong></div>
-      <div><span>${taxLabel} ${taxRate}%</span><strong>${currencySymbol} ${taxAmount.toFixed(2)}</strong></div>
+      <div><span>${escapeHtml(taxLabel)} ${taxRate}%</span><strong>${currencySymbol} ${taxAmount.toFixed(2)}</strong></div>
       <div class="grand"><span>Total</span><strong>${currencySymbol} ${totalPayable.toFixed(2)}</strong></div>
     </section>
   </body>
 </html>`;
+}
+
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }

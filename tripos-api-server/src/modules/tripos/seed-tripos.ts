@@ -213,6 +213,7 @@ async function main() {
     'campaigns',
     'support',
     'audit',
+    'reports',
     'settings',
     'identity',
   ];
@@ -582,6 +583,7 @@ async function main() {
       bookingId: 'BKG-SHARMA-DXB',
       type: 'receivable',
       amount: 129500,
+      amountMinor: 12950000,
       currencyCode: 'INR',
       partyName: 'Sharma Family',
       dueDate: '2026-11-15',
@@ -595,6 +597,7 @@ async function main() {
       bookingId: 'BKG-SHARMA-DXB',
       type: 'payable',
       amount: 42000,
+      amountMinor: 4200000,
       currencyCode: 'INR',
       partyName: 'DXB Prime Cars',
       dueDate: '2026-12-20',
@@ -629,6 +632,12 @@ async function main() {
           },
         ],
         totals: { subtotal: 109746, taxAmount: 19754, totalPayable: 129500 },
+        totalsMinor: {
+          subtotalMinor: 10974600,
+          taxAmountMinor: 1975400,
+          taxBasisMinor: 10974600,
+          totalPayableMinor: 12950000,
+        },
         status: 'draft',
       },
     },
@@ -818,14 +827,16 @@ async function upsertMany(
     );
   }
 
-  const isOrganizationScoped = Boolean(
-    modelRef.schema.path('organizationId'),
-  );
+  const isOrganizationScoped = Boolean(modelRef.schema.path('organizationId'));
 
   const operations = rows.map((row, index) => {
     const uniqueValue = row[uniqueKey];
 
-    if (uniqueValue === undefined || uniqueValue === null || uniqueValue === '') {
+    if (
+      uniqueValue === undefined ||
+      uniqueValue === null ||
+      uniqueValue === ''
+    ) {
       throw new Error(
         `Cannot seed ${modelRef.modelName}: row ${index + 1} has no value for unique key "${uniqueKey}".`,
       );

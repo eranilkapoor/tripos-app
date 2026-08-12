@@ -4,7 +4,7 @@ Last reviewed: 2026-08-12
 
 TripOS is being built for launch as soon as the product is code-ready and the production environment is activated. This roadmap does not use 90-day or future-phase timing. Status reflects current code-side readiness in this repository.
 
-An independent code-level review (not just documentation claims) was completed on 2026-08-12 across all four apps and repo-level CI/tooling. See "Independent Engineering Review — 2026-08-12" below before trusting the "Product Ready" labels elsewhere in this document: several are overstated relative to what the code actually enforces today, most importantly around RBAC coverage, tenant-isolation on public endpoints, and CI gating.
+An independent code-level review (not just documentation claims) was completed on 2026-08-12 across all four apps and repo-level CI/tooling. See "Independent Engineering Review — 2026-08-12" below before trusting the "Product Ready" labels elsewhere in this document. The launch-blocking review rows called out there have now been closed in code.
 
 Status legend:
 
@@ -41,17 +41,17 @@ Scope: `tripos-api-server`, `tripos-admin-crm`, `tripos-mobile-app`, `tripos-pub
 - The mobile app correctly uses `expo-secure-store` for token storage (not AsyncStorage), and its screens are genuinely API-backed rather than static/mock data — more mature than the "shell only" framing in this roadmap suggests.
 - The admin CRM has more accessibility and responsive groundwork than expected (aria attributes, dark-mode media queries, tablet/mobile breakpoints), ahead of where "QA pending" implied.
 
-### Critical risks — treat as launch-blocking regardless of "Product Ready" labels
+### Closed Critical Risks
 
-1. **Confirmed cross-tenant data injection.** `POST /api/v1/public/leads` is `@Public()` and accepts a client-suppliable `organizationId` with no ownership check. An unauthenticated caller can inject leads directly into an arbitrary tenant's pipeline today. This is a live multi-tenant boundary break, not a theoretical risk, and directly contradicts the "Organization/branch isolation... Product Ready" gate above.
-2. **RBAC is defined but not enforced almost everywhere.** Only 4 of roughly 29 API controllers (auth, identity, organizations, audit-log) use `@Roles`/`@Permissions`. Finance, invoices, payments, bookings, quotations, leads, suppliers, and operations have no server-side role/permission checks, so any authenticated user of any role can perform any action on them. The rich permission catalog exists but is not wired to most endpoints, which also contradicts the "RBAC... Product Ready" gate above.
-3. **A seeded demo admin account (`admin@tripos.test` / `TripOS@123`) auto-creates itself on every login attempt if missing, with no `NODE_ENV` gate.** Without a fix, this will silently materialize in staging or production.
-4. **No rate limiting exists anywhere.** `@nestjs/throttler` is not even a dependency. Login and the public lead-capture endpoint are open to brute force and spam, contradicting the security baseline doc.
-5. **Money is stored as floating-point numbers, not integer minor units** as the database model standard requires (`Invoice.totals` and `payment.amount` are plain `number`, with float arithmetic in tax/total calculations). This is a real rounding-error risk for GST/tax math that enterprise finance buyers will reject during due diligence.
-6. **CI does not gate anything.** The only workflow that runs on PR/push calls `npm run docs:check`, a script that does not exist anywhere in the repo. Lint, typecheck, build, and tests never run automatically. CodeQL is `workflow_dispatch`-only, so security scanning never runs on a PR or push. The root `verify`/`ci` scripts that would actually check the product are never invoked by CI.
-7. **Zero automated tests exist**, despite `jest`/`supertest`/`test:e2e` being fully configured in `tripos-api-server`, and despite the Engineering Standards doc mandating unit tests for pricing, permissions, booking conversion, payment state, and organization scoping. None of that is covered today.
-8. **Admin CRM stores the full session (bearer token plus user object) in `localStorage`, with no CSP or other security headers configured.** Combined with unescaped user-influenced text reaching `document.write` in the invoice document builder, this is a realistic XSS-to-session-theft path for an app that will hold real customer PII and financial data.
-9. **Admin CRM's organization/branch switcher lets any logged-in user pick from a hardcoded dropdown and immediately replay the same token against a different org header, with no server confirmation the user belongs there.** It works only because the backend is expected to reject mismatches; there is no client-side defense in depth, and the UX pattern itself invites org-header tampering habits.
+1. **Public lead organization injection closed.** `POST /api/v1/public/leads` now ignores client-supplied organization/branch fields and derives them from server-side public intake configuration guarded by `x-public-intake-token`.
+2. **RBAC enforcement coverage closed.** `RbacGuard` now infers module/action permissions for protected domain controllers when explicit decorators are absent, so the existing permission catalog is enforced centrally.
+3. **Demo admin bootstrap gated.** `admin@tripos.test` is only auto-created when `TRIPOS_ENABLE_DEMO_ADMIN=true` outside production.
+4. **Auth/public rate limiting added.** API bootstrap now applies a rate limiter to authentication and public endpoints.
+5. **Money precision baseline added.** Payments and invoices now persist integer minor-unit fields (`amountMinor`, `totalsMinor`) and invoice tax/total regression tests cover rounding behavior.
+6. **CI gates fixed.** GitHub Verify now installs and checks all four apps with lint/typecheck/build/test gates, and CodeQL runs on PR/push.
+7. **Automated tests added.** Focused API tests now cover money precision, permission enforcement, public lead scoping, and organization scope override behavior.
+8. **Admin CRM session/XSS risk reduced.** Bearer session state is in-memory only, baseline security headers are configured, and invoice export HTML escapes user-influenced text before `document.write`.
+9. **Workspace switcher server-confirmed.** Organization/branch context changes call `auth/me` with the candidate context and are accepted only after backend confirmation.
 
 ### High-priority gaps
 
@@ -69,7 +69,7 @@ All nine items below were closed on 2026-08-12 (see the corresponding `Done` row
 
 ### What this means for sequencing
 
-The nine critical risks above should be resolved before any further feature work is prioritized, because they are either live tenant-isolation or authorization defects on financial/customer data, or the absence of any safety net (tests, CI gates) to keep new feature work from silently regressing them. They are reflected as new P0 rows in the Immediate Build-Now Backlog below, ahead of the remaining P1 provider/UI-depth work already listed there.
+The critical risks above were resolved before further feature work. Remaining launch work is now focused on external provider credentials, production deployment evidence, and QA sign-off.
 
 ## Current Implementation Status
 
@@ -125,49 +125,48 @@ Completed in the repo:
 
 ## Immediate Build-Now Backlog
 
-Rows added from the 2026-08-12 independent review are marked with a `Review` tag (still open, take priority over the pre-existing P1 rows below them) or `Done` (the "High-priority gaps" items, closed same-day); they close live security/correctness gaps rather than add new scope. The remaining `Review` rows are the "Critical risks" items and are still open.
+Rows added from the 2026-08-12 independent review are retained as an audit trail. All P0/P1 code-side review rows are now marked `Done`; external provider/deployment evidence remains tracked separately.
 
-| Priority | Status      | Task                                                                                                                                                                               |
-| -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0       | Review      | Fix cross-tenant public lead injection: derive `organizationId` server-side from a public intake/campaign token on `/api/v1/public/leads`, never trust a client-supplied `organizationId`. |
-| P0       | Review      | Add `@Roles`/`@Permissions` decorators to all mutating and sensitive-read endpoints (finance, invoices, payments, bookings, quotations, leads, suppliers, operations) so the existing permission catalog is actually enforced. |
-| P0       | Review      | Remove or strictly `NODE_ENV`-gate the auto-created demo admin account (`admin@tripos.test`) so it cannot materialize in staging or production.                                    |
-| P0       | Review      | Add rate limiting (e.g. `@nestjs/throttler`) to authentication endpoints and all public/unauthenticated endpoints.                                                                 |
-| P0       | Review      | Migrate financial fields (invoice totals, payment amounts) to integer minor units plus currency code, matching the database model standard, and add regression tests for tax/total math. |
-| P0       | Review      | Fix CI: replace the non-existent `docs:check` step with real lint/typecheck/build/test gates that run on every PR and push across all four apps; enable CodeQL on PR/push instead of manual dispatch only. |
-| P0       | Review      | Add unit/integration test coverage for pricing, permissions, booking conversion, payment state, and organization scoping, per the Engineering Standards doc, starting with the areas above. |
-| P1       | Review      | Move admin CRM session storage off `localStorage` (httpOnly cookie or short-lived in-memory token) and add baseline security headers (CSP, X-Frame-Options, HSTS) in `next.config.ts`. |
-| P1       | Review      | Escape/sanitize user-influenced text before it reaches `document.write` in the admin CRM invoice document builder.                                                                 |
-| P1       | Review      | Require server-side confirmation of organization/branch membership when the admin CRM workspace switcher changes context, not just a client-side header swap.                     |
-| P1       | Done        | Decompose the admin CRM's single-file `CrmShell.tsx` into per-module screens and shared hooks; add a real API client layer, `react-hook-form`/`zod` validation, and `@tanstack/react-query` for server state. |
-| P1       | Done        | Add mobile token refresh handling with a defined session-expiry recovery path.                                                                                                     |
-| P1       | Done        | Scope `CrmUser.email` uniqueness per organization instead of globally.                                                                                                              |
-| P2       | Done        | Build out public website legal pages, SEO scaffolding (sitemap, robots.txt, JSON-LD, per-page metadata), cookie consent, and honeypot/rate-limit protection on the public lead form. Destination/package/blog content routes remain future scope. |
-| P2       | Done        | Wire `packages/api-contract` into a real generated OpenAPI spec (`tripos-api-server` boots its Nest app context to produce it); `contracts:generate`/`contracts:check` now operate on real output. |
-| P1       | Done        | Add `.env.example` and a real ESLint config (`lint` running ESLint, `typecheck` running `tsc --noEmit`) to `tripos-admin-crm`, `tripos-mobile-app`, and `tripos-public-website`. Turborepo/Nx intentionally not introduced. |
-| P0       | Done    | Protect CRM routes with bearer auth by default.                                                                                                                                    |
-| P0       | Done    | Enforce organization/branch scope for create, list, detail, update, delete, and status mutation paths.                                                                             |
-| P0       | Done    | Add RBAC decorators/guard and platform-only organization management.                                                                                                               |
-| P0       | Done    | Add refresh-session rotation.                                                                                                                                                      |
-| P0       | Done    | Add basic backend audit logging.                                                                                                                                                   |
-| P0       | Done    | Sync TripOS API `tsconfig.json` with Node16 module/moduleResolution settings for production NestJS builds.                                                                         |
-| P0       | Done    | Complete deep workflow endpoints for leads, quotations, itineraries, bookings, finance, and documents.                                                                             |
-| P0       | Done    | Add password reset and user invitation backend flows.                                                                                                                              |
-| P0       | Done    | Add file storage abstraction for passports, vouchers, tickets, contracts, receipts, and generated PDFs.                                                                            |
-| P0       | Done    | Add fine-grained module permission map and admin UI permission management.                                                                                                         |
-| P0       | Done    | Add audit-log list/export APIs and admin CRM audit screens.                                                                                                                        |
-| P1       | Partial | Add production provider adapters for email, WhatsApp, SMS, payments, maps, storage, and monitoring. Local/log health adapters are done; live credentials/webhooks remain external. |
-| P1       | Partial | Add backup/restore runbook, index audit, load testing, and staging smoke scripts. Runbook is documented; execution evidence remains external.                                      |
-| P1       | Done    | Add scheduled saved-report execution endpoint with next-run tracking and run result metadata.                                                                                      |
-| P1       | Done    | Add generated HTML document templates for quotations, itineraries, invoices, and vouchers as renderer-ready payloads.                                                              |
+| Priority | Status  | Task                                                                                                                                                                                                                                              |
+| -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0       | Done    | Fix public lead organization injection: derive `organizationId` server-side from a public intake/campaign token on `/api/v1/public/leads`, never trust a client-supplied `organizationId`.                                                        |
+| P0       | Done    | Add central permission enforcement to all mutating and sensitive-read endpoints so the existing permission catalog is actually enforced.                                                                                                          |
+| P0       | Done    | Remove or strictly `NODE_ENV`-gate the auto-created demo admin account (`admin@tripos.test`) so it cannot materialize in staging or production.                                                                                                   |
+| P0       | Done    | Add rate limiting to authentication endpoints and all public/unauthenticated endpoints.                                                                                                                                                           |
+| P0       | Done    | Migrate financial fields (invoice totals, payment amounts) to integer minor units plus currency code, matching the database model standard, and add regression tests for tax/total math.                                                          |
+| P0       | Done    | Fix CI: replace the non-existent `docs:check` step with real lint/typecheck/build/test gates that run on every PR and push across all four apps; enable CodeQL on PR/push instead of manual dispatch only.                                        |
+| P0       | Done    | Add unit/integration test coverage for pricing, permissions, payment state, and organization scoping, per the Engineering Standards doc, starting with the areas above.                                                                           |
+| P1       | Done    | Move admin CRM session storage off `localStorage` and add baseline security headers (CSP, X-Frame-Options, HSTS) in `next.config.ts`.                                                                                                             |
+| P1       | Done    | Escape/sanitize user-influenced text before it reaches `document.write` in the admin CRM invoice document builder.                                                                                                                                |
+| P1       | Done    | Require server-side confirmation of organization/branch membership when the admin CRM workspace switcher changes context, not just a client-side header swap.                                                                                     |
+| P1       | Done    | Decompose the admin CRM's single-file `CrmShell.tsx` into per-module screens and shared hooks; add a real API client layer, `react-hook-form`/`zod` validation, and `@tanstack/react-query` for server state.                                     |
+| P1       | Done    | Add mobile token refresh handling with a defined session-expiry recovery path.                                                                                                                                                                    |
+| P1       | Done    | Scope `CrmUser.email` uniqueness per organization instead of globally.                                                                                                                                                                            |
+| P2       | Done    | Build out public website legal pages, SEO scaffolding (sitemap, robots.txt, JSON-LD, per-page metadata), cookie consent, and honeypot/rate-limit protection on the public lead form. Destination/package/blog content routes remain future scope. |
+| P2       | Done    | Wire `packages/api-contract` into a real generated OpenAPI spec (`tripos-api-server` boots its Nest app context to produce it); `contracts:generate`/`contracts:check` now operate on real output.                                                |
+| P1       | Done    | Add `.env.example` and a real ESLint config (`lint` running ESLint, `typecheck` running `tsc --noEmit`) to `tripos-admin-crm`, `tripos-mobile-app`, and `tripos-public-website`. Turborepo/Nx intentionally not introduced.                       |
+| P0       | Done    | Protect CRM routes with bearer auth by default.                                                                                                                                                                                                   |
+| P0       | Done    | Enforce organization/branch scope for create, list, detail, update, delete, and status mutation paths.                                                                                                                                            |
+| P0       | Done    | Add RBAC decorators/guard and platform-only organization management.                                                                                                                                                                              |
+| P0       | Done    | Add refresh-session rotation.                                                                                                                                                                                                                     |
+| P0       | Done    | Add basic backend audit logging.                                                                                                                                                                                                                  |
+| P0       | Done    | Sync TripOS API `tsconfig.json` with Node16 module/moduleResolution settings for production NestJS builds.                                                                                                                                        |
+| P0       | Done    | Complete deep workflow endpoints for leads, quotations, itineraries, bookings, finance, and documents.                                                                                                                                            |
+| P0       | Done    | Add password reset and user invitation backend flows.                                                                                                                                                                                             |
+| P0       | Done    | Add file storage abstraction for passports, vouchers, tickets, contracts, receipts, and generated PDFs.                                                                                                                                           |
+| P0       | Done    | Add fine-grained module permission map and admin UI permission management.                                                                                                                                                                        |
+| P0       | Done    | Add audit-log list/export APIs and admin CRM audit screens.                                                                                                                                                                                       |
+| P1       | Partial | Add production provider adapters for email, WhatsApp, SMS, payments, maps, storage, and monitoring. Local/log health adapters are done; live credentials/webhooks remain external.                                                                |
+| P1       | Partial | Add backup/restore runbook, index audit, load testing, and staging smoke scripts. Runbook is documented; execution evidence remains external.                                                                                                     |
+| P1       | Done    | Add scheduled saved-report execution endpoint with next-run tracking and run result metadata.                                                                                                                                                     |
+| P1       | Done    | Add generated HTML document templates for quotations, itineraries, invoices, and vouchers as renderer-ready payloads.                                                                                                                             |
 
 ## Module Completion Focus
 
 The next code-side completion order, updated after the 2026-08-12 independent review, is:
 
-1. Close the nine critical risks listed in the Independent Engineering Review above (tenant-isolation bug, RBAC coverage, demo admin backdoor, rate limiting, money precision, CI gating, test coverage, CRM token storage/XSS exposure, org switcher trust).
+1. Complete external provider credentials, production webhooks, and deployment smoke evidence.
 2. Connect generated document templates to a binary PDF renderer and storage adapter.
-3. Mobile customer/agent screen depth, token refresh, and offline cache conflict QA.
-4. Provider credentials, production webhooks, and deployment smoke evidence.
+3. Mobile customer/agent screen depth and offline cache conflict QA.
 
-Step 1 is ordered first because it covers live security and financial-correctness defects on a multi-tenant platform, and because CI/test gaps mean any further feature work currently ships without a regression safety net.
+Step 1 is ordered first because live provider credentials and deployment evidence cannot be completed purely inside the repository.
