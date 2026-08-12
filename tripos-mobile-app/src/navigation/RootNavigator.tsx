@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -8,12 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  ApiRecord,
-  MobileSession,
-  loadRecords,
-  logout,
-} from "../api/triposApi";
+import { MobileSession, loadRecords, logout } from "../api/triposApi";
 import { SegmentButton } from "../core/components";
 import { clearSession, saveSession } from "../core/session/sessionStorage";
 import { AppMode, AppScreenProps, TripOSData } from "../core/types";
@@ -46,17 +41,15 @@ export function RootNavigator({
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("Ready");
 
-  useEffect(() => {
-    if (!session) return;
-    void refresh();
-  }, [session, mode]);
+  const persistRefreshedSession = useCallback(
+    async (nextSession: MobileSession) => {
+      setSession(nextSession);
+      await saveSession(nextSession);
+    },
+    [],
+  );
 
-  async function persistRefreshedSession(nextSession: MobileSession) {
-    setSession(nextSession);
-    await saveSession(nextSession);
-  }
-
-  async function refresh() {
+  const refresh = useCallback(async () => {
     if (!session) return;
     setLoading(true);
     try {
@@ -89,7 +82,12 @@ export function RootNavigator({
     } finally {
       setLoading(false);
     }
-  }
+  }, [mode, persistRefreshedSession, session]);
+
+  useEffect(() => {
+    if (!session) return;
+    void refresh();
+  }, [refresh, session]);
 
   async function handleLogin(nextSession: MobileSession) {
     await saveSession(nextSession);

@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 type ProviderStatus = {
   provider: string;
   enabled: boolean;
-  mode: 'local' | 'configured' | 'missing_credentials';
+  mode: 'local' | 'sandbox' | 'configured' | 'missing_credentials';
 };
 
 @Injectable()
@@ -44,6 +44,16 @@ export class IntegrationsService {
         'integrations.monitoring.enabled',
         ['SENTRY_DSN'],
       ),
+      documentRenderer: this.provider(
+        'integrations.documentRenderer.provider',
+        'integrations.documentRenderer.enabled',
+        ['DOCUMENT_RENDERER_API_KEY'],
+      ),
+      accountingExport: this.provider(
+        'integrations.accountingExport.provider',
+        'integrations.accountingExport.enabled',
+        ['ACCOUNTING_EXPORT_API_KEY'],
+      ),
       storage: {
         provider: this.configService.get<string>('storage.driver') ?? 'local',
         enabled: true,
@@ -58,6 +68,30 @@ export class IntegrationsService {
     };
   }
 
+  smokeTests() {
+    const health = this.health();
+    return Object.fromEntries(
+      Object.entries(health).map(([name, status]) => {
+        const item = status as ProviderStatus;
+        return [
+          name,
+          {
+            ...item,
+            checkedAt: new Date().toISOString(),
+            ok:
+              item.mode === 'local' ||
+              item.mode === 'sandbox' ||
+              item.mode === 'configured',
+            message:
+              item.mode === 'missing_credentials'
+                ? `${name} credentials are not configured.`
+                : `${name} provider is ${item.mode}.`,
+          },
+        ];
+      }),
+    );
+  }
+
   private provider(
     providerKey: string,
     enabledKey: string | undefined,
@@ -67,6 +101,7 @@ export class IntegrationsService {
     const enabled = enabledKey
       ? (this.configService.get<boolean>(enabledKey) ?? false)
       : provider !== 'log';
+    const sandboxEnabled = process.env.INTEGRATION_SANDBOX_MODE === 'true';
     const hasCredentials = requiredEnv.every((key) =>
       Boolean(process.env[key]),
     );
@@ -76,9 +111,11 @@ export class IntegrationsService {
       mode:
         !enabled || provider === 'log'
           ? 'local'
-          : hasCredentials
-            ? 'configured'
-            : 'missing_credentials',
+          : sandboxEnabled
+            ? 'sandbox'
+            : hasCredentials
+              ? 'configured'
+              : 'missing_credentials',
     };
   }
 }

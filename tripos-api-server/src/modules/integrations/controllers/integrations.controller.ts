@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { IntegrationsService } from '../services/integrations.service';
 
@@ -10,5 +10,10 @@ export class IntegrationsController {
   @Get('health')
   health() {
     return this.service.health();
+  }
+
+  @Post('smoke-tests')
+  smokeTests() {
+    return this.service.smokeTests();
   }
 }

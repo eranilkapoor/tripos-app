@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../common/dto/crm-list-query.dto';
 import { scopeFilter } from '../../common/utils/crm-list.util';
+import { fromMinorUnits, toMinorUnits } from '../../common/utils/money.util';
 import { Booking } from '../bookings/schemas/booking.schema';
 import { Campaign } from '../campaigns/schemas/campaign.schema';
 import { Lead } from '../leads/schemas/leads.schema';
@@ -65,8 +66,11 @@ export class ReportingService {
     return rows.reduce(
       (summary, payment) => {
         const type = String(payment.type ?? 'unknown');
-        summary[type] = (summary[type] ?? 0) + Number(payment.amount ?? 0);
-        summary.total += Number(payment.amount ?? 0);
+        const amount = fromMinorUnits(
+          payment.amountMinor ?? toMinorUnits(payment.amount),
+        );
+        summary[type] = (summary[type] ?? 0) + amount;
+        summary.total += amount;
         return summary;
       },
       { total: 0 } as Record<string, number>,

@@ -63,5 +63,13 @@ export default () => ({
       enabled: process.env.MONITORING_ENABLED === 'true',
       provider: process.env.MONITORING_PROVIDER || 'log',
     },
+    documentRenderer: {
+      enabled: process.env.DOCUMENT_RENDERER_ENABLED === 'true',
+      provider: process.env.DOCUMENT_RENDERER_PROVIDER || 'html',
+    },
+    accountingExport: {
+      enabled: process.env.ACCOUNTING_EXPORT_ENABLED === 'true',
+      provider: process.env.ACCOUNTING_EXPORT_PROVIDER || 'log',
+    },
   },
 });

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
 import { scopeFilter } from '../../../common/utils/crm-list.util';
+import { fromMinorUnits, toMinorUnits } from '../../../common/utils/money.util';
 import { Booking } from '../../bookings/schemas/booking.schema';
 import { Payment } from '../../payments/schemas/payment.schema';
 import { CreateRefundDto } from '../dto/finance-operations.dto';
@@ -26,6 +27,7 @@ export class FinanceOperationsService {
     return this.paymentModel.create({
       ...dto,
       type: 'refund',
+      amountMinor: toMinorUnits(dto.amount),
       currencyCode: dto.currencyCode ?? 'INR',
       status: 'pending',
       metadata: {
@@ -46,7 +48,9 @@ export class FinanceOperationsService {
     ]);
     const totals = payments.reduce(
       (summary, payment) => {
-        const amount = Number(payment.amount ?? 0);
+        const amount = fromMinorUnits(
+          payment.amountMinor ?? toMinorUnits(payment.amount),
+        );
         if (payment.type === 'receivable') summary.revenue += amount;
         if (payment.type === 'payable') summary.cost += amount;
         if (payment.type === 'refund') summary.refunds += amount;
@@ -71,7 +75,8 @@ export class FinanceOperationsService {
       (summary, payment) => {
         const bucket = `${payment.type}_${payment.status}`;
         summary.totals[bucket] =
-          (summary.totals[bucket] ?? 0) + Number(payment.amount ?? 0);
+          (summary.totals[bucket] ?? 0) +
+          fromMinorUnits(payment.amountMinor ?? toMinorUnits(payment.amount));
         summary.counts[bucket] = (summary.counts[bucket] ?? 0) + 1;
         return summary;
       },
