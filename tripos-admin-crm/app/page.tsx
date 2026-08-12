@@ -1,1 +1,3 @@
-export { default } from "./components/CrmShell";
+export default function Page() {
+  return null;
+}

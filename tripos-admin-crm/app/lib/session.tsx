@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { CrmSession } from "../components/crmTypes";
-import { apiGet, apiPost } from "./apiClient";
+import { apiPost } from "./apiClient";
 
 type SessionContextValue = {
   session: CrmSession | null;
@@ -49,19 +49,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     value: string,
   ) {
     if (!session) return;
-    const candidateSession: CrmSession = {
-      ...session,
-      organization:
-        field === "organizationCode"
-          ? { ...session.organization, code: value }
-          : session.organization,
-      user: { ...session.user, [field]: value },
-    };
-    const confirmed = await apiGet<Partial<CrmSession>>("auth/me", {
-      session: candidateSession,
-      errorMessage: "Workspace access denied.",
-    });
-    setSession({ ...candidateSession, ...confirmed });
+    const nextSession = await apiPost<CrmSession>(
+      "auth/workspace",
+      field === "organizationCode"
+        ? { organizationCode: value }
+        : { branchId: value },
+      {
+        session,
+        errorMessage: "Workspace access denied.",
+      },
+    );
+    setSession(nextSession);
   }
 
   return (

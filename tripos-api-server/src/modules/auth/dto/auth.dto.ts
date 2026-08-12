@@ -9,7 +9,12 @@ import {
 export class LoginDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(6) password!: string;
-  @IsString() organizationCode!: string;
+  @IsOptional() @IsString() organizationCode?: string;
+  @IsOptional() @IsString() branchId?: string;
+}
+
+export class SwitchWorkspaceDto {
+  @IsOptional() @IsString() organizationCode?: string;
   @IsOptional() @IsString() branchId?: string;
 }
 

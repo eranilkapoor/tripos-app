@@ -18,6 +18,7 @@ import {
   LoginDto,
   RegisterCrmUserDto,
   ResetPasswordDto,
+  SwitchWorkspaceDto,
   UpdateCrmUserPermissionsDto,
 } from '../dto/auth.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
@@ -120,21 +121,40 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     await this.ensureDemoAdmin();
-    const organization = await this.organizationsService.findByCode(
-      dto.organizationCode,
-    );
-    if (!organization)
+    const email = dto.email.toLowerCase();
+    const organization = dto.organizationCode
+      ? await this.organizationsService.findByCode(dto.organizationCode)
+      : null;
+    if (dto.organizationCode && !organization)
       throw new UnauthorizedException('Invalid email or password');
-    const user = await this.userModel
-      .findOne({
-        email: dto.email.toLowerCase(),
-        organizationId: String((organization as { _id: unknown })._id),
+    const users = await this.userModel
+      .find({
+        email,
+        ...(organization
+          ? { organizationId: String((organization as { _id: unknown })._id) }
+          : {}),
         status: 'active',
+        role: { $ne: 'agent' },
       })
       .lean()
       .exec();
+    const platformUsers = users.filter(
+      (item) => item.role === 'platform_admin',
+    );
+    const candidates = platformUsers.length === 1 ? platformUsers : users;
+    if (candidates.length !== 1) {
+      throw new UnauthorizedException(
+        candidates.length
+          ? 'Multiple CRM workspaces found for this email. Contact your administrator.'
+          : 'Invalid email or password',
+      );
+    }
+    const user = candidates[0];
     if (!user || !verifyPassword(dto.password, user.passwordHash))
       throw new UnauthorizedException('Invalid email or password');
+    const selectedOrganization =
+      organization ??
+      (await this.organizationsService.findOne(String(user.organizationId)));
     const branchId = assertBranchAccess(dto.branchId ?? user.branchId, user);
     const access = await this.identityService.permissionsForUser(
       String(user.organizationId),
@@ -145,7 +165,7 @@ export class AuthService {
     await this.sessionModel.create({
       tokenHash: hashToken(token),
       userId: String((user as { _id: unknown })._id),
-      organizationId: user.organizationId,
+      organizationId: String((selectedOrganization as { _id: unknown })._id),
       branchId,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 12),
     });
@@ -153,11 +173,12 @@ export class AuthService {
       token,
       user: sanitizeUser({
         ...user,
+        organizationId: String((selectedOrganization as { _id: unknown })._id),
         branchId,
         branchIds: mergeAccessIds(user.branchIds, access.branchIds, branchId),
         permissions,
       }),
-      organization,
+      organization: selectedOrganization,
     };
   }
 
@@ -183,6 +204,7 @@ export class AuthService {
     return {
       user: sanitizeUser({
         ...user,
+        organizationId: session.organizationId,
         branchId: session.branchId,
         branchIds: mergeAccessIds(
           user.branchIds,
@@ -232,6 +254,7 @@ export class AuthService {
       token: nextToken,
       user: sanitizeUser({
         ...user,
+        organizationId: session.organizationId,
         branchId: session.branchId,
         branchIds: mergeAccessIds(
           user.branchIds,
@@ -242,6 +265,50 @@ export class AuthService {
       }),
       organization,
     };
+  }
+
+  async switchWorkspace(token: string, dto: SwitchWorkspaceDto) {
+    const session = await this.sessionModel
+      .findOne({
+        tokenHash: hashToken(token),
+        revokedAt: { $exists: false },
+        expiresAt: { $gt: new Date() },
+      })
+      .lean()
+      .exec();
+    if (!session) throw new UnauthorizedException('Session expired');
+    const user = await this.userModel.findById(session.userId).lean().exec();
+    if (!user || user.status !== 'active')
+      throw new UnauthorizedException('User not found');
+
+    let organizationId = String(session.organizationId);
+    if (dto.organizationCode) {
+      const organization = await this.organizationsService.findByCode(
+        dto.organizationCode,
+      );
+      if (!organization)
+        throw new ForbiddenException('Organization access denied');
+      const requestedOrganizationId = String(
+        (organization as { _id: unknown })._id,
+      );
+      if (
+        requestedOrganizationId !== organizationId &&
+        user.role !== 'platform_admin'
+      ) {
+        throw new ForbiddenException('Organization access denied');
+      }
+      organizationId = requestedOrganizationId;
+    }
+
+    const branchId =
+      user.role === 'platform_admin'
+        ? (dto.branchId ?? session.branchId)
+        : assertBranchAccess(dto.branchId ?? session.branchId, user);
+
+    await this.sessionModel
+      .updateOne({ tokenHash: hashToken(token) }, { organizationId, branchId })
+      .exec();
+    return this.me(token);
   }
 
   async forgotPassword(dto: ForgotPasswordDto) {

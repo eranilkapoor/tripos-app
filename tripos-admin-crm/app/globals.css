@@ -558,6 +558,18 @@ td button:hover {
   padding-left: 9px;
 }
 
+.workspace-chip {
+  align-items: center;
+  color: var(--brand);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 950;
+  gap: 7px;
+  min-height: 30px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
 .header-workspace select {
   background: transparent;
   border: 0;

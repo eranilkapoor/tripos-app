@@ -152,6 +152,23 @@ function CrmShellContent() {
   );
   const metrics = buildMetrics(records, dashboard);
   const notificationCount = buildNotificationCount(dashboard, records);
+  const isPlatformUser = session?.user.role === "platform_admin";
+  const userBranchIds = Array.isArray(session?.user.branchIds)
+    ? session.user.branchIds.map((branchId) => String(branchId))
+    : [];
+  const availableBranchOptions = (
+    userBranchIds.length
+      ? userBranchIds.map((branchId) => ({
+          value: branchId,
+          label:
+            branchOptions.find((item) => item.value === branchId)?.label ??
+            formatDisplayValue(branchId),
+        }))
+      : branchOptions
+  ).filter(
+    (item, index, items) =>
+      items.findIndex((candidate) => candidate.value === item.value) === index,
+  );
 
   if (!authReady)
     return (
@@ -224,29 +241,36 @@ function CrmShellContent() {
           </div>
           <div className="top-actions">
             <div className="header-workspace" aria-label="Workspace context">
-              <label>
-                <FontAwesomeIcon aria-hidden icon={faBuilding} />
-                <select
-                  aria-label="Organization"
-                  onChange={(event) =>
-                    void handleWorkspaceChange(
-                      "organizationCode",
-                      event.target.value,
-                    )
-                  }
-                  value={String(
-                    session.organization.code ??
-                      session.user.organizationCode ??
-                      "WEBNZA",
-                  )}
-                >
-                  {organizationOptions.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              {isPlatformUser ? (
+                <label>
+                  <FontAwesomeIcon aria-hidden icon={faBuilding} />
+                  <select
+                    aria-label="Organization"
+                    onChange={(event) =>
+                      void handleWorkspaceChange(
+                        "organizationCode",
+                        event.target.value,
+                      )
+                    }
+                    value={String(
+                      session.organization.code ??
+                        session.user.organizationCode ??
+                        "WEBNZA",
+                    )}
+                  >
+                    {organizationOptions.map((item) => (
+                      <option key={item.value} value={item.value}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                <span className="workspace-chip">
+                  <FontAwesomeIcon aria-hidden icon={faBuilding} />
+                  {String(session.organization.name ?? "Organization")}
+                </span>
+              )}
               <label>
                 <FontAwesomeIcon aria-hidden icon={faCodeBranch} />
                 <select
@@ -256,7 +280,7 @@ function CrmShellContent() {
                   }
                   value={String(session.user.branchId ?? "delhi")}
                 >
-                  {branchOptions.map((item) => (
+                  {availableBranchOptions.map((item) => (
                     <option key={item.value} value={item.value}>
                       {item.label}
                     </option>

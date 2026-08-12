@@ -24,6 +24,7 @@ import {
   LoginDto,
   RegisterCrmUserDto,
   ResetPasswordDto,
+  SwitchWorkspaceDto,
   UpdateCrmUserPermissionsDto,
 } from '../dto/auth.dto';
 import { AuthService } from '../services/auth.service';
@@ -78,6 +79,13 @@ export class AuthController {
 
   @Get('me') me(@Headers('authorization') authorization?: string) {
     return this.service.me(extractBearer(authorization));
+  }
+  @Post('workspace')
+  switchWorkspace(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() dto: SwitchWorkspaceDto,
+  ) {
+    return this.service.switchWorkspace(extractBearer(authorization), dto);
   }
   @Post('refresh') refresh(@Headers('authorization') authorization?: string) {
     return this.service.refresh(extractBearer(authorization));

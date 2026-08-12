@@ -14,8 +14,6 @@ export default function LoginScreen({
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [organizationCode, setOrganizationCode] = useState("");
-  const [branchId, setBranchId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,8 +26,6 @@ export default function LoginScreen({
         {
           email,
           password,
-          organizationCode,
-          ...(branchId ? { branchId } : {}),
         },
         { errorMessage: "Invalid login or API unavailable" },
       );
@@ -67,22 +63,6 @@ export default function LoginScreen({
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-        <label>
-          Organization Code
-          <input
-            placeholder="WEBNZA"
-            value={organizationCode}
-            onChange={(event) => setOrganizationCode(event.target.value)}
-          />
-        </label>
-        <label>
-          Branch
-          <input
-            placeholder="delhi"
-            value={branchId}
-            onChange={(event) => setBranchId(event.target.value)}
           />
         </label>
         {error ? <div className="form-error">{error}</div> : null}

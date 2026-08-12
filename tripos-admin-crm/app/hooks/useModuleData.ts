@@ -7,8 +7,19 @@ import { normalizeRecords } from "../components/crmUtils";
 import { apiGet } from "../lib/apiClient";
 import { useSession } from "../lib/session";
 
-export function moduleQueryKey(moduleId: string, search: string) {
-  return ["crm-module", moduleId, search] as const;
+export function moduleQueryKey(
+  moduleId: string,
+  search: string,
+  organizationId?: unknown,
+  branchId?: unknown,
+) {
+  return [
+    "crm-module",
+    moduleId,
+    search,
+    String(organizationId ?? ""),
+    String(branchId ?? ""),
+  ] as const;
 }
 
 type ModuleQueryData = {
@@ -24,7 +35,12 @@ export function useModuleData(
   const { session } = useSession();
 
   const query = useQuery({
-    queryKey: moduleQueryKey(module.id, search),
+    queryKey: moduleQueryKey(
+      module.id,
+      search,
+      session?.user.organizationId,
+      session?.user.branchId,
+    ),
     queryFn: async (): Promise<ModuleQueryData> => {
       if (module.id === "dashboard") {
         const dashboard = await apiGet<Record<string, unknown>>(
