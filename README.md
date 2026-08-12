@@ -17,8 +17,8 @@ TripOS should start as a modular SaaS platform, not as a generic OTA clone. The 
 tripos-app/
   tripos-admin-crm/       Internal CRM, admin, sales, finance, operations console
   tripos-api-server/      NestJS modular monolith backend
-  tripos-mobile-app/      React Native mobile app for customers
-  tripos-public-website/  Public website, packages, enquiry, SEO, booking engine
+  tripos-mobile-app/      React Native mobile app for customers and agents
+  tripos-public-website/  Public website, packages, enquiry, SEO, booking entry points
   packages/
     api-contract/    OpenAPI snapshot and generated API types
   scripts/           Repository-level automation scripts
@@ -149,4 +149,6 @@ Runs on `http://localhost:3001`.
 npm run verify
 npm --prefix tripos-admin-crm run build
 npm --prefix tripos-public-website run build
+npm --prefix tripos-mobile-app run typecheck
+npm --prefix tripos-mobile-app run test
 ```

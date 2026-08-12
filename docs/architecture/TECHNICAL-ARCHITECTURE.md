@@ -28,7 +28,7 @@ B2C Web        Admin CRM        Mobile App
 
 - `tripos-admin-crm`: internal CRM, admin, sales, operations, finance, marketing, reporting, supplier management, and restricted B2B agent workflows.
 - `tripos-public-website`: public website, destination pages, package pages, enquiry and booking entry points.
-- `tripos-mobile-app`: customer itinerary, documents, payments, support, feedback.
+- `tripos-mobile-app`: customer and agent mobile experience for itineraries, documents, payments, support, and role-specific work queues.
 
 B2B and operations should remain inside `tripos-admin-crm` for v1. Extract them only when the product has enough partner or field-user activity to justify independent portals.
 
@@ -117,8 +117,11 @@ Later, Kafka can replace or complement BullMQ when integration volume and servic
 - Hotel, flight, activity, visa, and insurance APIs
 - Accounting export integrations
 - CRM/web form importers
+- Document renderer for quotation, itinerary, invoice, and voucher output
 
 Each integration should be wrapped behind an internal provider interface to avoid vendor lock-in.
+
+The API exposes integration health and smoke-test endpoints so local, sandbox, configured, and missing-credential states are visible before launch.
 
 ## AI Architecture
 

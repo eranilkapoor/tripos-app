@@ -32,4 +32,3 @@
 - Are external calls retried safely?
 - Are background jobs idempotent?
 - Are uploaded documents private by default?
-

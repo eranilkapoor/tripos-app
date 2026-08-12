@@ -1,6 +1,6 @@
 # TripOS Database Model
 
-## Core Tables
+## Core Collections
 
 ### Identity and Organization
 
@@ -146,7 +146,7 @@ TripOS uses MongoDB as the primary database. Redis is reserved for cache, queues
 - Every organization-owned business collection includes `organizationId`.
 - Use soft delete only for organization-facing business records that users may need to restore.
 - Use append-only history tables for financial and status-critical changes.
-- Use JSONB for controlled flexible fields, not as a replacement for relational modeling.
+- Use controlled nested objects for flexible fields, not as a replacement for clear MongoDB document modeling.
 - Store money as integer minor units plus currency code.
 - Store timezone-aware timestamps.
 

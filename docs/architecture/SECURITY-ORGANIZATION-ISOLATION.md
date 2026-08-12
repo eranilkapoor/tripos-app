@@ -19,7 +19,7 @@ Current repo status:
 - Route protection, RBAC guards, and refresh token rotation are implemented.
 - Basic audit logging for authenticated mutations and sensitive reads is implemented.
 - Password reset and invitation backend flows are implemented.
-- Email delivery provider, audit-log UI/reporting, and retention policies are still pending.
+- Email, SMS, WhatsApp, payments, storage, maps, AI, document renderer, accounting export, and monitoring are provider-configurable with local/sandbox health checks. Live credentials and retention-policy sign-off remain production environment tasks.
 
 ## Authorization Model
 
@@ -33,11 +33,11 @@ Use layered authorization:
 
 ## Organization Isolation
 
-Organization isolation must be part of the data access layer, not left to UI filters. In TripOS, organization and organization are the same boundary; use Organization in product language and `organizationId` in persisted business data.
+Organization isolation must be part of the data access layer, not left to UI filters. In TripOS, Organization is the business isolation boundary; use Organization in product language and `organizationId` in persisted business data.
 
 Rules:
 
-- All business queries must scope by `organization_id`.
+- All business queries must scope by `organizationId`.
 - Middleware should resolve organization context from the authenticated session.
 - Repositories must require organization context.
 - Background jobs must carry organization context explicitly.
@@ -50,10 +50,9 @@ TripOS organization storage modes:
 - `customer_managed`: organization stores data in its own system; TripOS needs connector APIs and delayed sync.
 - `hybrid_sync`: TripOS stores operational cache and syncs back to customer-owned storage.
 
-Next implementation step:
+Current implementation status:
 
-- Add a request context resolver that validates the bearer session and exposes `organizationId`, compatibility `organizationId`, `branchId`, `role`, and `permissions`.
-- Apply this context to every module service so list/create/update operations cannot cross organizations or branches.
+- Bearer session validation, organization/branch context, RBAC guard enforcement, refresh rotation, and scoped create/list/detail/update/delete behavior are implemented for protected CRM/domain modules.
 
 ## Sensitive Data
 

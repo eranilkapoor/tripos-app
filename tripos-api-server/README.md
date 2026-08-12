@@ -2,7 +2,7 @@
 
 NestJS modular monolith backend.
 
-Initial modules:
+Implemented modules:
 
 - auth
 - organization
@@ -17,6 +17,21 @@ Initial modules:
 - communications
 - reporting
 - ai
+- integrations
+- audit logs
+- storage files
+- saved reports
+
+Useful commands:
+
+```bash
+npm install
+npm run start:dev
+npm run seed
+npm run lint
+npm run test -- --runInBand
+npm run build
+```
 
 Recommended internal module shape:
 

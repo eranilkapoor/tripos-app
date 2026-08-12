@@ -79,4 +79,3 @@ TripOS can also support:
 - Data migration fees
 - Marketing service retainers
 - Support and training packages
-

@@ -18,4 +18,3 @@ npm run contracts:check      # regenerates and fails if the checked-in output is
 ```
 
 `contracts:snapshot` requires a working local `tripos-api-server` environment (MongoDB reachable, `.env.development` configured) since it boots the full Nest application context to read route/DTO metadata.
-

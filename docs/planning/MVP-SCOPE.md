@@ -14,8 +14,8 @@ Organization -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Book
 
 - Organization onboarding - backend organization model completed
 - User login/logout - completed for CRM session foundation
-- User invitation - backend flow implemented; email delivery provider pending
-- Roles and permissions - RBAC guard/decorators implemented; admin permission UI pending
+- User invitation - backend flow implemented with provider-configurable delivery
+- Roles and permissions - RBAC guard/decorators and admin permission UI implemented
 - Lead management - completed API and CRM surface
 - Customer profiles - completed API and CRM surface
 - Tasks and follow-ups
@@ -49,14 +49,14 @@ Organization -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Book
 - Complete accounting replacement
 - Dedicated supplier portal
 - Full B2B agent wallet
-- Full native mobile production release
+- App store release builds before final mobile publishing
 - Kubernetes
 - Kafka
 - Multi-database organization isolation
 
 ## First Demo Script
 
-1. Create a organization for a travel agency.
+1. Create an organization for a travel agency.
 2. Invite sales and operations users.
 3. Create a Dubai family holiday lead.
 4. Assign lead to a sales executive.
@@ -77,13 +77,11 @@ Built:
 
 - Admin CRM login/logout with demo CRM admin.
 - Dedicated APIs for core travel CRM, operations, finance, support, and marketing modules.
-- Multi-organization organization/branch data model with storage and sync policy fields.
-- Mobile app scaffold exists and is now promoted into the MVP track for customer and B2B agent views.
+- Multi-organization and branch data model with storage and sync policy fields.
+- Mobile app has persisted secure session storage, customer/agent navigation, API-backed records, and offline fallback messaging.
 
 Remaining before production:
 
-- Enforce authenticated organization/branch scoping across all module queries.
-- Add RBAC guards and permission checks.
-- Add password reset, invitations, refresh/session rotation, and audit logging.
-- Replace mobile static data with authenticated API-backed customer/agent dashboards.
-- Add upload/download for documents, vouchers, tickets, receipts, and supplier contracts.
+- Enter live provider credentials and run integration smoke tests.
+- Deploy staging/production infrastructure with MongoDB, Redis, storage, monitoring, backups, secrets, and strict CORS.
+- Complete desktop/tablet/mobile QA, role-policy sign-off, backup/restore drill, load-test evidence, and app store release builds.

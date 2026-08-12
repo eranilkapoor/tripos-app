@@ -12,7 +12,7 @@ Recommended stack:
 - Shared UI package
 - Shared validation package
 
-Initial views:
+Implemented views:
 
 - Dashboard
 - Leads
@@ -28,3 +28,13 @@ Initial views:
 - Suppliers
 - Reports
 - Settings
+
+Useful commands:
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run typecheck
+npm run lint
+```

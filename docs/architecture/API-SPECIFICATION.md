@@ -165,17 +165,17 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 - `POST /quotations/:id/calculate` - implemented
 - `POST /quotations/:id/send` - implemented
 - `POST /quotations/:id/accept` - implemented
-- `POST /quotations/:id/pdf` - implemented as generated HTML template payload; binary renderer/storage adapter pending
+- `POST /quotations/:id/pdf` - implemented as generated HTML template payload; binary renderer provider is deployment-configurable
 - `POST /itineraries/:id/days` - implemented
 - `PATCH /itineraries/:id/days/:dayId` - implemented
 - `POST /itineraries/:id/items` - implemented
-- `POST /itineraries/:id/pdf` - implemented as generated HTML template payload; binary renderer/storage adapter pending
+- `POST /itineraries/:id/pdf` - implemented as generated HTML template payload; binary renderer provider is deployment-configurable
 - `PATCH /itineraries/:id/items/:itemId` - not required for launch; day updates and item append are API-backed
 - `POST /bookings/from-quotation/:quotationId` - implemented
 - `POST /bookings/:id/passengers` - implemented
 - `POST /bookings/:id/payments` - implemented
 - `POST /bookings/:id/vouchers` - implemented
-- `POST /vouchers/:id/pdf` - implemented as generated HTML template payload; binary renderer/storage adapter pending
+- `POST /vouchers/:id/pdf` - implemented as generated HTML template payload; binary renderer provider is deployment-configurable
 - `GET /finance/receivables` - implemented
 - `GET /finance/payables` - implemented
 - `GET /finance/bookings/:bookingId/profitability` - implemented
@@ -188,6 +188,7 @@ All main list endpoints support `page`, `limit`, `search`, and `status` where ap
 - `PATCH /storage/files/:id` - implemented
 - `DELETE /storage/files/:id` - implemented
 - `GET /integrations/health` - implemented
+- `POST /integrations/smoke-tests` - implemented
 - `GET /reporting/overview` - implemented
 - `GET /reporting/sales-funnel` - implemented
 - `GET /reporting/operations` - implemented

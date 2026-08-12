@@ -4,14 +4,12 @@ TripOS is not planned as a 90-day build. The target is to complete code-side pro
 
 ## Build-Now Order
 
-| Priority | Workstream | Target |
-| --- | --- | --- |
-| P0 | Backend workflow depth | Complete booking, quotation, itinerary, finance, supplier, document, and B2B agent subflows. |
-| P0 | Admin CRM production UX | Replace remaining dummy/detail-only states with real forms, actions, validation, and error handling. |
-| P0 | Mobile production UX | Complete role-specific customer and agent flows with real APIs, offline cache, and token refresh. |
-| P0 | Public website conversion | Complete SEO package/destination pages and production lead capture. |
-| P0 | Security | Finish invitations, password reset, permission matrix, audit UI/export, and storage policies. |
-| P0 | Infrastructure | Configure production MongoDB, Redis, S3-compatible storage, secrets, monitoring, backups, and deployment runbooks. |
+| Priority | Workstream             | Target                                                                                                                                                                      |
+| -------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P0       | Provider activation    | Enter sandbox/live credentials and run integration smoke tests for email, SMS, WhatsApp, payments, storage, maps, AI, document renderer, accounting export, and monitoring. |
+| P0       | Production environment | Configure MongoDB, Redis, S3-compatible storage, secrets, strict CORS, monitoring, backups, and deployment runbooks.                                                        |
+| P0       | QA evidence            | Execute CRM desktop/tablet QA, mobile Android/iOS QA, public website QA, role-policy QA, backup/restore drill, and load testing.                                            |
+| P0       | Release sign-off       | Confirm legal/privacy/refund/cancellation/retention pages, production domains, analytics consent, rollback owner, and incident contacts.                                    |
 
 ## Launch Gates
 

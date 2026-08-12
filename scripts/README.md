@@ -2,11 +2,11 @@
 
 Repository-level automation scripts for TripOS.
 
-Expected future scripts:
+Current script areas:
 
 - OpenAPI snapshot generation
 - Database migration validation
 - Seed data helpers
-- Release notes
+- Staging smoke checks
+- Collection-name migration helpers
 - Local environment checks
-
