@@ -221,6 +221,9 @@ async function main() {
     'audit',
     'reports',
     'settings',
+    'tasks',
+    'tags',
+    'batch-jobs',
     'identity',
   ];
   const permissionActions = [

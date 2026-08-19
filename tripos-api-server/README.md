@@ -36,6 +36,13 @@ npm run test -- --runInBand
 npm run build
 ```
 
+Local CRM test login after seeding:
+
+- Email: `admin@tripos.test`
+- Password: `TripOS@123`
+- Organization code: `WEBNZA`
+- Default branch: `delhi`
+
 Recommended internal module shape:
 
 ```text
