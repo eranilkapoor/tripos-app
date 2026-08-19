@@ -17,6 +17,7 @@
 - [MVP Scope](planning/MVP-SCOPE.md)
 - [Launch Execution Plan](planning/LAUNCH-EXECUTION-PLAN.md)
 - [Roadmap](planning/ROADMAP.md)
+- [Sandbox integrations](operations/SANDBOX-INTEGRATIONS.md)
 
 ## Launch
 

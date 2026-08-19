@@ -6,7 +6,7 @@ Last reviewed: 2026-08-19
 
 TripOS is code-side product ready for the planned launch modules, but it should not yet be marked production-live until external launch evidence is attached.
 
-The current blockers are external deployment and release gates: production environment activation, live provider credentials/webhooks, QA evidence, backup/restore execution, monitoring evidence, and legal/security sign-off.
+The current blockers are external deployment and release gates: production environment activation, live provider credentials/webhooks, QA evidence, backup/restore execution, monitoring evidence, and legal/security sign-off. Sandbox/local credentials are present for development and smoke-test readiness; real vendor secrets must come from the deployment secret store.
 
 ## Verified Locally
 

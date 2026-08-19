@@ -23,6 +23,15 @@ export class IntegrationsService {
         'integrations.sms.enabled',
         ['NOTIFICATION_SMS_MSG91_AUTH_KEY'],
       ),
+      push: this.provider(
+        'NOTIFICATION_PUSH_PROVIDER',
+        'NOTIFICATION_PUSH_ENABLED',
+        [
+          'NOTIFICATION_PUSH_FCM_PROJECT_ID',
+          'NOTIFICATION_PUSH_FCM_CLIENT_EMAIL',
+          'NOTIFICATION_PUSH_FCM_PRIVATE_KEY',
+        ],
+      ),
       whatsapp: this.provider(
         'integrations.whatsapp.provider',
         'integrations.whatsapp.enabled',
@@ -54,6 +63,16 @@ export class IntegrationsService {
         'integrations.accountingExport.enabled',
         ['ACCOUNTING_EXPORT_API_KEY'],
       ),
+      googlePlay: this.provider('GOOGLE_PLAY_PROVIDER', undefined, [
+        'GOOGLE_PLAY_SERVICE_ACCOUNT_JSON',
+        'GOOGLE_PLAY_RTDN_AUDIENCE',
+      ]),
+      appStore: this.provider('APPLE_STORE_PROVIDER', undefined, [
+        'APPLE_STORE_ISSUER_ID',
+        'APPLE_STORE_KEY_ID',
+        'APPLE_STORE_BUNDLE_ID',
+        'APPLE_STORE_PRIVATE_KEY',
+      ]),
       storage: {
         provider: this.configService.get<string>('storage.driver') ?? 'local',
         enabled: true,
