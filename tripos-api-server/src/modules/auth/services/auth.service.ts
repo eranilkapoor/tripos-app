@@ -415,6 +415,7 @@ export class AuthService {
       'settings',
       'tasks',
       'tags',
+      'batch-jobs',
     ];
     const actions = ['read', 'create', 'update', 'delete', 'approve', 'export'];
     return {

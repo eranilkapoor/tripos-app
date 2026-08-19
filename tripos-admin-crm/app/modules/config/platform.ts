@@ -75,6 +75,23 @@ const platformModules: CrmModule[] = [
       { key: "value", label: "Value", type: "textarea" },
     ],
   },
+  {
+    id: "batch-jobs",
+    title: "Batch Jobs",
+    group: "System",
+    endpoint: "batch-jobs",
+    description:
+      "Scheduled platform jobs for notification retention, operations SLA checks, and manual sandbox runs.",
+    columns: ["Job", "Interval", "Last Status", "Last Run", "Result"],
+    rowMap: [
+      "name",
+      "intervalMinutes",
+      "lastStatus",
+      "lastRunAt",
+      "lastResult",
+    ],
+    fields: [],
+  },
 ];
 
 export default platformModules;

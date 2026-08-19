@@ -91,6 +91,7 @@ Completed in the repo:
 | 26  | Settings                           | Product Ready | Product Ready    | N/A                  | Final organization defaults sign-off during QA                         |
 | 27  | Tags                               | Product Ready | Product Ready    | N/A                  | Taxonomy naming sign-off during onboarding QA                          |
 | 28  | Tasks and Follow-ups               | Product Ready | Product Ready    | N/A                  | SLA and ownership policy sign-off during QA                            |
+| 29  | Batch Jobs                         | Product Ready | Product Ready    | N/A                  | Production scheduler cadence and alert thresholds are environment QA   |
 
 ## Immediate Build-Now Backlog
 

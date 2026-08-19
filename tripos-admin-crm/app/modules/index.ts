@@ -44,6 +44,7 @@ const ORIGINAL_ORDER = [
   "permission-catalog",
   "storage-files",
   "integrations",
+  "batch-jobs",
   "settings",
 ];
 

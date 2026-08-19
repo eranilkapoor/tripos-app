@@ -8,6 +8,7 @@ import {
   OperationTask,
   OperationTaskSchema,
 } from '../operations/schemas/operation-task.schema';
+import { BatchJobsController } from './controllers/batch-jobs.controller';
 import { BatchJobsService } from './services/batch-jobs.service';
 
 @Module({
@@ -17,6 +18,7 @@ import { BatchJobsService } from './services/batch-jobs.service';
       { name: OperationTask.name, schema: OperationTaskSchema },
     ]),
   ],
+  controllers: [BatchJobsController],
   providers: [BatchJobsService],
 })
 export class BatchJobsModule {}

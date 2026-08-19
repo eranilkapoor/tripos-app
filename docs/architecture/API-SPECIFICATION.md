@@ -30,6 +30,7 @@
 /api/v1/settings
 /api/v1/tags
 /api/v1/tasks
+/api/v1/batch-jobs
 ```
 
 ## MVP Endpoints
@@ -175,6 +176,12 @@
 - `PATCH /tasks/:id`
 - `PATCH /tasks/:id/status`
 - `DELETE /tasks/:id`
+
+### Batch Jobs
+
+- `GET /batch-jobs`
+- `POST /batch-jobs/run`
+- `POST /batch-jobs/:name/run`
 
 All main list endpoints support `page`, `limit`, `search`, and `status` where applicable. Organization-scoped domain modules expose enterprise CRUD with `POST /module`, `GET /module`, `GET /module/:id`, `PATCH /module/:id`, `PATCH /module/:id/status` where status applies, and `DELETE /module/:id`.
 

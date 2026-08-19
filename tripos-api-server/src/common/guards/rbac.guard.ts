@@ -72,6 +72,10 @@ const PROTECTED_MODULES = new Set([
   'saved-reports',
   'reporting',
   'ai',
+  'batch-jobs',
+  'settings',
+  'tasks',
+  'tags',
 ]);
 
 function inferPermissions(context: ExecutionContext) {
