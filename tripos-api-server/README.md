@@ -36,6 +36,10 @@ npm run test -- --runInBand
 npm run build
 ```
 
+Private local overrides are loaded from `.env.local` before `.env.development`.
+Use `.env.local` for your real MongoDB/Redis/provider credentials because it is
+ignored by Git.
+
 Local CRM test login after seeding:
 
 - Email: `admin@tripos.test`

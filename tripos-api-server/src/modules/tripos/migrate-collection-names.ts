@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { COLLECTION_NAMES } from '../../common/constants/collection-names.constants';
 
+dotenv.config({ path: '.env.local' });
 dotenv.config({ path: '.env.development' });
 dotenv.config();
 

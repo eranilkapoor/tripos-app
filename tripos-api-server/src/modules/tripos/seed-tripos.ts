@@ -36,6 +36,7 @@ import {
   UserRoleSchema,
 } from '../identity/schemas/identity.schema';
 
+config({ path: '.env.local' });
 config({ path: '.env.development' });
 config();
 

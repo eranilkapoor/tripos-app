@@ -38,7 +38,7 @@ import { AppStateModule } from './app-state.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.development', '.env'],
+      envFilePath: ['.env.local', '.env.development', '.env'],
       isGlobal: true,
       load: configuration,
     }),
