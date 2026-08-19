@@ -23,6 +23,8 @@ const ORIGINAL_ORDER = [
   "vouchers",
   "support-tickets",
   "notifications",
+  "tasks",
+  "tags",
   "campaigns",
   "invoices",
   "finance-reports",
@@ -42,6 +44,7 @@ const ORIGINAL_ORDER = [
   "permission-catalog",
   "storage-files",
   "integrations",
+  "settings",
 ];
 
 const byId = new Map<string, CrmModule>(

@@ -2,6 +2,39 @@ import type { CrmModule } from "../../components/crmTypes";
 
 const operationsModules: CrmModule[] = [
   {
+    id: "tasks",
+    title: "Tasks",
+    group: "Operations",
+    endpoint: "tasks",
+    description:
+      "Cross-module tasks and follow-ups for sales, bookings, suppliers, support, finance, and operations teams.",
+    columns: ["Task", "Module", "Entity", "Owner", "Due", "Priority", "Status"],
+    rowMap: [
+      "title",
+      "module",
+      "entityId",
+      "assignedTo",
+      "dueAt",
+      "priority",
+      "status",
+    ],
+    statusOptions: ["open", "in_progress", "waiting", "completed", "cancelled"],
+    fields: [
+      { key: "title", label: "Task", required: true },
+      { key: "description", label: "Description", type: "textarea" },
+      { key: "module", label: "Module" },
+      { key: "entityId", label: "Record ID" },
+      { key: "assignedTo", label: "Owner" },
+      {
+        key: "priority",
+        label: "Priority",
+        type: "select",
+        options: ["low", "medium", "high", "urgent"],
+      },
+      { key: "dueAt", label: "Due Date", type: "date" },
+    ],
+  },
+  {
     id: "operations",
     title: "Operations",
     group: "Operations",
@@ -96,6 +129,23 @@ const operationsModules: CrmModule[] = [
       { key: "market", label: "Market" },
       { key: "creditLimit", label: "Credit Limit", type: "number" },
       { key: "commissionRate", label: "Commission %", type: "number" },
+    ],
+  },
+  {
+    id: "tags",
+    title: "Tags",
+    group: "Inventory",
+    endpoint: "tags",
+    description:
+      "Reusable organization taxonomy for labeling leads, customers, bookings, suppliers, support, and campaigns.",
+    columns: ["Tag", "Module", "Color", "Description", "Status"],
+    rowMap: ["name", "module", "color", "description", "status"],
+    statusOptions: ["active", "inactive"],
+    fields: [
+      { key: "name", label: "Tag", required: true },
+      { key: "module", label: "Module" },
+      { key: "color", label: "Color" },
+      { key: "description", label: "Description", type: "textarea" },
     ],
   },
 ];

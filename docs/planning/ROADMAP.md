@@ -42,10 +42,10 @@ The 2026-08-12 engineering review is closed in code. The resolved items are:
 Completed in the repo:
 
 - Monorepo structure uses product-specific app boundaries for API, CRM, mobile, public website, packages, scripts, and documentation.
-- MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, organizations, auth, finance invoices, and audit logs.
+- MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, organizations, settings, tags, tasks, auth, finance invoices, and audit logs.
 - Admin CRM connected to dedicated production APIs with bearer session handling.
 - CRM list pagination, status filtering, server-side search, organization/branch-scoped create/detail/update/delete, and status mutation scoping.
-- Organization, branch, department, team, CRM user, role, permission, user-role, and role-permission CRUD; login, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only organization management.
+- Organization, branch, department, team, CRM user, role, permission, user-role, and role-permission CRUD; email/password CRM login, post-login workspace switching, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only organization management.
 - Basic audit logging for authenticated mutations and sensitive finance/payment/document/organization reads, with scoped list and CSV export APIs.
 - Local/log provider configuration for email, SMS, WhatsApp, payments, maps, AI, monitoring, and local/S3-style file storage.
 - File upload-intent registry for passports, vouchers, tickets, contracts, receipts, and generated document references.
@@ -53,7 +53,7 @@ Completed in the repo:
 - Booking conversion from quotation, passenger capture, payment schedule, and voucher subflows.
 - Finance receivables, payables, refunds, booking profitability, and reconciliation endpoints.
 - Organization-current aliases, reporting overview/funnel/operations/finance APIs, and local/provider-ready AI travel assistant endpoints.
-- Admin CRM navigation and live API screens for users/permissions, audit logs, storage files, integrations, and reporting.
+- Admin CRM navigation and live API screens for users/permissions, settings, tags, tasks, audit logs, storage files, integrations, and reporting.
 - Supplier contracts/rates/confirmations, B2B KYC/credit/commission/wallet/invoice actions, operations SLA/escalations/timeline, and saved report templates are API-backed.
 - Mobile app shell with persisted secure session storage and separate customer/agent navigation foundations.
 - Public website lead capture wired to backend public lead endpoint.
@@ -88,6 +88,9 @@ Completed in the repo:
 | 23  | Integrations                       | Product Ready | Product Ready    | N/A                  | Sandbox smoke endpoint added; live credentials remain external         |
 | 24  | Reporting and Analytics            | Product Ready | Product Ready    | N/A                  | Dashboard QA and production delivery provider for scheduled exports    |
 | 25  | AI Travel Assistant                | Product Ready | Product Ready    | N/A                  | Local assist and provider-ready mode implemented                       |
+| 26  | Settings                           | Product Ready | Product Ready    | N/A                  | Final organization defaults sign-off during QA                         |
+| 27  | Tags                               | Product Ready | Product Ready    | N/A                  | Taxonomy naming sign-off during onboarding QA                          |
+| 28  | Tasks and Follow-ups               | Product Ready | Product Ready    | N/A                  | SLA and ownership policy sign-off during QA                            |
 
 ## Immediate Build-Now Backlog
 

@@ -13,6 +13,9 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 - User invitations
 - Password reset
 - Audit logs
+- Settings
+- Tags
+- Cross-module tasks and follow-ups
 - Optional mobile OTP/SSO when providers are selected
 
 ### Organization Management
@@ -23,6 +26,7 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 - Departments
 - Teams
 - Organization settings
+- Branch-level settings
 - White-label branding
 - Subscription plan metadata
 - Storage mode: TripOS cloud, customer-managed, or hybrid sync
@@ -94,6 +98,7 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 ### Operations
 
 - Daily operations dashboard
+- Cross-module tasks and follow-ups
 - Hotel confirmations
 - Transfer assignments
 - Driver assignments

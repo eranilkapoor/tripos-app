@@ -17,8 +17,11 @@ TripOS uses `Organization` as the business isolation boundary. Every organizatio
 - role_permissions
 - invitations
 - audit_logs
+- settings
+- tags
+- tasks
 
-TripOS uses MongoDB as the primary database. Redis is reserved for cache, queues, locks, rate limits, and short-lived session acceleration; PostgreSQL is not part of the current TripOS stack.
+TripOS uses MongoDB as the primary database. Redis is reserved for cache, queues, locks, rate limits, and short-lived session acceleration.
 
 ### CRM
 

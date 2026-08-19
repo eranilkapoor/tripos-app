@@ -21,6 +21,9 @@ Implemented modules:
 - audit logs
 - storage files
 - saved reports
+- settings
+- tags
+- tasks
 
 Useful commands:
 

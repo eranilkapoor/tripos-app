@@ -28,6 +28,8 @@ Implemented views:
 - Suppliers
 - Reports
 - Settings
+- Tags
+- Tasks
 
 Useful commands:
 

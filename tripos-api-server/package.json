@@ -68,7 +68,16 @@
     ],
     "rootDir": "src",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "diagnostics": {
+            "ignoreCodes": [
+              151002
+            ]
+          }
+        }
+      ]
     },
     "testRegex": ".*\\.spec\\.ts$",
     "testEnvironment": "node",

@@ -31,4 +31,7 @@ export const COLLECTION_NAMES = {
   AUDIT_LOG: 'audit_logs',
   STORED_FILE: 'stored_files',
   SAVED_REPORT: 'saved_reports',
+  SETTING: 'settings',
+  TAG: 'tags',
+  TASK: 'tasks',
 } as const;

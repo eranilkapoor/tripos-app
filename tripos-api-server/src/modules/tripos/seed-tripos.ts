@@ -23,6 +23,9 @@ import { CampaignSchema } from '../campaigns/schemas/campaign.schema';
 import { StoredFileSchema } from '../storage/schemas/stored-file.schema';
 import { SavedReportSchema } from '../reporting/schemas/saved-report.schema';
 import { AuditLogSchema } from '../audit/schemas/audit-log.schema';
+import { SettingSchema } from '../settings/schemas/setting.schema';
+import { TagSchema } from '../tags/schemas/tag.schema';
+import { TaskSchema } from '../tasks/schemas/task.schema';
 import {
   BranchSchema,
   DepartmentSchema,
@@ -63,6 +66,9 @@ async function main() {
   const StoredFile = model('StoredFile', StoredFileSchema);
   const SavedReport = model('SavedReport', SavedReportSchema);
   const AuditLog = model('AuditLog', AuditLogSchema);
+  const Setting = model('Setting', SettingSchema);
+  const Tag = model('Tag', TagSchema);
+  const Task = model('Task', TaskSchema);
   const Branch = model('Branch', BranchSchema);
   const Department = model('Department', DepartmentSchema);
   const Team = model('Team', TeamSchema);
@@ -739,6 +745,93 @@ async function main() {
       bookings: 7,
       revenue: 906500,
       status: 'active',
+    },
+  ]);
+
+  await upsertMany(Setting, 'key', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      key: 'default_currency',
+      label: 'Default Currency',
+      category: 'finance',
+      value: { currencyCode: 'INR' },
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      key: 'quotation_validity_days',
+      label: 'Quotation Validity Days',
+      category: 'sales',
+      value: { days: 7 },
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      key: 'operations_sla_hours',
+      label: 'Operations SLA Hours',
+      category: 'operations',
+      value: { high: 4, medium: 12, low: 24 },
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Tag, 'name', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Luxury Family',
+      module: 'leads',
+      color: '#0f766e',
+      description: 'Premium family holiday enquiries.',
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Urgent Departure',
+      module: 'bookings',
+      color: '#dc2626',
+      description: 'Trips requiring same-day operations attention.',
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Preferred Supplier',
+      module: 'suppliers',
+      color: '#7c3aed',
+      description: 'Vendors approved for priority quoting.',
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Task, 'title', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      title: 'Follow up Dubai family quotation',
+      description: 'Confirm decision timeline and collect passport names.',
+      module: 'quotations',
+      entityId: 'QTN-SHARMA-DXB',
+      assignedTo: 'sales@webnza.test',
+      priority: 'high',
+      dueAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      status: 'open',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      title: 'Verify supplier confirmation',
+      description: 'Check transfer confirmation and driver reporting time.',
+      module: 'operations',
+      entityId: 'BKG-SHARMA-DXB',
+      assignedTo: 'ops@webnza.test',
+      priority: 'urgent',
+      dueAt: new Date(Date.now() + 6 * 60 * 60 * 1000),
+      status: 'in_progress',
     },
   ]);
 

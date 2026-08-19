@@ -27,15 +27,19 @@
 /api/v1/marketing
 /api/v1/communications
 /api/v1/ai
+/api/v1/settings
+/api/v1/tags
+/api/v1/tasks
 ```
 
 ## MVP Endpoints
 
 ### Auth
 
-- `POST /auth/login` - implemented
+- `POST /auth/login` - implemented; CRM uses email/password and resolves the allowed organization workspace server-side
 - `POST /auth/logout` - implemented
 - `GET /auth/me` - implemented
+- `POST /auth/workspace` - implemented for post-login organization/branch switching
 - `POST /auth/register-crm-user` - implemented for CRM bootstrap/admin use
 - `POST /auth/refresh` - implemented
 - `POST /auth/password/forgot` - implemented
@@ -153,6 +157,24 @@
 - `GET /finance/invoices`
 - `GET /finance/invoices/next-number/:series`
 - `POST /finance/invoices/:id/pdf`
+- `POST /settings`
+- `GET /settings`
+- `GET /settings/:id`
+- `PATCH /settings/:id`
+- `PATCH /settings/:id/status`
+- `DELETE /settings/:id`
+- `POST /tags`
+- `GET /tags`
+- `GET /tags/:id`
+- `PATCH /tags/:id`
+- `PATCH /tags/:id/status`
+- `DELETE /tags/:id`
+- `POST /tasks`
+- `GET /tasks`
+- `GET /tasks/:id`
+- `PATCH /tasks/:id`
+- `PATCH /tasks/:id/status`
+- `DELETE /tasks/:id`
 
 All main list endpoints support `page`, `limit`, `search`, and `status` where applicable. Organization-scoped domain modules expose enterprise CRUD with `POST /module`, `GET /module`, `GET /module/:id`, `PATCH /module/:id`, `PATCH /module/:id/status` where status applies, and `DELETE /module/:id`.
 

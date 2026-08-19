@@ -58,6 +58,23 @@ const platformModules: CrmModule[] = [
     rowMap: ["provider", "enabled", "mode"],
     fields: [],
   },
+  {
+    id: "settings",
+    title: "Settings",
+    group: "System",
+    endpoint: "settings",
+    description:
+      "Organization and branch runtime settings for branding, defaults, workflow controls, and integrations.",
+    columns: ["Key", "Label", "Category", "Status"],
+    rowMap: ["key", "label", "category", "status"],
+    statusOptions: ["active", "inactive"],
+    fields: [
+      { key: "key", label: "Key", required: true },
+      { key: "label", label: "Label", required: true },
+      { key: "category", label: "Category" },
+      { key: "value", label: "Value", type: "textarea" },
+    ],
+  },
 ];
 
 export default platformModules;

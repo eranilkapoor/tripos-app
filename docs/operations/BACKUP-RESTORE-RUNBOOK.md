@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-08-12
 
-TripOS uses MongoDB as the system of record and Redis for cache, queues, locks, and short-lived runtime state. PostgreSQL is not part of the current TripOS stack.
+TripOS uses MongoDB as the system of record and Redis for cache, queues, locks, and short-lived runtime state.
 
 ## Local Development
 

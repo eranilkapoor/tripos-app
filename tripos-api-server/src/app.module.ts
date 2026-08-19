@@ -29,6 +29,9 @@ import { StorageModule } from './modules/storage/storage.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
 import { AiAssistantModule } from './modules/ai/ai-assistant.module';
+import { SettingsModule } from './modules/settings/settings.module';
+import { TagsModule } from './modules/tags/tags.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 import { OrganizationContextMiddleware } from './common/middleware/organization-context.middleware';
 import { AppStateModule } from './app-state.module';
 
@@ -79,6 +82,9 @@ import { AppStateModule } from './app-state.module';
     IntegrationsModule,
     ReportingModule,
     AiAssistantModule,
+    SettingsModule,
+    TagsModule,
+    TasksModule,
     TriposModule,
   ],
 })

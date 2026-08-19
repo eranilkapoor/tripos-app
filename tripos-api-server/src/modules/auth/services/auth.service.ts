@@ -413,6 +413,8 @@ export class AuthService {
       'audit',
       'reports',
       'settings',
+      'tasks',
+      'tags',
     ];
     const actions = ['read', 'create', 'update', 'delete', 'approve', 'export'];
     return {
