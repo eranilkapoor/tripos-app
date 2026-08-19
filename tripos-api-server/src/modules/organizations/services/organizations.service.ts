@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateOrganizationDto } from '../dto/organization.dto';
 import { Organization } from '../schemas/organization.schema';
 
@@ -24,7 +24,7 @@ export class OrganizationsService {
   }
 
   async findOne(id: string) {
-    const organization = await this.model.findById(id).lean().exec();
+    const organization = await this.findByIdOrCode(id);
     if (!organization) throw new NotFoundException('Organization not found');
     return organization;
   }
@@ -74,6 +74,14 @@ export class OrganizationsService {
         customerManagedStorage: false,
       },
     });
+  }
+
+  private findByIdOrCode(idOrCode: string) {
+    if (Types.ObjectId.isValid(idOrCode)) {
+      return this.model.findById(idOrCode).lean().exec();
+    }
+    const code = idOrCode === 'demo-org' ? 'WEBNZA' : idOrCode;
+    return this.model.findOne({ code: code.toUpperCase() }).lean().exec();
   }
 }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { AppService } from '../../app.service';
 import { CrmListQueryDto } from '../../common/dto/crm-list-query.dto';
 import { AuditLog } from '../audit/schemas/audit-log.schema';
@@ -79,7 +79,7 @@ export class TriposService {
       invoiced,
       recentAuditLogs,
     ] = await Promise.all([
-      this.organizationModel.findById(scope.organizationId).lean().exec(),
+      this.findOrganization(scope.organizationId),
       this.leadModel.countDocuments(scope).exec(),
       this.leadModel.countDocuments({ ...scope, stage: 'new' }).exec(),
       this.leadModel.countDocuments({ ...scope, temperature: 'hot' }).exec(),
@@ -213,6 +213,17 @@ export class TriposService {
       organizationId: query.organizationId ?? 'demo-org',
       ...(query.branchId ? { branchId: query.branchId } : {}),
     };
+  }
+
+  private findOrganization(organizationId: string) {
+    if (Types.ObjectId.isValid(organizationId)) {
+      return this.organizationModel.findById(organizationId).lean().exec();
+    }
+    const code = organizationId === 'demo-org' ? 'WEBNZA' : organizationId;
+    return this.organizationModel
+      .findOne({ code: code.toUpperCase() })
+      .lean()
+      .exec();
   }
 
   private async sumPayments(
