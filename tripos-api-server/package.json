@@ -10,7 +10,7 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "npm run clean && cross-env NODE_ENV=development nest start --watch",
+    "start:dev": "npm run clean && nest start --watch",
     "start:prod": "node dist/main.js",
     "lint:check": "eslint \"{src,test}/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
