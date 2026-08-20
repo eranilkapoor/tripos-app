@@ -16,12 +16,14 @@ The core promise:
 - B2B travel wholesalers
 - Corporate travel desks
 - White-label travel brands
+- TripOS SaaS owner/operator managing subscription plans and organization onboarding
 
 ## Primary Personas
 
 - Platform Super Admin: manages TripOS SaaS organizations, plans, billing, and system settings.
 - Organization Owner: owns a travel business organization.
 - Admin: configures branches, users, permissions, destinations, suppliers, and workflows.
+- CRM User: maintains profile, password, workspace, notifications, and role-specific settings.
 - Sales Manager: manages pipeline, performance, and quotation quality.
 - Sales Executive: handles leads, follow-ups, quotations, and customer communication.
 - Operations Manager: coordinates suppliers, drivers, guides, hotels, vouchers, and trip execution.
@@ -31,6 +33,8 @@ The core promise:
 - Supplier User: confirms services, uploads invoices, manages rates and availability.
 - Customer: views itinerary, quotations, payments, vouchers, and support.
 - Driver or Guide: views assigned operations and marks service progress.
+
+For launch, Platform Super Admin and organization users access `tripos-admin-crm`. Customers and agents are supported by the mobile app foundations and API-backed customer/agent views. Supplier, driver, and guide-specific portals are future extraction candidates unless a launch customer requires them.
 
 ## Product Principles
 
@@ -84,6 +88,17 @@ Agent Registered
 -> Voucher Downloaded
 ```
 
+### SaaS Subscription Flow
+
+```text
+Platform Plan Created
+-> Travel Organization Onboarded
+-> Subscription Selected
+-> Trial or Active Subscription Started
+-> Seats and Billing Profile Maintained
+-> Renewal, Upgrade, Downgrade, or Cancellation Managed
+```
+
 ## Success Metrics
 
 - Quotation creation time reduced by 60 percent.
@@ -92,3 +107,4 @@ Agent Registered
 - Operations team can see today's hotels, transfers, activities, and exceptions.
 - Marketing team can connect campaign spend to bookings and revenue.
 - B2B agents can self-serve enquiry, booking, commission, payment, and voucher status.
+- Platform owner can manage plans, organization subscriptions, billing profile, and subscription status from the CRM.

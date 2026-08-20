@@ -6,8 +6,8 @@ Initial local stack:
 
 - Node.js LTS
 - MongoDB
-- Redis
-- S3-compatible local storage such as MinIO
+- Optional Redis/queue service if enabled
+- Local file storage or S3-compatible local storage such as MinIO
 - API app
 - Admin web app
 
@@ -24,7 +24,7 @@ Recommended first production architecture:
 
 - AWS ECS/Fargate for API and workers
 - MongoDB Atlas or self-managed MongoDB on private infrastructure
-- AWS ElastiCache Redis
+- AWS ElastiCache Redis only if queues/cache/distributed rate limits are enabled
 - AWS S3 for files
 - AWS CloudFront for public assets
 - AWS Secrets Manager
@@ -34,7 +34,7 @@ Recommended first production architecture:
 ## Deployment Rules
 
 - MongoDB index/schema compatibility checks run before application deployment.
-- Background workers deploy with API version compatibility.
+- Background workers deploy with API version compatibility if queue workers are enabled.
 - Rollbacks must include migration strategy.
 - Feature flags protect incomplete modules.
 - Staging must use production-like organization data structure.

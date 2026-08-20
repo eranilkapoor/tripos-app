@@ -8,7 +8,7 @@
 - 1 UI/UX designer
 - 1 QA engineer
 
-DevOps can remain founder-led during MVP if the deployment target stays simple.
+DevOps can remain founder-led during launch if the deployment target stays simple.
 
 ## Scale Team
 
@@ -24,7 +24,7 @@ DevOps can remain founder-led during MVP if the deployment target stays simple.
 
 ## SaaS Packaging
 
-### Starter
+### Starter CRM
 
 For small travel agencies.
 
@@ -34,24 +34,26 @@ For small travel agencies.
 - Quotation builder
 - Itinerary PDF
 - Basic reports
+- 3-5 included CRM seats
 
-Indicative pricing: INR 2,000 to INR 5,000 per month.
+Seeded product reference: `starter`, monthly, INR 9,999, 14-day trial.
 
-### Professional
+### Growth Suite
 
 For growing agencies and tour operators.
 
 - CRM
-- B2B portal
+- B2B agent operations inside CRM/mobile
 - Supplier management
 - Operations
 - Finance
 - WhatsApp integration
 - Reports
+- 15 included CRM seats
 
-Indicative pricing: INR 10,000 to INR 30,000 per month.
+Seeded product reference: `growth`, monthly, INR 24,999 plus setup fee, 14-day trial.
 
-### Enterprise / DMC
+### Enterprise OS
 
 For large DMCs and travel networks.
 
@@ -64,8 +66,11 @@ For large DMCs and travel networks.
 - Advanced reporting
 - AI features
 - Custom integrations
+- 50 included CRM seats
 
-Indicative pricing: INR 50,000 to INR 2,00,000 plus per month.
+Seeded product reference: `enterprise`, yearly, INR 4,99,990 plus setup fee.
+
+Final commercial prices can be changed in the CRM Pricing Plans module without code changes.
 
 ## Service Revenue
 

@@ -16,6 +16,8 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 - Settings
 - Tags
 - Cross-module tasks and follow-ups
+- My Profile and change password
+- Notification preferences
 - Optional mobile OTP/SSO when providers are selected
 
 ### Organization Management
@@ -29,6 +31,10 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 - Branch-level settings
 - White-label branding
 - Subscription plan metadata
+- Pricing plans
+- Organization subscriptions
+- Billing profile
+- Trial, renewal, cancellation, and provider references
 - Storage mode: TripOS cloud, customer-managed, or hybrid sync
 
 ## CRM and Sales
@@ -122,6 +128,7 @@ Operations lives inside `tripos-admin-crm` as role-based views for launch.
 
 ### Communication
 
+- Notifications module
 - WhatsApp templates
 - Email templates
 - SMS templates
@@ -149,8 +156,9 @@ B2B lives inside `tripos-admin-crm` as restricted role-based views for launch. A
 
 ### B2C Website and CMS
 
-- Destination pages
-- Package pages
+- Public website lead capture
+- SEO and legal pages
+- Destination and package content surface
 - Custom trip forms
 - Blog
 - Offers
@@ -176,3 +184,11 @@ B2B lives inside `tripos-admin-crm` as restricted role-based views for launch. A
 - AI support assistant
 - AI content generator
 - LLM gateway and prompt logs
+
+## Current Launch Notes
+
+- Admin CRM modules are API-backed with list/search/sort/pagination, create, edit, import/export, detail, and status mutation patterns.
+- SaaS pricing and subscription modules are implemented for TripOS platform ownership.
+- Mobile customer/agent app has persisted secure sessions, refresh handling, and API-backed records for trips, documents, payments, support, and agent work queues.
+- Public website has lead capture, SEO/legal foundations, cookie consent, and production build coverage.
+- Live provider credentials, production domains, device/store release builds, and final QA evidence remain external launch tasks.

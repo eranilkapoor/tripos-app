@@ -33,6 +33,8 @@ The seed creates:
 - Organization code: `WEBNZA`
 - Branches: `Delhi HQ`, `Dubai Desk`, `Jaipur Sales`
 - CRM admin user: `admin@tripos.test`
+- Seeded SaaS plans: `starter`, `growth`, `enterprise`
+- Demo organization subscription: `growth`
 - Travel demo records across leads, customers, quotations, itineraries, bookings, suppliers, operations, agents, payments, invoices, documents, vouchers, campaigns, tasks, tags, reports, notifications, and audit logs
 
 ## API Login Payload

@@ -1,6 +1,6 @@
 # TripOS Task Roadmap
 
-Last reviewed: 2026-08-12
+Last reviewed: 2026-08-20
 
 TripOS is being built for launch as soon as the product is code-ready and the production environment is activated. Status reflects current code-side readiness in this repository.
 
@@ -13,15 +13,15 @@ Status legend:
 
 ## Production Gates
 
-| Priority | Launch gate                                                                                        | Status            |
-| -------- | -------------------------------------------------------------------------------------------------- | ----------------- |
-| P0       | Production environment, secrets, MongoDB, Redis, S3-compatible storage, strict CORS, seeder policy | External Evidence |
-| P0       | API lint/typecheck/build, admin CRM build, public website build, mobile typecheck                  | Verified locally  |
-| P0       | Organization/branch isolation, authenticated protected routes, RBAC, refresh rotation              | Product Ready     |
-| P0       | Audit logging, scoped audit list API, and CSV export payloads                                      | Product Ready     |
-| P0       | Provider smoke tests for email, WhatsApp, SMS, payments, storage, maps, analytics, monitoring      | Sandbox Ready     |
-| P0       | Desktop/tablet CRM QA, mobile Android/iOS QA, public website SEO/legal QA                          | QA Ready          |
-| P0       | Backup/restore, load testing, monitoring alerts, incident runbook                                  | External Evidence |
+| Priority | Launch gate                                                                                                                   | Status            |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| P0       | Production environment, secrets, MongoDB, S3-compatible storage, strict CORS, seeder policy, optional Redis/queues if enabled | External Evidence |
+| P0       | API lint/typecheck/build, admin CRM build, public website build, mobile typecheck                                             | Verified locally  |
+| P0       | Organization/branch isolation, authenticated protected routes, RBAC, refresh rotation                                         | Product Ready     |
+| P0       | Audit logging, scoped audit list API, and CSV export payloads                                                                 | Product Ready     |
+| P0       | Provider smoke tests for email, WhatsApp, SMS, payments, storage, maps, analytics, monitoring                                 | Sandbox Ready     |
+| P0       | Desktop/tablet CRM QA, mobile Android/iOS QA, public website SEO/legal QA                                                     | QA Ready          |
+| P0       | Backup/restore, load testing, monitoring alerts, incident runbook                                                             | External Evidence |
 
 ## Engineering Review Closure
 
@@ -54,6 +54,8 @@ Completed in the repo:
 - Finance receivables, payables, refunds, booking profitability, and reconciliation endpoints.
 - Organization-current aliases, reporting overview/funnel/operations/finance APIs, and local/provider-ready AI travel assistant endpoints.
 - Admin CRM navigation and live API screens for users/permissions, settings, tags, tasks, audit logs, storage files, integrations, and reporting.
+- Admin CRM schema-driven create/edit forms, detail drawer edit action, import/export, search, sorting, pagination, and status mutation flows are wired to module APIs.
+- Platform pricing plans, organization subscriptions, CRM My Profile, change password, settings, and notifications are API/CRM backed.
 - Supplier contracts/rates/confirmations, B2B KYC/credit/commission/wallet/invoice actions, operations SLA/escalations/timeline, and saved report templates are API-backed.
 - Mobile app shell with persisted secure session storage and separate customer/agent navigation foundations.
 - Public website lead capture wired to backend public lead endpoint.
@@ -92,6 +94,9 @@ Completed in the repo:
 | 27  | Tags                               | Product Ready | Product Ready    | N/A                  | Taxonomy naming sign-off during onboarding QA                          |
 | 28  | Tasks and Follow-ups               | Product Ready | Product Ready    | N/A                  | SLA and ownership policy sign-off during QA                            |
 | 29  | Batch Jobs                         | Product Ready | Product Ready    | N/A                  | Production scheduler cadence and alert thresholds are environment QA   |
+| 30  | SaaS Pricing Plans                 | Product Ready | Product Ready    | N/A                  | Sandbox/live payment provider selection and commercial sign-off        |
+| 31  | Organization Subscriptions         | Product Ready | Product Ready    | N/A                  | Provider webhook/live billing evidence or manual invoice policy        |
+| 32  | CRM Account Profile/Password       | Product Ready | Product Ready    | N/A                  | Optional MFA/SSO provider selection                                    |
 
 ## Immediate Build-Now Backlog
 
@@ -130,6 +135,9 @@ Rows added from the 2026-08-12 independent review are retained as an audit trail
 | P1       | Done   | Add backup/restore runbook, index audit, load testing, and staging smoke scripts. Runbook and repo-side hooks are documented; execution evidence remains external.                                                                                |
 | P1       | Done   | Add scheduled saved-report execution endpoint with next-run tracking and run result metadata.                                                                                                                                                     |
 | P1       | Done   | Add generated HTML document templates for quotations, itineraries, invoices, and vouchers as renderer-ready payloads.                                                                                                                             |
+| P1       | Done   | Add platform pricing plans, organization subscriptions, seeded launch plans, and CRM subscription management screens.                                                                                                                             |
+| P1       | Done   | Add CRM user My Profile, change password, notification preferences, and schema-driven edit forms for module records.                                                                                                                              |
+| P1       | Done   | Align product, planning, database, security, technical architecture, and API documents with the current implementation.                                                                                                                           |
 
 ## Module Completion Focus
 
