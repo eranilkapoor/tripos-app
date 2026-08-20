@@ -6,17 +6,26 @@ import { formatDisplayValue, getRecordId } from "./crmUtils";
 export default function DetailPanel({
   module,
   onClose,
+  onEdit,
   record,
 }: {
   module: CrmModule;
   onClose: () => void;
+  onEdit?: () => void;
   record: ApiRecord;
 }) {
   return (
     <aside className="detail-panel">
-      <button onClick={onClose} type="button">
-        Close
-      </button>
+      <div className="detail-actions">
+        {onEdit && module.fields.length ? (
+          <button onClick={onEdit} type="button">
+            Edit
+          </button>
+        ) : null}
+        <button onClick={onClose} type="button">
+          Close
+        </button>
+      </div>
       <span className="eyebrow">{module.title}</span>
       <h2>
         {String(

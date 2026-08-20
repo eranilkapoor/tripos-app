@@ -11,6 +11,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Roles } from '../../../common/decorators/roles.decorator';
+import { StatusUpdateDto } from '../../../common/dto/status-update.dto';
 import { CreateOrganizationDto } from '../dto/organization.dto';
 import { OrganizationsService } from '../services/organizations.service';
 
@@ -58,6 +59,12 @@ export class OrganizationsController {
   @Roles('platform_admin')
   update(@Param('id') id: string, @Body() dto: Record<string, unknown>) {
     return this.service.update(id, dto);
+  }
+
+  @Patch(':id/status')
+  @Roles('platform_admin')
+  updateStatus(@Param('id') id: string, @Body() dto: StatusUpdateDto) {
+    return this.service.updateStatus(id, dto.status);
   }
 
   @Delete(':id')

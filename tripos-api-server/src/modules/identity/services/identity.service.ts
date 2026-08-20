@@ -140,6 +140,20 @@ export class IdentityService {
     );
   }
 
+  updateDepartmentStatus(
+    id: string,
+    dto: StatusUpdateDto,
+    query: CrmListQueryDto,
+  ) {
+    return this.updateScoped(
+      this.departmentModel,
+      id,
+      { status: dto.status },
+      query,
+      'Department not found',
+    );
+  }
+
   removeDepartment(id: string, query: CrmListQueryDto) {
     return deleteScopedCrmRecord(
       this.departmentModel,
@@ -173,6 +187,16 @@ export class IdentityService {
     return this.updateScoped(this.teamModel, id, dto, query, 'Team not found');
   }
 
+  updateTeamStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
+    return this.updateScoped(
+      this.teamModel,
+      id,
+      { status: dto.status },
+      query,
+      'Team not found',
+    );
+  }
+
   removeTeam(id: string, query: CrmListQueryDto) {
     return deleteScopedCrmRecord(this.teamModel, id, query, 'Team not found');
   }
@@ -198,6 +222,16 @@ export class IdentityService {
 
   updateRole(id: string, dto: Partial<CreateRoleDto>, query: CrmListQueryDto) {
     return this.updateScoped(this.roleModel, id, dto, query, 'Role not found');
+  }
+
+  updateRoleStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
+    return this.updateScoped(
+      this.roleModel,
+      id,
+      { status: dto.status },
+      query,
+      'Role not found',
+    );
   }
 
   removeRole(id: string, query: CrmListQueryDto) {
@@ -299,6 +333,20 @@ export class IdentityService {
     );
   }
 
+  updateUserRoleStatus(
+    id: string,
+    dto: StatusUpdateDto,
+    query: CrmListQueryDto,
+  ) {
+    return this.updateScoped(
+      this.userRoleModel,
+      id,
+      { status: dto.status },
+      query,
+      'User role assignment not found',
+    );
+  }
+
   removeUserRole(id: string, query: CrmListQueryDto) {
     return deleteScopedCrmRecord(
       this.userRoleModel,
@@ -342,6 +390,20 @@ export class IdentityService {
       dto.permissionCode
         ? { ...dto, permissionCode: dto.permissionCode.toLowerCase() }
         : dto,
+      query,
+      'Role permission assignment not found',
+    );
+  }
+
+  updateRolePermissionStatus(
+    id: string,
+    dto: StatusUpdateDto,
+    query: CrmListQueryDto,
+  ) {
+    return this.updateScoped(
+      this.rolePermissionModel,
+      id,
+      { status: dto.status },
       query,
       'Role permission assignment not found',
     );
@@ -428,6 +490,20 @@ export class IdentityService {
       this.invitationModel,
       id,
       dto,
+      query,
+      'Invitation not found',
+    );
+  }
+
+  updateInvitationStatus(
+    id: string,
+    dto: StatusUpdateDto,
+    query: CrmListQueryDto,
+  ) {
+    return this.updateScoped(
+      this.invitationModel,
+      id,
+      { status: dto.status },
       query,
       'Invitation not found',
     );

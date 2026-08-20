@@ -1242,7 +1242,7 @@ tbody tr:nth-child(even) {
   z-index: 20;
 }
 
-.detail-panel > button,
+.detail-actions button,
 .record-modal button {
   background: var(--surface-2);
   border: 1px solid var(--line);
@@ -1252,12 +1252,13 @@ tbody tr:nth-child(even) {
   padding: 6px 10px;
 }
 
-.detail-panel > button {
-  float: right;
+.detail-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .detail-panel h2 {
-  clear: both;
   color: var(--brand);
   font-size: 22px;
   margin: 6px 0 14px;

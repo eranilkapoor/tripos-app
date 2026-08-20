@@ -49,8 +49,12 @@ export class OrganizationsService {
   }
 
   async remove(id: string) {
+    return this.updateStatus(id, 'inactive');
+  }
+
+  async updateStatus(id: string, status: string) {
     const organization = await this.model
-      .findByIdAndUpdate(id, { status: 'inactive' }, { new: true })
+      .findByIdAndUpdate(id, { status }, { new: true })
       .lean()
       .exec();
     if (!organization) throw new NotFoundException('Organization not found');

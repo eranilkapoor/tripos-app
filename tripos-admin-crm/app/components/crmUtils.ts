@@ -47,14 +47,18 @@ export function normalizeRecords(payload: unknown): ApiRecord[] {
 }
 
 export function valueAtPath(record: ApiRecord, path: string) {
-  const value = path.split(".").reduce<unknown>((current, segment) => {
-    if (!current || typeof current !== "object") return undefined;
-    return (current as Record<string, unknown>)[segment];
-  }, record);
+  const value = valueAtRawPath(record, path);
   if (Array.isArray(value)) return value.length ? `${value.length} items` : "-";
   if (typeof value === "number") return formatNumber(value);
   if (value === undefined || value === null || value === "") return "-";
   return formatDisplayValue(String(value), path);
+}
+
+export function valueAtRawPath(record: Record<string, unknown>, path: string) {
+  return path.split(".").reduce<unknown>((current, segment) => {
+    if (!current || typeof current !== "object") return undefined;
+    return (current as Record<string, unknown>)[segment];
+  }, record);
 }
 
 export function recordToRow(record: ApiRecord, module: CrmModule) {
@@ -148,7 +152,7 @@ export function toPayload(
               .filter(Boolean)
           : field.type === "textarea"
             ? parseTextareaValue(raw ?? "")
-          : (raw ?? "");
+            : (raw ?? "");
     assignPath(payload, field.key, value);
   }
   return payload;

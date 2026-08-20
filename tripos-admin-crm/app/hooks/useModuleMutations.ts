@@ -31,6 +31,34 @@ export function useModuleMutations(
     onSuccess: () => invalidate(),
   });
 
+  const updateRecord = useMutation({
+    mutationFn: async ({
+      record,
+      values,
+    }: {
+      record: ApiRecord;
+      values: Record<string, string>;
+    }) => {
+      const id = getRecordId(record);
+      if (!id || !module.endpoint) return;
+      await apiPatch(
+        `${module.endpoint}/${id}`,
+        toPayload(module.fields, values),
+        {
+          session,
+          errorMessage: `Could not update ${module.title}`,
+        },
+      );
+    },
+    onSuccess: () => invalidate(),
+    onError: (error) =>
+      onNotify(
+        error instanceof Error
+          ? error.message
+          : `Could not update ${module.title}.`,
+      ),
+  });
+
   const updateStatus = useMutation({
     mutationFn: async ({
       record,
@@ -84,5 +112,5 @@ export function useModuleMutations(
       onNotify(error instanceof Error ? error.message : "Import failed."),
   });
 
-  return { createRecord, updateStatus, importRecords };
+  return { createRecord, updateRecord, updateStatus, importRecords };
 }

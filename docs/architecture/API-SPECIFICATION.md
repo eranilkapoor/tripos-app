@@ -2,234 +2,235 @@
 
 ## API Style
 
-- REST APIs for v1.
-- OpenAPI documentation generated from backend decorators.
+- REST APIs under `/api/v1`.
 - JSON request and response bodies.
-- Cursor pagination for large lists.
-- Idempotency keys for payments, booking conversion, and supplier confirmations.
-- Organization context is derived from authenticated user claims and selected branch access.
+- OpenAPI documentation is generated from NestJS decorators.
+- List endpoints use `page`, `limit`, `search`, and `status` where applicable.
+- Organization and branch context is derived from authenticated user claims and the selected workspace headers/session.
+- Organization-scoped modules use the standard CRUD contract unless noted:
+  - `POST /module`
+  - `GET /module`
+  - `GET /module/:id`
+  - `PATCH /module/:id`
+  - `PATCH /module/:id/status`
+  - `DELETE /module/:id`
 
-## Base Route Pattern
+## Base Routes
 
 ```text
 /api/v1/auth
 /api/v1/organizations
 /api/v1/identity
-/api/v1/crm
-/api/v1/sales
+/api/v1/leads
+/api/v1/customers
+/api/v1/quotations
 /api/v1/itineraries
 /api/v1/bookings
 /api/v1/suppliers
 /api/v1/operations
+/api/v1/b2b-agents
+/api/v1/payments
 /api/v1/finance
-/api/v1/b2b
-/api/v1/cms
-/api/v1/marketing
-/api/v1/communications
-/api/v1/ai
+/api/v1/destinations
+/api/v1/tour-packages
+/api/v1/travel-documents
+/api/v1/vouchers
+/api/v1/support-tickets
+/api/v1/notifications
+/api/v1/campaigns
+/api/v1/plans
+/api/v1/subscriptions
 /api/v1/settings
 /api/v1/tags
 /api/v1/tasks
+/api/v1/storage/files
+/api/v1/reporting
+/api/v1/saved-reports
 /api/v1/batch-jobs
+/api/v1/integrations
+/api/v1/ai
 ```
 
-## MVP Endpoints
+## Auth And Account
 
-### Auth
+- `POST /auth/login`
+- `POST /auth/logout`
+- `POST /auth/refresh`
+- `GET /auth/me`
+- `PATCH /auth/me`
+- `POST /auth/change-password`
+- `POST /auth/workspace`
+- `POST /auth/register-crm-user`
+- `POST /auth/password/forgot`
+- `POST /auth/password/reset`
+- `POST /auth/invitations`
+- `POST /auth/invitations/accept`
+- `GET /auth/users`
+- `GET /auth/users/:id`
+- `PATCH /auth/users/:id`
+- `PATCH /auth/users/:id/permissions`
+- `DELETE /auth/users/:id`
+- `GET /auth/permissions/catalog`
 
-- `POST /auth/login` - implemented; CRM uses email/password and resolves the allowed organization workspace server-side
-- `POST /auth/logout` - implemented
-- `GET /auth/me` - implemented
-- `POST /auth/workspace` - implemented for post-login organization/branch switching
-- `POST /auth/register-crm-user` - implemented for CRM bootstrap/admin use
-- `POST /auth/refresh` - implemented
-- `POST /auth/password/forgot` - implemented
-- `POST /auth/password/reset` - implemented
-- `POST /auth/invitations` - implemented
-- `POST /auth/invitations/accept` - implemented
+CRM users include profile, phone, locale, timezone, branch access, department/team access, permissions, notification preferences, and session security fields.
 
-### Organizations
+## Organizations
 
-- `POST /organizations` - implemented
-- `GET /organizations` - implemented
-- `GET /organizations/:id` - implemented
-- `PATCH /organizations/:id` - implemented
-- `DELETE /organizations/:id` - implemented as inactive status transition
-- `GET /organizations/current` - implemented
-- `PATCH /organizations/current` - implemented
-- `/organizations` routes remain implemented as platform compatibility aliases.
-- `POST /auth/invitations` - implemented
-- `GET /auth/users` - implemented
-- `GET /auth/users/:id` - implemented
-- `PATCH /auth/users/:id` - implemented
-- `PATCH /auth/users/:id/permissions` - implemented
-- `DELETE /auth/users/:id` - implemented as inactive status transition and session revocation
-- `GET /auth/permissions/catalog` - implemented
+- `POST /organizations` - platform admin
+- `GET /organizations` - platform admin
+- `GET /organizations/current`
+- `PATCH /organizations/current`
+- `GET /organizations/:id` - platform admin
+- `PATCH /organizations/:id` - platform admin
+- `PATCH /organizations/:id/status` - platform admin
+- `DELETE /organizations/:id` - inactive status transition
 
-### Identity and Access
+Organization records include billing profile, subscription snapshot, branding, compliance, security policy, integrations, data hosting mode, branches, and sync policy.
 
-- `POST /identity/branches` - implemented
-- `GET /identity/branches` - implemented
-- `GET /identity/branches/:id` - implemented
-- `PATCH /identity/branches/:id` - implemented
-- `PATCH /identity/branches/:id/status` - implemented
-- `DELETE /identity/branches/:id` - implemented as inactive status transition
-- `POST /identity/departments` - implemented
-- `GET /identity/departments` - implemented
-- `GET /identity/departments/:id` - implemented
-- `PATCH /identity/departments/:id` - implemented
-- `DELETE /identity/departments/:id` - implemented as inactive status transition
-- `POST /identity/teams` - implemented
-- `GET /identity/teams` - implemented
-- `GET /identity/teams/:id` - implemented
-- `PATCH /identity/teams/:id` - implemented
-- `DELETE /identity/teams/:id` - implemented as inactive status transition
-- `POST /identity/roles` - implemented
-- `GET /identity/roles` - implemented
-- `GET /identity/roles/:id` - implemented
-- `PATCH /identity/roles/:id` - implemented
-- `DELETE /identity/roles/:id` - implemented as inactive status transition
-- `POST /identity/permissions` - implemented
-- `GET /identity/permissions` - implemented
-- `GET /identity/permissions/:id` - implemented
-- `PATCH /identity/permissions/:id` - implemented
-- `PATCH /identity/permissions/:id/status` - implemented
-- `DELETE /identity/permissions/:id` - implemented as inactive status transition
-- `POST /identity/user-roles` - implemented
-- `GET /identity/user-roles` - implemented
-- `GET /identity/user-roles/:id` - implemented
-- `PATCH /identity/user-roles/:id` - implemented
-- `DELETE /identity/user-roles/:id` - implemented as inactive status transition
-- `POST /identity/role-permissions` - implemented
-- `GET /identity/role-permissions` - implemented
-- `GET /identity/role-permissions/:id` - implemented
-- `PATCH /identity/role-permissions/:id` - implemented
-- `DELETE /identity/role-permissions/:id` - implemented as inactive status transition
-- `GET /identity/invitations` - implemented
-- `GET /identity/invitations/:id` - implemented
-- `PATCH /identity/invitations/:id` - implemented
-- `DELETE /identity/invitations/:id` - implemented as revoked status transition
+## Identity And Access
 
-### Implemented Travel CRM Modules
+The following identity modules support list/search, create, detail, update, status update, and delete/inactive or revoke behavior:
 
-- `POST /leads`
-- `GET /leads`
-- `GET /leads/:id`
-- `PATCH /leads/:id/assign`
-- `PATCH /leads/:id/stage`
-- `POST /customers`
-- `GET /customers`
-- `GET /customers/:id`
-- `PATCH /customers/:id/status`
-- `POST /quotations`
-- `GET /quotations`
-- `GET /quotations/:id`
-- `PATCH /quotations/:id/status`
-- `POST /itineraries`
-- `GET /itineraries`
-- `GET /itineraries/:id`
-- `PATCH /itineraries/:id/status`
-- `POST /bookings`
-- `GET /bookings`
-- `GET /bookings/:id`
-- `PATCH /bookings/:id/status`
-- `POST /suppliers`
-- `GET /suppliers`
-- `POST /operations`
-- `GET /operations`
-- `POST /b2b-agents`
-- `GET /b2b-agents`
-- `POST /payments`
-- `GET /payments`
-- `GET /payments/summary`
-- `POST /destinations`
-- `GET /destinations`
-- `POST /tour-packages`
-- `GET /tour-packages`
-- `POST /travel-documents`
-- `GET /travel-documents`
-- `POST /vouchers`
-- `GET /vouchers`
-- `POST /support-tickets`
-- `GET /support-tickets`
-- `POST /campaigns`
-- `GET /campaigns`
+- `identity/branches`
+- `identity/departments`
+- `identity/teams`
+- `identity/roles`
+- `identity/permissions`
+- `identity/user-roles`
+- `identity/role-permissions`
+- `identity/invitations`
+
+Permissions are platform-managed. Role, user-role, and role-permission records are organization scoped.
+
+## Travel CRM Modules
+
+These modules support the standard CRUD contract and are wired to Admin CRM forms, listings, search, sorting, import/export, detail, edit, and status controls:
+
+- `leads`
+- `customers`
+- `quotations`
+- `itineraries`
+- `bookings`
+- `suppliers`
+- `operations`
+- `b2b-agents`
+- `payments`
+- `destinations`
+- `tour-packages`
+- `travel-documents`
+- `vouchers`
+- `support-tickets`
+- `notifications`
+- `campaigns`
+- `settings`
+- `tags`
+- `tasks`
+- `saved-reports`
+
+The Admin CRM module configs expose the enterprise schema fields used by the DTOs, including owner/team/department references, external references, tags, metadata, commercial fields, costing, compliance, document references, tax/bank profiles, delivery data, consent, and reporting schedules.
+
+## Finance And Documents
+
 - `POST /finance/invoices`
 - `GET /finance/invoices`
+- `GET /finance/invoices/:id`
+- `PATCH /finance/invoices/:id`
+- `DELETE /finance/invoices/:id`
 - `GET /finance/invoices/next-number/:series`
 - `POST /finance/invoices/:id/pdf`
-- `POST /settings`
-- `GET /settings`
-- `GET /settings/:id`
-- `PATCH /settings/:id`
-- `PATCH /settings/:id/status`
-- `DELETE /settings/:id`
-- `POST /tags`
-- `GET /tags`
-- `GET /tags/:id`
-- `PATCH /tags/:id`
-- `PATCH /tags/:id/status`
-- `DELETE /tags/:id`
-- `POST /tasks`
-- `GET /tasks`
-- `GET /tasks/:id`
-- `PATCH /tasks/:id`
-- `PATCH /tasks/:id/status`
-- `DELETE /tasks/:id`
+- `GET /finance/receivables`
+- `GET /finance/payables`
+- `GET /finance/bookings/:bookingId/profitability`
+- `POST /finance/refunds`
+- `GET /payments/summary`
+- `GET /storage/files`
+- `POST /storage/files/upload-intent`
+- `GET /storage/files/:id`
+- `PATCH /storage/files/:id`
+- `DELETE /storage/files/:id`
 
-### Batch Jobs
+The CRM invoice builder can save invoices and download document payloads as PDF, Doc, and Excel-compatible files from the browser-side utility.
 
+## SaaS Pricing And Subscriptions
+
+- `POST /plans` - platform admin
+- `GET /plans`
+- `GET /plans/:id`
+- `PATCH /plans/:id` - platform admin
+- `PATCH /plans/:id/status` - platform admin
+- `DELETE /plans/:id` - platform admin
+- `GET /subscriptions`
+- `GET /subscriptions/current`
+- `POST /subscriptions`
+- `GET /subscriptions/:id`
+- `PATCH /subscriptions/:id`
+- `PATCH /subscriptions/:id/status`
+- `POST /subscriptions/:id/cancel`
+- `DELETE /subscriptions/:id` - platform admin
+
+Plans define audience, billing cycle, currency, price minor units, setup fee, trial days, seats, features, limits, provider price references, and terms. Subscriptions are organization scoped and store plan snapshots, seats, renewal state, provider references, billing profile, and cancellation state.
+
+## Deep Workflow Endpoints
+
+- `PATCH /leads/:id/assign`
+- `PATCH /leads/:id/stage`
+- `GET /leads/:id/activities`
+- `POST /leads/:id/notes`
+- `POST /leads/:id/activities`
+- `POST /quotations/:id/calculate`
+- `POST /quotations/:id/send`
+- `POST /quotations/:id/accept`
+- `POST /quotations/:id/pdf`
+- `POST /itineraries/:id/days`
+- `PATCH /itineraries/:id/days/:dayId`
+- `POST /itineraries/:id/items`
+- `POST /itineraries/:id/pdf`
+- `POST /bookings/from-quotation/:quotationId`
+- `POST /bookings/:id/passengers`
+- `POST /bookings/:id/payments`
+- `POST /bookings/:id/vouchers`
+- `POST /vouchers/:id/pdf`
+- `POST /suppliers/:id/contracts`
+- `POST /suppliers/:id/rates`
+- `POST /suppliers/:id/confirmations`
+- `POST /b2b-agents/:id/kyc-documents`
+- `PATCH /b2b-agents/:id/credit-limit`
+- `POST /b2b-agents/:id/commissions`
+- `POST /b2b-agents/:id/wallet`
+- `POST /b2b-agents/:id/invoices`
+- `PATCH /operations/:id/assign`
+- `PATCH /operations/:id/sla`
+- `POST /operations/:id/escalations`
+- `POST /operations/:id/timeline`
+
+Document/PDF endpoints currently return renderer-ready HTML/template payloads. Binary renderer/live provider credentials remain deployment configuration.
+
+## Reporting, Audit, Jobs, Integrations, AI
+
+- `GET /audit-logs`
+- `GET /audit-logs/export.csv`
+- `GET /reporting/overview`
+- `GET /reporting/sales-funnel`
+- `GET /reporting/operations`
+- `GET /reporting/finance`
+- `POST /saved-reports/run-due`
+- `POST /saved-reports/:id/run`
 - `GET /batch-jobs`
 - `POST /batch-jobs/run`
 - `POST /batch-jobs/:name/run`
+- `GET /integrations/health`
+- `POST /integrations/smoke-tests`
+- `POST /ai/itinerary-drafts`
+- `POST /ai/quotation-assist`
+- `POST /ai/sales-reply`
 
-All main list endpoints support `page`, `limit`, `search`, and `status` where applicable. Organization-scoped domain modules expose enterprise CRUD with `POST /module`, `GET /module`, `GET /module/:id`, `PATCH /module/:id`, `PATCH /module/:id/status` where status applies, and `DELETE /module/:id`.
+## CRM Contract
 
-### Deep Workflow Endpoints
+Admin CRM modules use the same `endpoint`, `fields`, `columns`, `rowMap`, and `statusOptions` configuration to keep the UI aligned with backend DTOs and schemas.
 
-- `POST /leads/:id/notes` - implemented
-- `GET /leads/:id/activities` - implemented
-- `POST /leads/:id/activities` - implemented
-- `POST /crm/leads/:id/convert-to-customer` - not required for launch; customer creation and lead won stage are API-backed
-- `POST /quotations/:id/calculate` - implemented
-- `POST /quotations/:id/send` - implemented
-- `POST /quotations/:id/accept` - implemented
-- `POST /quotations/:id/pdf` - implemented as generated HTML template payload; binary renderer provider is deployment-configurable
-- `POST /itineraries/:id/days` - implemented
-- `PATCH /itineraries/:id/days/:dayId` - implemented
-- `POST /itineraries/:id/items` - implemented
-- `POST /itineraries/:id/pdf` - implemented as generated HTML template payload; binary renderer provider is deployment-configurable
-- `PATCH /itineraries/:id/items/:itemId` - not required for launch; day updates and item append are API-backed
-- `POST /bookings/from-quotation/:quotationId` - implemented
-- `POST /bookings/:id/passengers` - implemented
-- `POST /bookings/:id/payments` - implemented
-- `POST /bookings/:id/vouchers` - implemented
-- `POST /vouchers/:id/pdf` - implemented as generated HTML template payload; binary renderer provider is deployment-configurable
-- `GET /finance/receivables` - implemented
-- `GET /finance/payables` - implemented
-- `GET /finance/bookings/:bookingId/profitability` - implemented
-- `POST /finance/refunds` - implemented
-- `GET /audit-logs` - implemented
-- `GET /audit-logs/export.csv` - implemented
-- `GET /storage/files` - implemented
-- `POST /storage/files/upload-intent` - implemented
-- `GET /storage/files/:id` - implemented
-- `PATCH /storage/files/:id` - implemented
-- `DELETE /storage/files/:id` - implemented
-- `GET /integrations/health` - implemented
-- `POST /integrations/smoke-tests` - implemented
-- `GET /reporting/overview` - implemented
-- `GET /reporting/sales-funnel` - implemented
-- `GET /reporting/operations` - implemented
-- `GET /reporting/finance` - implemented
-- `POST /saved-reports` - implemented
-- `GET /saved-reports` - implemented
-- `POST /saved-reports/run-due` - implemented
-- `POST /saved-reports/:id/run` - implemented
-- `PATCH /saved-reports/:id/status` - implemented
-
-### AI
-
-- `POST /ai/itinerary-drafts` - implemented with local/provider-ready response
-- `POST /ai/quotation-assist` - implemented with local/provider-ready response
-- `POST /ai/sales-reply` - implemented with local/provider-ready response
+- Add forms submit `POST`.
+- Edit forms submit `PATCH /:id`.
+- Status dropdowns submit `PATCH /:id/status`, except leads stage updates, which use `PATCH /leads/:id/stage`.
+- Listings support client-side sorting/pagination and API-backed search.
+- Import uses module fields/row maps to submit JSON/CSV records through the same create API.
+- Export supports CSV and JSON from the current filtered listing.

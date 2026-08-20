@@ -64,6 +64,7 @@ function CrmShellContent() {
     "TripOS CRM connected to production APIs.",
   );
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<ApiRecord | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
   const [theme, setTheme] = useState<CrmTheme>("system");
   const activeNavItemRef = useRef<HTMLButtonElement | null>(null);
@@ -112,10 +113,8 @@ function CrmShellContent() {
     setToast,
   );
 
-  const { createRecord, updateStatus, importRecords } = useModuleMutations(
-    selected,
-    setToast,
-  );
+  const { createRecord, updateRecord, updateStatus, importRecords } =
+    useModuleMutations(selected, setToast);
 
   function selectModule(id: string) {
     setSelectedId(id);
@@ -368,7 +367,10 @@ function CrmShellContent() {
               filteredRows={filteredRows}
               isLoading={isLoading}
               module={selected}
-              onCreate={() => setModalOpen(true)}
+              onCreate={() => {
+                setEditingRecord(null);
+                setModalOpen(true);
+              }}
               onExport={(format) =>
                 exportRecords(
                   selected.title,
@@ -424,15 +426,31 @@ function CrmShellContent() {
               module={selected}
               record={selectedRecord}
               onClose={() => setSelectedRecord(null)}
+              onEdit={() => {
+                setEditingRecord(selectedRecord);
+                setModalOpen(true);
+              }}
             />
           ) : null}
           {modalOpen ? (
             <RecordForm
+              initialRecord={editingRecord}
               module={selected}
-              onClose={() => setModalOpen(false)}
-              onSubmit={async (values) => {
-                await createRecord.mutateAsync(values);
+              onClose={() => {
                 setModalOpen(false);
+                setEditingRecord(null);
+              }}
+              onSubmit={async (values) => {
+                if (editingRecord) {
+                  await updateRecord.mutateAsync({
+                    record: editingRecord,
+                    values,
+                  });
+                } else {
+                  await createRecord.mutateAsync(values);
+                }
+                setModalOpen(false);
+                setEditingRecord(null);
               }}
             />
           ) : null}

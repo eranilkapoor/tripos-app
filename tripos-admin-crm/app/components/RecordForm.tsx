@@ -4,17 +4,22 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { CrmModule } from "./crmTypes";
-import { optionValue } from "./crmUtils";
-import { buildZodSchemaFromFields, fieldFormKey } from "../validation/dynamicSchema";
+import { optionValue, valueAtRawPath } from "./crmUtils";
+import {
+  buildZodSchemaFromFields,
+  fieldFormKey,
+} from "../validation/dynamicSchema";
 import FormField from "./FormField";
 
 export default function RecordForm({
   module,
   onClose,
+  initialRecord,
   onSubmit,
 }: {
   module: CrmModule;
   onClose: () => void;
+  initialRecord?: Record<string, unknown> | null;
   onSubmit: (values: Record<string, string>) => Promise<void>;
 }) {
   const [formError, setFormError] = useState("");
@@ -26,7 +31,11 @@ export default function RecordForm({
     defaultValues: Object.fromEntries(
       module.fields.map((field) => [
         fieldFormKey(field.key),
-        field.options?.[0] ? optionValue(field.options[0]) : "",
+        initialRecord
+          ? formValue(valueAtRawPath(initialRecord, field.key))
+          : field.options?.[0]
+            ? optionValue(field.options[0])
+            : "",
       ]),
     ),
     resolver: zodResolver(buildZodSchemaFromFields(module.fields)),
@@ -53,7 +62,9 @@ export default function RecordForm({
         <div className="record-modal-head">
           <div>
             <span className="eyebrow">{module.group}</span>
-            <h3>Create {module.title}</h3>
+            <h3>
+              {initialRecord ? "Update" : "Create"} {module.title}
+            </h3>
           </div>
           <button onClick={onClose} type="button">
             Close
@@ -62,7 +73,9 @@ export default function RecordForm({
         <div className="record-form-grid">
           {module.fields.map((field) => (
             <FormField
-              error={errors[fieldFormKey(field.key)]?.message as string | undefined}
+              error={
+                errors[fieldFormKey(field.key)]?.message as string | undefined
+              }
               field={field}
               key={field.key}
               name={fieldFormKey(field.key)}
@@ -86,4 +99,11 @@ export default function RecordForm({
       </section>
     </div>
   );
+}
+
+function formValue(value: unknown) {
+  if (value === undefined || value === null) return "";
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "object") return JSON.stringify(value, null, 2);
+  return String(value);
 }

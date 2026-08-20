@@ -132,6 +132,20 @@ export class IdentityController {
     );
   }
 
+  @Patch('departments/:id/status')
+  updateDepartmentStatus(
+    @Param('id') id: string,
+    @Body() dto: StatusUpdateDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateDepartmentStatus(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
+  }
+
   @Delete('departments/:id')
   removeDepartment(
     @Param('id') id: string,
@@ -177,6 +191,20 @@ export class IdentityController {
     );
   }
 
+  @Patch('teams/:id/status')
+  updateTeamStatus(
+    @Param('id') id: string,
+    @Body() dto: StatusUpdateDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateTeamStatus(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
+  }
+
   @Delete('teams/:id')
   removeTeam(
     @Param('id') id: string,
@@ -213,6 +241,20 @@ export class IdentityController {
     @Req() request: Request,
   ) {
     return this.service.updateRole(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
+  }
+
+  @Patch('roles/:id/status')
+  updateRoleStatus(
+    @Param('id') id: string,
+    @Body() dto: StatusUpdateDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateRoleStatus(
       id,
       dto,
       organizationScopedQuery(query, request),
@@ -304,6 +346,20 @@ export class IdentityController {
     );
   }
 
+  @Patch('user-roles/:id/status')
+  updateUserRoleStatus(
+    @Param('id') id: string,
+    @Body() dto: StatusUpdateDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateUserRoleStatus(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
+  }
+
   @Delete('user-roles/:id')
   removeUserRole(
     @Param('id') id: string,
@@ -362,6 +418,20 @@ export class IdentityController {
     );
   }
 
+  @Patch('role-permissions/:id/status')
+  updateRolePermissionStatus(
+    @Param('id') id: string,
+    @Body() dto: StatusUpdateDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateRolePermissionStatus(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
+  }
+
   @Delete('role-permissions/:id')
   removeRolePermission(
     @Param('id') id: string,
@@ -401,6 +471,20 @@ export class IdentityController {
     @Req() request: Request,
   ) {
     return this.service.updateInvitation(
+      id,
+      dto,
+      organizationScopedQuery(query, request),
+    );
+  }
+
+  @Patch('invitations/:id/status')
+  updateInvitationStatus(
+    @Param('id') id: string,
+    @Body() dto: StatusUpdateDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateInvitationStatus(
       id,
       dto,
       organizationScopedQuery(query, request),
