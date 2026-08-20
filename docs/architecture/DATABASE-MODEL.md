@@ -78,6 +78,7 @@ Rules:
 - Use embedded arrays for bounded operational details, such as itinerary days, passengers, line items, KYC documents, contract summaries, payment schedules, and delivery history.
 - Promote embedded records into separate collections when they need independent permissions, high-volume search, reporting, or lifecycle workflows.
 - Use structured JSON objects for flexible enterprise fields such as `metadata`, `customFields`, `commercial`, `supplierCosting`, `taxProfile`, `bankDetails`, `billingProfile`, and `compliance`.
+- Capture enterprise lifecycle fields where operationally important, including assignment, SLA, escalation, delivery, publishing, verification, consent, retention, and provider references.
 - Avoid putting organization isolation only in UI filters; queries must include organization context at API/service level.
 
 ## Implemented Index Patterns

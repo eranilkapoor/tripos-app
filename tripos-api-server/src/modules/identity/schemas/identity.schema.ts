@@ -22,6 +22,13 @@ export class Branch {
   @Prop({ trim: true }) address?: string;
   @Prop({ trim: true }) phone?: string;
   @Prop({ trim: true, lowercase: true }) email?: string;
+  @Prop({ trim: true }) managerUserId?: string;
+  @Prop({ trim: true }) branchType?: string;
+  @Prop({ trim: true }) taxRegistrationNo?: string;
+  @Prop({ trim: true }) costCenterCode?: string;
+  @Prop({ trim: true }) language?: string;
+  @Prop({ type: Object, default: {} }) geo!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) contactPerson!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) settings!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) operatingHours!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) taxProfile!: Record<string, unknown>;
@@ -37,6 +44,10 @@ export class Department {
   @Prop({ required: true, trim: true }) name!: string;
   @Prop({ required: true, trim: true, index: true }) code!: string;
   @Prop({ trim: true }) managerUserId?: string;
+  @Prop({ trim: true }) departmentType?: string;
+  @Prop({ trim: true }) costCenterCode?: string;
+  @Prop({ trim: true }) escalationUserId?: string;
+  @Prop({ type: [String], default: [] }) serviceModules!: string[];
   @Prop({ type: Object, default: {} }) settings!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) slaPolicy!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
@@ -53,6 +64,13 @@ export class Team {
   @Prop({ required: true, trim: true, index: true }) code!: string;
   @Prop({ trim: true }) leadUserId?: string;
   @Prop({ type: [String], default: [] }) memberUserIds!: string[];
+  @Prop({ type: [String], default: [] }) skillTags!: string[];
+  @Prop({ type: [String], default: [] }) supportedDestinations!: string[];
+  @Prop({ type: Object, default: {} }) capacity!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) escalationPolicy!: Record<
+    string,
+    unknown
+  >;
   @Prop({ type: Object, default: {} }) settings!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) queueRules!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;

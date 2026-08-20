@@ -13,25 +13,45 @@ export class TourPackage {
   @Prop({ trim: true, index: true }) category?: string;
   @Prop({ trim: true, index: true }) packageCode?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ trim: true, index: true }) destinationId?: string;
+  @Prop({ trim: true, index: true }) supplierId?: string;
+  @Prop({ trim: true, index: true }) audience?: string;
+  @Prop({ trim: true, index: true }) packageType?: string;
   @Prop({ default: 0 }) durationDays!: number;
+  @Prop({ default: 0 }) durationNights!: number;
+  @Prop({ default: 0 }) minTravellers!: number;
+  @Prop({ default: 0 }) maxTravellers!: number;
   @Prop({ default: 0 }) basePrice!: number;
   @Prop({ default: 0 }) basePriceMinor!: number;
   @Prop({ default: 'INR', trim: true }) currency!: string;
   @Prop({ type: [String], default: [] }) inclusions!: string[];
   @Prop({ type: [String], default: [] }) exclusions!: string[];
+  @Prop({ type: [String], default: [] }) themes!: string[];
+  @Prop({ type: [String], default: [] }) images!: string[];
+  @Prop({ type: [Object], default: [] }) departures!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: [Object], default: [] }) itinerary!: Array<
     Record<string, unknown>
   >;
   @Prop({ type: Object, default: {} }) costing!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) pricingRules!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) commissionPolicy!: Record<
+    string,
+    unknown
+  >;
   @Prop({ type: Object, default: {} }) bookingRules!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) cancellationPolicy!: Record<
     string,
     unknown
   >;
+  @Prop({ type: Object, default: {} }) changePolicy!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) seo!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) publishing!: Record<string, unknown>;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
+  @Prop() publishedAt?: Date;
   @Prop({
     enum: ['draft', 'active', 'inactive', 'archived'],
     default: 'draft',

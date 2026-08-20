@@ -17,6 +17,13 @@ export class CreateBranchDto {
   @IsOptional() @IsString() address?: string;
   @IsOptional() @IsString() phone?: string;
   @IsOptional() @IsEmail() email?: string;
+  @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsString() branchType?: string;
+  @IsOptional() @IsString() taxRegistrationNo?: string;
+  @IsOptional() @IsString() costCenterCode?: string;
+  @IsOptional() @IsString() language?: string;
+  @IsOptional() @IsObject() geo?: Record<string, unknown>;
+  @IsOptional() @IsObject() contactPerson?: Record<string, unknown>;
   @IsOptional() @IsObject() operatingHours?: Record<string, unknown>;
   @IsOptional() @IsObject() taxProfile?: Record<string, unknown>;
   @IsOptional() @IsObject() settings?: Record<string, unknown>;
@@ -29,6 +36,10 @@ export class CreateDepartmentDto {
   @IsString() @MinLength(2) name!: string;
   @IsString() @MinLength(2) code!: string;
   @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsString() departmentType?: string;
+  @IsOptional() @IsString() costCenterCode?: string;
+  @IsOptional() @IsString() escalationUserId?: string;
+  @IsOptional() @IsArray() serviceModules?: string[];
   @IsOptional() @IsObject() slaPolicy?: Record<string, unknown>;
   @IsOptional() @IsObject() settings?: Record<string, unknown>;
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;
@@ -42,6 +53,10 @@ export class CreateTeamDto {
   @IsString() @MinLength(2) code!: string;
   @IsOptional() @IsString() leadUserId?: string;
   @IsOptional() @IsArray() memberUserIds?: string[];
+  @IsOptional() @IsArray() skillTags?: string[];
+  @IsOptional() @IsArray() supportedDestinations?: string[];
+  @IsOptional() @IsObject() capacity?: Record<string, unknown>;
+  @IsOptional() @IsObject() escalationPolicy?: Record<string, unknown>;
   @IsOptional() @IsObject() queueRules?: Record<string, unknown>;
   @IsOptional() @IsObject() settings?: Record<string, unknown>;
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;

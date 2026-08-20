@@ -13,13 +13,26 @@ export class Voucher {
   @Prop({ required: true, trim: true, index: true }) customerName!: string;
   @Prop({ required: true, trim: true, index: true }) voucherType!: string;
   @Prop({ trim: true, index: true }) voucherNo?: string;
+  @Prop({ trim: true, index: true }) serviceType?: string;
   @Prop({ trim: true, index: true }) supplierName?: string;
   @Prop({ trim: true, index: true }) supplierId?: string;
   @Prop({ trim: true }) issueDate?: string;
   @Prop({ trim: true }) serviceDate?: string;
+  @Prop({ trim: true }) serviceTime?: string;
+  @Prop({ trim: true }) destination?: string;
   @Prop({ trim: true, index: true }) confirmationNumber?: string;
+  @Prop({ trim: true, index: true }) fileId?: string;
+  @Prop({ trim: true }) fileUrl?: string;
   @Prop({ type: [Object], default: [] }) lineItems!: Array<
     Record<string, unknown>
+  >;
+  @Prop({ type: Object, default: {} }) supplierConfirmation!: Record<
+    string,
+    unknown
+  >;
+  @Prop({ type: Object, default: {} }) travellerInstructions!: Record<
+    string,
+    unknown
   >;
   @Prop({
     enum: ['draft', 'issued', 'sent', 'cancelled'],
@@ -28,6 +41,10 @@ export class Voucher {
   })
   status!: string;
   @Prop({ type: Object, default: {} }) delivery!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) cancellationPolicy!: Record<
+    string,
+    unknown
+  >;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
 }
 

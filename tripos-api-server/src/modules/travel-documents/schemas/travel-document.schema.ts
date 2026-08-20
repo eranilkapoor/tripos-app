@@ -11,6 +11,8 @@ export class TravelDocument {
   @Prop({ index: true }) customerId?: string;
   @Prop({ required: true, trim: true, index: true }) customerName!: string;
   @Prop({ index: true }) bookingId?: string;
+  @Prop({ trim: true, index: true }) passengerId?: string;
+  @Prop({ trim: true, index: true }) travellerName?: string;
   @Prop({ required: true, trim: true, index: true }) documentType!: string;
   @Prop({ trim: true, index: true }) documentNumber?: string;
   @Prop({ trim: true }) expiryDate?: string;
@@ -18,10 +20,20 @@ export class TravelDocument {
   @Prop({ trim: true }) notes?: string;
   @Prop({ trim: true, index: true }) fileId?: string;
   @Prop({ trim: true, index: true }) issuingCountry?: string;
+  @Prop({ trim: true, index: true }) nationality?: string;
   @Prop() issueDate?: string;
   @Prop() verifiedAt?: Date;
   @Prop({ trim: true }) verifiedBy?: string;
+  @Prop({ trim: true }) rejectionReason?: string;
+  @Prop({ trim: true }) reminderStatus?: string;
+  @Prop() requestedAt?: Date;
+  @Prop() receivedAt?: Date;
+  @Prop() reminderDueAt?: Date;
+  @Prop({ type: [Object], default: [] }) verificationHistory!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: Object, default: {} }) compliance!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) security!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['pending', 'received', 'verified', 'expired', 'rejected'],

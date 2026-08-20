@@ -30,7 +30,19 @@ export class Notification {
   audience!: string;
   @Prop({ trim: true, index: true }) module?: string;
   @Prop({ trim: true, index: true }) recordId?: string;
+  @Prop({ trim: true, index: true }) entityType?: string;
+  @Prop({ trim: true, index: true }) entityId?: string;
   @Prop({ trim: true, index: true }) assignedTo?: string;
+  @Prop({ trim: true, index: true }) userId?: string;
+  @Prop({ trim: true, index: true }) agentId?: string;
+  @Prop({ trim: true, index: true }) customerId?: string;
+  @Prop({ trim: true, index: true }) actionUrl?: string;
+  @Prop({ trim: true }) icon?: string;
+  @Prop({ type: Object, default: {} }) delivery!: Record<string, unknown>;
+  @Prop() scheduledAt?: Date;
+  @Prop() readAt?: Date;
+  @Prop() archivedAt?: Date;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['unread', 'read', 'archived'],
     default: 'unread',

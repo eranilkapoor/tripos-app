@@ -13,7 +13,10 @@ export class SupportTicket {
   @Prop({ index: true }) customerId?: string;
   @Prop({ required: true, trim: true, index: true }) customerName!: string;
   @Prop({ index: true }) bookingId?: string;
+  @Prop({ trim: true, index: true }) agentId?: string;
+  @Prop({ trim: true, index: true }) supplierId?: string;
   @Prop({ trim: true, index: true }) channel?: string;
+  @Prop({ trim: true, index: true }) source?: string;
   @Prop({
     enum: ['low', 'medium', 'high', 'urgent'],
     default: 'medium',
@@ -23,15 +26,27 @@ export class SupportTicket {
   @Prop({ trim: true, index: true }) assignedTo?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
   @Prop({ trim: true, index: true }) category?: string;
+  @Prop({ trim: true, index: true }) subCategory?: string;
+  @Prop({ trim: true, index: true }) departmentId?: string;
+  @Prop({ trim: true, index: true }) teamId?: string;
   @Prop({ trim: true }) description?: string;
   @Prop() firstResponseDueAt?: Date;
+  @Prop() firstRespondedAt?: Date;
   @Prop() resolutionDueAt?: Date;
   @Prop() resolvedAt?: Date;
+  @Prop() closedAt?: Date;
+  @Prop({ trim: true }) resolutionSummary?: string;
+  @Prop({ trim: true }) rootCause?: string;
+  @Prop({ type: Object, default: {} }) sla!: Record<string, unknown>;
+  @Prop({ type: [Object], default: [] }) escalations!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: [Object], default: [] }) messages!: Array<
     Record<string, unknown>
   >;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) satisfaction!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) attachments!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['open', 'in_progress', 'waiting_customer', 'resolved', 'closed'],

@@ -7,6 +7,15 @@ export type OrganizationDocument = HydratedDocument<Organization>;
 @Schema({ collection: COLLECTION_NAMES.ORGANIZATION, timestamps: true })
 export class Organization {
   @Prop({ required: true, trim: true }) name!: string;
+  @Prop({ trim: true, index: true }) legalName?: string;
+  @Prop({ trim: true, index: true }) organizationType?: string;
+  @Prop({ trim: true }) industry?: string;
+  @Prop({ trim: true }) website?: string;
+  @Prop({ trim: true }) primaryEmail?: string;
+  @Prop({ trim: true }) primaryPhone?: string;
+  @Prop({ trim: true }) timezone?: string;
+  @Prop({ trim: true }) locale?: string;
+  @Prop({ trim: true }) baseCurrency?: string;
   @Prop({
     required: true,
     trim: true,
@@ -32,11 +41,26 @@ export class Organization {
   })
   syncPolicy!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) billingProfile!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) address!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) contacts!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) subscription!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) commercial!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) branding!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) compliance!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) securityPolicy!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) integrations!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) notificationPolicy!: Record<
+    string,
+    unknown
+  >;
+  @Prop({ type: Object, default: {} }) retentionPolicy!: Record<
+    string,
+    unknown
+  >;
+  @Prop({ type: Object, default: {} }) auditPolicy!: Record<string, unknown>;
+  @Prop() onboardedAt?: Date;
+  @Prop() trialEndsAt?: Date;
+  @Prop() suspendedAt?: Date;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['active', 'inactive', 'suspended'],
