@@ -56,7 +56,7 @@ export class IdentityService {
   }
 
   listBranches(query: CrmListQueryDto) {
-    return listCrmRecords(this.branchModel, query, [
+    return listCrmRecords(this.branchModel, organizationOnlyQuery(query), [
       'name',
       'code',
       'city',
@@ -66,7 +66,12 @@ export class IdentityService {
   }
 
   findBranch(id: string, query: CrmListQueryDto) {
-    return findScopedCrmRecord(this.branchModel, id, query, 'Branch not found');
+    return findScopedCrmRecord(
+      this.branchModel,
+      id,
+      organizationOnlyQuery(query),
+      'Branch not found',
+    );
   }
 
   updateBranch(
@@ -78,7 +83,7 @@ export class IdentityService {
       this.branchModel,
       id,
       dto,
-      query,
+      organizationOnlyQuery(query),
       'Branch not found',
     );
   }
@@ -88,7 +93,7 @@ export class IdentityService {
       this.branchModel,
       id,
       { status: dto.status },
-      query,
+      organizationOnlyQuery(query),
       'Branch not found',
     );
   }
@@ -97,7 +102,7 @@ export class IdentityService {
     return deleteScopedCrmRecord(
       this.branchModel,
       id,
-      query,
+      organizationOnlyQuery(query),
       'Branch not found',
     );
   }
@@ -208,7 +213,7 @@ export class IdentityService {
   }
 
   listRoles(query: CrmListQueryDto) {
-    return listCrmRecords(this.roleModel, query, [
+    return listCrmRecords(this.roleModel, organizationOnlyQuery(query), [
       'name',
       'code',
       'description',
@@ -217,11 +222,22 @@ export class IdentityService {
   }
 
   findRole(id: string, query: CrmListQueryDto) {
-    return findScopedCrmRecord(this.roleModel, id, query, 'Role not found');
+    return findScopedCrmRecord(
+      this.roleModel,
+      id,
+      organizationOnlyQuery(query),
+      'Role not found',
+    );
   }
 
   updateRole(id: string, dto: Partial<CreateRoleDto>, query: CrmListQueryDto) {
-    return this.updateScoped(this.roleModel, id, dto, query, 'Role not found');
+    return this.updateScoped(
+      this.roleModel,
+      id,
+      dto,
+      organizationOnlyQuery(query),
+      'Role not found',
+    );
   }
 
   updateRoleStatus(id: string, dto: StatusUpdateDto, query: CrmListQueryDto) {
@@ -229,13 +245,18 @@ export class IdentityService {
       this.roleModel,
       id,
       { status: dto.status },
-      query,
+      organizationOnlyQuery(query),
       'Role not found',
     );
   }
 
   removeRole(id: string, query: CrmListQueryDto) {
-    return deleteScopedCrmRecord(this.roleModel, id, query, 'Role not found');
+    return deleteScopedCrmRecord(
+      this.roleModel,
+      id,
+      organizationOnlyQuery(query),
+      'Role not found',
+    );
   }
 
   async createPermission(dto: CreatePermissionDto) {
@@ -282,7 +303,7 @@ export class IdentityService {
 
   async updatePermission(id: string, dto: Partial<CreatePermissionDto>) {
     const permission = await this.permissionModel
-      .findByIdAndUpdate(id, normalizeCode(dto), { new: true })
+      .findByIdAndUpdate(id, normalizeCode(dto), { returnDocument: 'after' })
       .lean()
       .exec();
     if (!permission) throw new NotFoundException('Permission not found');
@@ -291,7 +312,11 @@ export class IdentityService {
 
   async updatePermissionStatus(id: string, dto: StatusUpdateDto) {
     const permission = await this.permissionModel
-      .findByIdAndUpdate(id, { status: dto.status }, { new: true })
+      .findByIdAndUpdate(
+        id,
+        { status: dto.status },
+        { returnDocument: 'after' },
+      )
       .lean()
       .exec();
     if (!permission) throw new NotFoundException('Permission not found');
@@ -307,14 +332,17 @@ export class IdentityService {
   }
 
   listUserRoles(query: CrmListQueryDto) {
-    return listCrmRecords(this.userRoleModel, query, ['userId', 'roleId']);
+    return listCrmRecords(this.userRoleModel, organizationOnlyQuery(query), [
+      'userId',
+      'roleId',
+    ]);
   }
 
   findUserRole(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(
       this.userRoleModel,
       id,
-      query,
+      organizationOnlyQuery(query),
       'User role assignment not found',
     );
   }
@@ -328,7 +356,7 @@ export class IdentityService {
       this.userRoleModel,
       id,
       dto,
-      query,
+      organizationOnlyQuery(query),
       'User role assignment not found',
     );
   }
@@ -342,7 +370,7 @@ export class IdentityService {
       this.userRoleModel,
       id,
       { status: dto.status },
-      query,
+      organizationOnlyQuery(query),
       'User role assignment not found',
     );
   }
@@ -351,7 +379,7 @@ export class IdentityService {
     return deleteScopedCrmRecord(
       this.userRoleModel,
       id,
-      query,
+      organizationOnlyQuery(query),
       'User role assignment not found',
     );
   }
@@ -364,17 +392,18 @@ export class IdentityService {
   }
 
   listRolePermissions(query: CrmListQueryDto) {
-    return listCrmRecords(this.rolePermissionModel, query, [
-      'roleId',
-      'permissionCode',
-    ]);
+    return listCrmRecords(
+      this.rolePermissionModel,
+      organizationOnlyQuery(query),
+      ['roleId', 'permissionCode'],
+    );
   }
 
   findRolePermission(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(
       this.rolePermissionModel,
       id,
-      query,
+      organizationOnlyQuery(query),
       'Role permission assignment not found',
     );
   }
@@ -390,7 +419,7 @@ export class IdentityService {
       dto.permissionCode
         ? { ...dto, permissionCode: dto.permissionCode.toLowerCase() }
         : dto,
-      query,
+      organizationOnlyQuery(query),
       'Role permission assignment not found',
     );
   }
@@ -404,7 +433,7 @@ export class IdentityService {
       this.rolePermissionModel,
       id,
       { status: dto.status },
-      query,
+      organizationOnlyQuery(query),
       'Role permission assignment not found',
     );
   }
@@ -413,7 +442,7 @@ export class IdentityService {
     return deleteScopedCrmRecord(
       this.rolePermissionModel,
       id,
-      query,
+      organizationOnlyQuery(query),
       'Role permission assignment not found',
     );
   }
@@ -446,7 +475,7 @@ export class IdentityService {
             status: 'pending',
           },
         },
-        { new: true, upsert: true },
+        { returnDocument: 'after', upsert: true },
       )
       .lean()
       .exec();
@@ -457,7 +486,7 @@ export class IdentityService {
       .findOneAndUpdate(
         { tokenHash, status: 'pending' },
         { status: 'accepted', acceptedAt: new Date() },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .lean()
       .exec();
@@ -579,4 +608,8 @@ function sanitizeUpdate(dto: Record<string, unknown>) {
 
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function organizationOnlyQuery<T extends CrmListQueryDto>(query: T) {
+  return { ...query, branchId: '' };
 }

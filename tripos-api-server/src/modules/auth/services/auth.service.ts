@@ -97,7 +97,7 @@ export class AuthService {
             permissions: [],
           },
         },
-        { new: true, upsert: true },
+        { returnDocument: 'after', upsert: true },
       )
       .exec();
     await this.identityService.recordInvitation({
@@ -234,7 +234,7 @@ export class AuthService {
       .findOneAndUpdate(
         { _id: session.userId, organizationId: session.organizationId },
         update,
-        { new: true },
+        { returnDocument: 'after' },
       )
       .lean()
       .exec();
@@ -376,7 +376,7 @@ export class AuthService {
           resetTokenHash: hashToken(resetToken),
           resetTokenExpiresAt: new Date(Date.now() + 1000 * 60 * 30),
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
     return withDevelopmentToken(
@@ -398,7 +398,7 @@ export class AuthService {
           status: 'active',
           $unset: { resetTokenHash: '', resetTokenExpiresAt: '' },
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
     if (!user)
@@ -422,7 +422,7 @@ export class AuthService {
           status: 'active',
           $unset: { invitationTokenHash: '', invitationExpiresAt: '' },
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
     if (!user)
@@ -564,7 +564,7 @@ export class AuthService {
     if (dto.permissions) update.permissions = dto.permissions;
     const user = await this.userModel
       .findOneAndUpdate(userScopeFilter(query, { _id: id }), update, {
-        new: true,
+        returnDocument: 'after',
       })
       .exec();
     if (!user) throw new ForbiddenException('CRM user not found');
@@ -589,7 +589,7 @@ export class AuthService {
     if (dto.permissions) update.permissions = dto.permissions;
     const user = await this.userModel
       .findOneAndUpdate(userScopeFilter(query, { _id: id }), update, {
-        new: true,
+        returnDocument: 'after',
       })
       .exec();
     if (!user) throw new ForbiddenException('CRM user not found');
@@ -601,7 +601,7 @@ export class AuthService {
       .findOneAndUpdate(
         userScopeFilter(query, { _id: id }),
         { status: 'inactive' },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
     if (!user) throw new ForbiddenException('CRM user not found');
@@ -723,13 +723,11 @@ function mergePermissions(
 function userScopeFilter(
   query: CrmListQueryDto,
   extra: Record<string, unknown> = {},
-) {
-  const filter: Record<string, unknown> = {
+) : Record<string, unknown> {
+  return {
     ...extra,
     organizationId: query.organizationId ?? 'demo-org',
   };
-  if (query.branchId) filter.branchId = query.branchId;
-  return filter;
 }
 
 function escapeRegex(value: string) {

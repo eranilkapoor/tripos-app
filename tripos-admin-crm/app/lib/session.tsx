@@ -8,7 +8,9 @@ import {
   type ReactNode,
 } from "react";
 import type { CrmSession } from "../components/crmTypes";
-import { apiPost } from "./apiClient";
+import { apiGet, apiPost } from "./apiClient";
+
+const SESSION_TOKEN_KEY = "tripos-crm-session-token";
 
 type SessionContextValue = {
   session: CrmSession | null;
@@ -28,11 +30,42 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    setAuthReady(true);
+    let mounted = true;
+    const token = window.localStorage.getItem(SESSION_TOKEN_KEY);
+    if (!token) {
+      setAuthReady(true);
+      return () => {
+        mounted = false;
+      };
+    }
+    apiGet<Omit<CrmSession, "token">>("auth/me", {
+      session: { token, user: {} },
+      errorMessage: "Stored session expired.",
+    })
+      .then((restoredSession) => {
+        if (!mounted) return;
+        setSession({ ...restoredSession, token });
+      })
+      .catch(() => {
+        window.localStorage.removeItem(SESSION_TOKEN_KEY);
+      })
+      .finally(() => {
+        if (mounted) setAuthReady(true);
+      });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   function login(nextSession: CrmSession) {
-    setSession(nextSession);
+    const normalizedSession =
+      nextSession.token || !session
+        ? nextSession
+        : { ...nextSession, token: session.token };
+    setSession(normalizedSession);
+    if (normalizedSession.token) {
+      window.localStorage.setItem(SESSION_TOKEN_KEY, normalizedSession.token);
+    }
   }
 
   async function logout() {
@@ -41,6 +74,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         () => undefined,
       );
     }
+    window.localStorage.removeItem(SESSION_TOKEN_KEY);
     setSession(null);
   }
 
@@ -49,7 +83,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     value: string,
   ) {
     if (!session) return;
-    const nextSession = await apiPost<CrmSession>(
+    const nextSession = await apiPost<Omit<CrmSession, "token">>(
       "auth/workspace",
       field === "organizationCode"
         ? { organizationCode: value }
@@ -59,7 +93,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         errorMessage: "Workspace access denied.",
       },
     );
-    setSession(nextSession);
+    setSession({ ...nextSession, token: session.token });
   }
 
   return (

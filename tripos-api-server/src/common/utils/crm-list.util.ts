@@ -73,7 +73,7 @@ export async function updateScopedCrmRecord<T>(
         Model<T>['findOneAndUpdate']
       >[0],
       update,
-      { new: true },
+      { returnDocument: 'after' },
     )
     .exec();
   if (!item) throw new NotFoundException(notFoundMessage);

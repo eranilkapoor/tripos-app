@@ -4,7 +4,7 @@ const identityModules: CrmModule[] = [
   {
     id: "branches",
     title: "Branches",
-    group: "Security",
+    group: "Access Control",
     endpoint: "identity/branches",
     description:
       "Organization branch offices, service desks, local settings, and operating status.",
@@ -29,7 +29,7 @@ const identityModules: CrmModule[] = [
   {
     id: "departments",
     title: "Departments",
-    group: "Security",
+    group: "Access Control",
     endpoint: "identity/departments",
     description:
       "Branch-level departments for sales, operations, finance, support, and management teams.",
@@ -49,7 +49,7 @@ const identityModules: CrmModule[] = [
   {
     id: "teams",
     title: "Teams",
-    group: "Security",
+    group: "Access Control",
     endpoint: "identity/teams",
     description:
       "Operational teams with branch, department, team lead, and member assignments.",
@@ -78,7 +78,7 @@ const identityModules: CrmModule[] = [
   {
     id: "roles",
     title: "Roles",
-    group: "Security",
+    group: "Access Control",
     endpoint: "identity/roles",
     description:
       "Organization roles for admins, branch managers, sales, operations, finance, agents, and custom teams.",
@@ -106,29 +106,23 @@ const identityModules: CrmModule[] = [
   },
   {
     id: "permissions",
-    title: "Permissions",
-    group: "Security",
+    title: "Permission Registry",
+    group: "Access Control",
     endpoint: "identity/permissions",
     description:
-      "Action-level permission catalog used by role policies and permission overrides.",
+      "Platform-managed action permissions used when granting access to organization roles.",
     columns: ["Module", "Action", "Code", "Label", "Status"],
     rowMap: ["module", "action", "code", "label", "status"],
     statusOptions: ["active", "inactive"],
-    fields: [
-      { key: "module", label: "Module", required: true },
-      { key: "action", label: "Action", required: true },
-      { key: "code", label: "Code", required: true },
-      { key: "label", label: "Label", required: true },
-      { key: "description", label: "Description" },
-    ],
+    fields: [],
   },
   {
     id: "user-roles",
-    title: "User Roles",
-    group: "Security",
+    title: "Role Assignments",
+    group: "Access Control",
     endpoint: "identity/user-roles",
     description:
-      "User-to-role assignments with allowed branches, departments, and teams.",
+      "Assign CRM users to roles and restrict access to selected branches, departments, and teams.",
     columns: ["User", "Role", "Branches", "Departments", "Teams", "Status"],
     rowMap: [
       "userId",
@@ -140,25 +134,25 @@ const identityModules: CrmModule[] = [
     ],
     statusOptions: ["active", "inactive"],
     fields: [
-      { key: "userId", label: "User ID", required: true },
-      { key: "roleId", label: "Role ID", required: true },
-      { key: "branchIds", label: "Branch IDs", type: "tags" },
-      { key: "departmentIds", label: "Department IDs", type: "tags" },
-      { key: "teamIds", label: "Team IDs", type: "tags" },
+      { key: "userId", label: "CRM User Ref", required: true },
+      { key: "roleId", label: "Role Ref", required: true },
+      { key: "branchIds", label: "Allowed Branch Refs", type: "tags" },
+      { key: "departmentIds", label: "Allowed Department Refs", type: "tags" },
+      { key: "teamIds", label: "Allowed Team Refs", type: "tags" },
     ],
   },
   {
     id: "role-permissions",
-    title: "Role Permissions",
-    group: "Security",
+    title: "Permission Grants",
+    group: "Access Control",
     endpoint: "identity/role-permissions",
     description:
-      "Role-to-permission grants for enterprise access policy management.",
+      "Grant module/action permissions to roles with optional scope and conditions.",
     columns: ["Role", "Permission", "Scope", "Status"],
     rowMap: ["roleId", "permissionCode", "scope", "status"],
     statusOptions: ["active", "inactive"],
     fields: [
-      { key: "roleId", label: "Role ID", required: true },
+      { key: "roleId", label: "Role Ref", required: true },
       { key: "permissionCode", label: "Permission Code", required: true },
       { key: "scope", label: "Scope" },
       { key: "conditions", label: "Conditions", type: "textarea" },
@@ -167,7 +161,7 @@ const identityModules: CrmModule[] = [
   {
     id: "invitations",
     title: "Invitations",
-    group: "Security",
+    group: "Access Control",
     endpoint: "identity/invitations",
     createEndpoint: "auth/invitations",
     description:
@@ -189,20 +183,31 @@ const identityModules: CrmModule[] = [
   },
   {
     id: "team-users",
-    title: "Users & Permissions",
-    group: "Security",
+    title: "Users",
+    group: "Access Control",
     endpoint: "auth/users",
+    createEndpoint: "auth/register-crm-user",
     description:
-      "CRM users, roles, branches, status, and fine-grained permission assignment.",
-    columns: ["Name", "Email", "Role", "Branch", "Status", "Permissions"],
-    rowMap: ["name", "email", "role", "branchId", "status", "permissions"],
+      "CRM users allowed to access the admin portal. Role policies and branch access are managed through assignments and grants.",
+    columns: ["Name", "Email", "Role", "Primary Branch", "Status"],
+    rowMap: ["name", "email", "role", "branchId", "status"],
     statusOptions: ["active", "inactive", "locked", "invited"],
-    fields: [],
+    fields: [
+      { key: "name", label: "Name", required: true },
+      { key: "email", label: "Email", required: true, type: "email" },
+      { key: "password", label: "Temporary Password", required: true },
+      { key: "role", label: "Primary Role Code" },
+      { key: "branchId", label: "Primary Branch Ref" },
+      { key: "branchIds", label: "Allowed Branch Refs", type: "tags" },
+      { key: "departmentIds", label: "Allowed Department Refs", type: "tags" },
+      { key: "teamIds", label: "Allowed Team Refs", type: "tags" },
+      { key: "permissions", label: "Direct Permission Overrides", type: "tags" },
+    ],
   },
   {
     id: "permission-catalog",
     title: "Permission Catalog",
-    group: "Security",
+    group: "Access Control",
     endpoint: "auth/permissions/catalog",
     description:
       "Module/action permission map used by organization admins and platform admins.",

@@ -23,7 +23,7 @@ export class RegisterCrmUserDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(6) password!: string;
   @IsString() @MinLength(2) name!: string;
-  @IsString() organizationId!: string;
+  @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
   @IsOptional() @IsArray() branchIds?: string[];
   @IsOptional() @IsArray() departmentIds?: string[];

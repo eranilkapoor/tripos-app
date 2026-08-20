@@ -7,6 +7,9 @@ import {
   faBell,
   faBuilding,
   faCodeBranch,
+  faGear,
+  faKey,
+  faUser,
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import type { ApiRecord } from "./crmTypes";
@@ -66,18 +69,15 @@ function CrmShellContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<ApiRecord | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
-  const [theme, setTheme] = useState<CrmTheme>("system");
+  const [theme, setTheme] = useState<CrmTheme>("light");
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const activeNavItemRef = useRef<HTMLButtonElement | null>(null);
   const selected = modules.find((item) => item.id === selectedId) ?? modules[0];
   const { session, authReady, login, logout, updateWorkspace } = useSession();
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem("tripos-crm-theme");
-    if (
-      storedTheme === "system" ||
-      storedTheme === "light" ||
-      storedTheme === "dark"
-    ) {
+    if (storedTheme === "light" || storedTheme === "dark") {
       setTheme(storedTheme);
     }
   }, []);
@@ -117,6 +117,7 @@ function CrmShellContent() {
     useModuleMutations(selected, setToast);
 
   function selectModule(id: string) {
+    setProfileMenuOpen(false);
     setSelectedId(id);
     router.push(id === "dashboard" ? "/" : `/${id}`);
   }
@@ -234,12 +235,15 @@ function CrmShellContent() {
       <section className="right-sec">
         <header className="topbar">
           <div className="topbar-title">
-            <strong>TripOS Admin CRM</strong>
+            <strong>
+              {selected.id === "dashboard" ? "Live Dashboard" : selected.title}
+            </strong>
             <small>
+              {selected.group} /{" "}
               {String(session.organization.name ?? "Organization Workspace")}
             </small>
           </div>
-          <div className="top-actions">
+          <div className="top-actions" role="toolbar" aria-label="CRM actions">
             <div className="header-workspace" aria-label="Workspace context">
               {isPlatformUser ? (
                 <label>
@@ -289,20 +293,9 @@ function CrmShellContent() {
               </label>
             </div>
             <ThemeSwitcher onChange={changeTheme} selectedTheme={theme} />
-            <div className="profile-chip">
-              <span>{String(session.user.name ?? "Admin").slice(0, 1)}</span>
-              <div>
-                <strong>{String(session.user.name ?? "TripOS Admin")}</strong>
-                <small>
-                  {formatDisplayValue(
-                    String(session.user.role ?? "organization_admin"),
-                  )}
-                </small>
-              </div>
-            </div>
             <button
               aria-label={`${notificationCount} notifications`}
-              className="icon-action notification-action"
+              className="topbar-icon-button notification-action"
               onClick={() => selectModule("notifications")}
               title="Notifications"
               type="button"
@@ -310,14 +303,51 @@ function CrmShellContent() {
               <FontAwesomeIcon aria-hidden icon={faBell} />
               {notificationCount ? <span>{notificationCount}</span> : null}
             </button>
-            <button
-              className="logout-action"
-              onClick={() => void handleLogout()}
-              type="button"
-            >
-              <FontAwesomeIcon aria-hidden icon={faRightFromBracket} />
-              <span>Logout</span>
-            </button>
+            <div className="profile-menu">
+              <button
+                aria-expanded={profileMenuOpen}
+                aria-haspopup="menu"
+                className="profile-menu-trigger"
+                onClick={() => setProfileMenuOpen((current) => !current)}
+                type="button"
+              >
+                <span className="profile-avatar">
+                  {String(session.user.name ?? "Admin").slice(0, 1)}
+                </span>
+                <span className="profile-name">
+                  {String(session.user.name ?? "TripOS Admin")}
+                </span>
+              </button>
+              {profileMenuOpen ? (
+                <div className="profile-menu-dropdown" role="menu">
+                  <button
+                    onClick={() => selectModule("my-profile")}
+                    type="button"
+                  >
+                    <FontAwesomeIcon aria-hidden icon={faUser} />
+                    <span>My Profile</span>
+                  </button>
+                  <button
+                    onClick={() => selectModule("change-password")}
+                    type="button"
+                  >
+                    <FontAwesomeIcon aria-hidden icon={faKey} />
+                    <span>Change Password</span>
+                  </button>
+                  <button
+                    onClick={() => selectModule("settings")}
+                    type="button"
+                  >
+                    <FontAwesomeIcon aria-hidden icon={faGear} />
+                    <span>Settings</span>
+                  </button>
+                  <button onClick={() => void handleLogout()} type="button">
+                    <FontAwesomeIcon aria-hidden icon={faRightFromBracket} />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              ) : null}
+            </div>
           </div>
         </header>
 
@@ -394,32 +424,34 @@ function CrmShellContent() {
             />
           )}
 
-          <section className="quick-grid">
-            <article>
-              <span className="eyebrow">Production Data</span>
-              <strong>Direct module APIs</strong>
-              <p>
-                CRM records now load from dedicated TripOS endpoints instead of
-                generic demo records.
-              </p>
-            </article>
-            <article>
-              <span className="eyebrow">B2B + Operations</span>
-              <strong>Inside admin CRM</strong>
-              <p>
-                Agents, supplier ops, vouchers, payments, documents, and tickets
-                stay in one back-office workspace.
-              </p>
-            </article>
-            <article>
-              <span className="eyebrow">Next Sync</span>
-              <strong>Mobile customer flows</strong>
-              <p>
-                The same APIs can power B2C trip status, vouchers, documents,
-                support, and payments in the app.
-              </p>
-            </article>
-          </section>
+          {selected.id === "dashboard" ? (
+            <section className="quick-grid">
+              <article>
+                <span className="eyebrow">Production Data</span>
+                <strong>Direct module APIs</strong>
+                <p>
+                  CRM records now load from dedicated TripOS endpoints instead
+                  of generic demo records.
+                </p>
+              </article>
+              <article>
+                <span className="eyebrow">B2B + Operations</span>
+                <strong>Inside admin CRM</strong>
+                <p>
+                  Agents, supplier ops, vouchers, payments, documents, and
+                  tickets stay in one back-office workspace.
+                </p>
+              </article>
+              <article>
+                <span className="eyebrow">Next Sync</span>
+                <strong>Mobile customer flows</strong>
+                <p>
+                  The same APIs can power B2C trip status, vouchers, documents,
+                  support, and payments in the app.
+                </p>
+              </article>
+            </section>
+          ) : null}
 
           {selectedRecord ? (
             <DetailPanel

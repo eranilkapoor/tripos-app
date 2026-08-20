@@ -151,6 +151,21 @@ export class AuthController {
   }
 
   @Roles('platform_admin', 'organization_admin')
+  @Patch('users/:id/status')
+  updateUserStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateCrmUserPermissionsDto,
+    @Query() query: CrmListQueryDto,
+    @Req() request: Request,
+  ) {
+    return this.service.updateUserPermissions(
+      id,
+      { status: dto.status },
+      organizationScopedQuery(query, request),
+    );
+  }
+
+  @Roles('platform_admin', 'organization_admin')
   @Patch('users/:id/permissions')
   updateUserPermissions(
     @Param('id') id: string,

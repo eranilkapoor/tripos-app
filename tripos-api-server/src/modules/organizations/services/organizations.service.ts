@@ -40,7 +40,7 @@ export class OrganizationsService {
         {
           $set: sanitizeOrganizationUpdate(dto),
         },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .lean()
       .exec();
@@ -54,7 +54,7 @@ export class OrganizationsService {
 
   async updateStatus(id: string, status: string) {
     const organization = await this.model
-      .findByIdAndUpdate(id, { status }, { new: true })
+      .findByIdAndUpdate(id, { status }, { returnDocument: 'after' })
       .lean()
       .exec();
     if (!organization) throw new NotFoundException('Organization not found');

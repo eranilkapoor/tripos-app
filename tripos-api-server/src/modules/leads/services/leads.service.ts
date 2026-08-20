@@ -93,7 +93,7 @@ export class LeadsService {
       .findOneAndUpdate(
         scopeFilter(query, { _id: id }),
         { assignedTo: dto.assignedTo, stage: 'assigned' },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
     if (!lead) throw new NotFoundException('Lead not found');
@@ -147,7 +147,7 @@ export class LeadsService {
       .findOneAndUpdate(
         scopeFilter(query, { _id: id }),
         { stage: dto.stage },
-        { new: true },
+        { returnDocument: 'after' },
       )
       .exec();
     if (!lead) throw new NotFoundException('Lead not found');

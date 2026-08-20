@@ -65,7 +65,7 @@ export class SubscriptionsService {
 
   async updatePlan(id: string, dto: Partial<CreatePricingPlanDto>) {
     const plan = await this.planModel
-      .findByIdAndUpdate(id, dto, { new: true })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .exec();
     if (!plan) throw new NotFoundException('Pricing plan not found');
     return plan;
@@ -169,7 +169,7 @@ export class SubscriptionsService {
             status: trialDays ? 'trialing' : 'active',
           },
         },
-        { new: true, upsert: true },
+        { returnDocument: 'after', upsert: true },
       )
       .exec();
     return subscription;

@@ -1,18 +1,16 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDesktop, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
-export type CrmTheme = "system" | "light" | "dark";
+export type CrmTheme = "light" | "dark";
 
 const crmThemes: { id: CrmTheme; label: string }[] = [
-  { id: "system", label: "System" },
   { id: "light", label: "Light" },
   { id: "dark", label: "Dark" },
 ];
 
 const themeIcons = {
-  system: faDesktop,
   light: faSun,
   dark: faMoon,
 };

@@ -211,29 +211,13 @@ async function main() {
     },
   ]);
 
-  await CrmUser.updateOne(
-    { email: 'admin@tripos.test' },
-    {
-      $set: {
-        name: 'TripOS Admin',
-        email: 'admin@tripos.test',
-        passwordHash: hashPassword('TripOS@123'),
-        organizationId: organizationId,
-        branchId: BRANCH_ID,
-        branchIds: ['delhi', 'dubai', 'jaipur'],
-        departmentIds: [],
-        teamIds: [],
-        role: 'organization_admin',
-        status: 'active',
-        permissions: ['*'],
-      },
-    },
-    { upsert: true },
-  ).exec();
+  await seedCrmUsers(CrmUser, organizationId);
 
-  const adminUser = await CrmUser.findOne({ email: 'admin@tripos.test' })
-    .lean()
-    .exec();
+  const seededUsers = await CrmUser.find({ organizationId }).lean().exec();
+  const usersByRole = new Map(
+    seededUsers.map((user) => [String(user.role), user]),
+  );
+  const adminUser = usersByRole.get('organization_admin');
 
   await upsertMany(Branch, 'code', [
     {
@@ -404,49 +388,14 @@ async function main() {
     },
   ]);
 
-  const adminRole = await Role.findOne({
+  const seededRoles = await Role.find({ organizationId }).lean().exec();
+  await seedRoleAssignments(
+    UserRole,
     organizationId,
-    code: 'organization_admin',
-  })
-    .lean()
-    .exec();
-  if (adminRole && adminUser) {
-    await UserRole.updateOne(
-      {
-        organizationId,
-        userId: String(adminUser._id),
-        roleId: String(adminRole._id),
-      },
-      {
-        $set: {
-          organizationId,
-          userId: String(adminUser._id),
-          roleId: String(adminRole._id),
-          branchIds: ['delhi', 'dubai', 'jaipur'],
-          departmentIds: [],
-          teamIds: [],
-          status: 'active',
-        },
-      },
-      { upsert: true },
-    ).exec();
-    await RolePermission.updateOne(
-      {
-        organizationId,
-        roleId: String(adminRole._id),
-        permissionCode: '*',
-      },
-      {
-        $set: {
-          organizationId,
-          roleId: String(adminRole._id),
-          permissionCode: '*',
-          status: 'active',
-        },
-      },
-      { upsert: true },
-    ).exec();
-  }
+    seededUsers,
+    seededRoles,
+  );
+  await seedRolePermissionGrants(RolePermission, organizationId, seededRoles);
 
   await upsertMany(Lead, 'phone', [
     {
@@ -1015,6 +964,9 @@ async function main() {
   console.log(
     'CRM login: admin@tripos.test / TripOS@123 / organization WEBNZA / branch delhi',
   );
+  console.log(
+    'Additional CRM users: platform@tripos.test, manager@tripos.test, sales@tripos.test, operations@tripos.test, finance@tripos.test. Password: TripOS@123',
+  );
 }
 
 function model(name: string, schema: mongoose.Schema) {
@@ -1090,6 +1042,213 @@ async function upsertMany(
     });
     throw error;
   }
+}
+
+async function seedCrmUsers(
+  modelRef: mongoose.Model<unknown>,
+  organizationId: string,
+) {
+  const users = [
+    {
+      name: 'TripOS Platform Owner',
+      email: 'platform@tripos.test',
+      branchId: 'delhi',
+      branchIds: ['delhi', 'dubai', 'jaipur'],
+      role: 'platform_admin',
+      permissions: ['*'],
+    },
+    {
+      name: 'TripOS Admin',
+      email: 'admin@tripos.test',
+      branchId: 'delhi',
+      branchIds: ['delhi', 'dubai', 'jaipur'],
+      role: 'organization_admin',
+      permissions: ['*'],
+    },
+    {
+      name: 'Delhi Branch Manager',
+      email: 'manager@tripos.test',
+      branchId: 'delhi',
+      branchIds: ['delhi'],
+      role: 'branch_manager',
+      permissions: [],
+    },
+    {
+      name: 'Sales Consultant',
+      email: 'sales@tripos.test',
+      branchId: 'delhi',
+      branchIds: ['delhi'],
+      departmentIds: ['sales'],
+      teamIds: ['b2c-sales'],
+      role: 'sales',
+      permissions: [],
+    },
+    {
+      name: 'Operations Executive',
+      email: 'operations@tripos.test',
+      branchId: 'delhi',
+      branchIds: ['delhi'],
+      departmentIds: ['operations'],
+      teamIds: ['dmc-ops'],
+      role: 'operations',
+      permissions: [],
+    },
+    {
+      name: 'Finance Executive',
+      email: 'finance@tripos.test',
+      branchId: 'delhi',
+      branchIds: ['delhi'],
+      departmentIds: ['finance'],
+      role: 'finance',
+      permissions: [],
+    },
+    {
+      name: 'B2B Agent User',
+      email: 'agent@tripos.test',
+      branchId: 'delhi',
+      branchIds: ['delhi'],
+      role: 'agent',
+      permissions: [],
+    },
+  ];
+
+  await modelRef.bulkWrite(
+    users.map((user) => ({
+      updateOne: {
+        filter: { organizationId, email: user.email },
+        update: {
+          $set: {
+            ...user,
+            organizationId,
+            passwordHash: hashPassword('TripOS@123'),
+            departmentIds: user.departmentIds ?? [],
+            teamIds: user.teamIds ?? [],
+            status: 'active',
+          },
+        },
+        upsert: true,
+      },
+    })),
+    { ordered: true },
+  );
+  console.log(`Seeded CrmUser: ${users.length} record(s).`);
+}
+
+async function seedRoleAssignments(
+  modelRef: mongoose.Model<unknown>,
+  organizationId: string,
+  users: Array<Record<string, unknown>>,
+  roles: Array<Record<string, unknown>>,
+) {
+  const roleByCode = new Map(roles.map((role) => [String(role.code), role]));
+  const assignments = users
+    .map((user) => {
+      const role = roleByCode.get(String(user.role));
+      if (!role || String(user.role) === 'platform_admin') return null;
+      return {
+        organizationId,
+        userId: String(user._id),
+        roleId: String(role._id),
+        branchIds: (user.branchIds as string[]) ?? [],
+        departmentIds: (user.departmentIds as string[]) ?? [],
+        teamIds: (user.teamIds as string[]) ?? [],
+        status: 'active',
+      };
+    })
+    .filter(Boolean) as Array<Record<string, unknown>>;
+
+  if (!assignments.length) return;
+  await modelRef.bulkWrite(
+    assignments.map((assignment) => ({
+      updateOne: {
+        filter: {
+          organizationId,
+          userId: assignment.userId,
+          roleId: assignment.roleId,
+        },
+        update: { $set: assignment },
+        upsert: true,
+      },
+    })),
+    { ordered: true },
+  );
+  console.log(`Seeded UserRole: ${assignments.length} record(s).`);
+}
+
+async function seedRolePermissionGrants(
+  modelRef: mongoose.Model<unknown>,
+  organizationId: string,
+  roles: Array<Record<string, unknown>>,
+) {
+  const permissionsByRole: Record<string, string[]> = {
+    organization_admin: ['*'],
+    branch_manager: [
+      'leads:read',
+      'leads:create',
+      'leads:update',
+      'customers:read',
+      'quotations:read',
+      'quotations:create',
+      'quotations:update',
+      'bookings:read',
+      'bookings:update',
+      'operations:read',
+      'reports:read',
+    ],
+    sales: [
+      'leads:read',
+      'leads:create',
+      'leads:update',
+      'customers:read',
+      'quotations:read',
+      'quotations:create',
+      'quotations:update',
+      'itineraries:read',
+      'bookings:read',
+    ],
+    operations: [
+      'bookings:read',
+      'bookings:update',
+      'suppliers:read',
+      'operations:read',
+      'operations:create',
+      'operations:update',
+      'documents:read',
+    ],
+    finance: [
+      'payments:read',
+      'payments:create',
+      'payments:update',
+      'finance:read',
+      'finance:create',
+      'finance:update',
+      'finance:export',
+    ],
+  };
+  const grants = roles.flatMap((role) =>
+    (permissionsByRole[String(role.code)] ?? []).map((permissionCode) => ({
+      organizationId,
+      roleId: String(role._id),
+      permissionCode,
+      status: 'active',
+    })),
+  );
+  if (!grants.length) return;
+  await modelRef.bulkWrite(
+    grants.map((grant) => ({
+      updateOne: {
+        filter: {
+          organizationId,
+          roleId: grant.roleId,
+          permissionCode: grant.permissionCode,
+        },
+        update: { $set: grant },
+        upsert: true,
+      },
+    })),
+    { ordered: true },
+  );
+  console.log(`Seeded RolePermission: ${grants.length} record(s).`);
 }
 
 function hashPassword(password: string) {

@@ -65,6 +65,14 @@ const byId = new Map<string, CrmModule>(
   ].map((module) => [module.id, module]),
 );
 
+const TOPBAR_ONLY_MODULES = new Set([
+  "my-profile",
+  "change-password",
+  "notifications",
+  "permission-catalog",
+  "settings",
+]);
+
 export const modules: CrmModule[] = ORIGINAL_ORDER.map((id) => {
   const moduleConfig = byId.get(id);
   if (!moduleConfig) throw new Error(`Missing module config for "${id}"`);
@@ -73,6 +81,7 @@ export const modules: CrmModule[] = ORIGINAL_ORDER.map((id) => {
 
 export const navGroups = modules.reduce<{ title: string; items: string[] }[]>(
   (groups, module) => {
+    if (TOPBAR_ONLY_MODULES.has(module.id)) return groups;
     const existing = groups.find((group) => group.title === module.group);
     if (existing) existing.items.push(module.id);
     else groups.push({ title: module.group, items: [module.id] });
