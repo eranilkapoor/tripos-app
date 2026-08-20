@@ -74,6 +74,11 @@ const PROTECTED_MODULES = new Set([
   'ai',
   'batch-jobs',
   'settings',
+  'workflows',
+  'communications',
+  'feature-flags',
+  'imports-exports',
+  'operating-records',
   'plans',
   'subscriptions',
   'tasks',
@@ -124,6 +129,10 @@ function permissionModule(moduleName: string) {
     return 'reports';
   }
   if (moduleName === 'ai') return 'settings';
+  if (moduleName === 'feature-flags') return 'settings';
+  if (moduleName === 'imports-exports') return 'reports';
+  if (moduleName === 'operating-records') return 'tasks';
+  if (moduleName === 'communications') return 'campaigns';
   if (moduleName === 'plans' || moduleName === 'subscriptions')
     return 'billing';
   return moduleName;

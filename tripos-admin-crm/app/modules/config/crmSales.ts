@@ -1,9 +1,9 @@
 import type { CrmModule } from "../../components/crmTypes";
 
 const ownerFields = [
-  { key: "ownerId", label: "Owner User ID" },
-  { key: "teamId", label: "Team ID" },
-  { key: "departmentId", label: "Department ID" },
+      { key: "ownerId", label: "Owner User Ref" },
+      { key: "teamId", label: "Team Ref" },
+      { key: "departmentId", label: "Department Ref" },
 ];
 
 const crmMetadataFields = [

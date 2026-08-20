@@ -168,6 +168,7 @@ const marketingModules: CrmModule[] = [
       "Booking",
       "Channel",
       "Priority",
+      "Owner",
       "Status",
     ],
     rowMap: [
@@ -177,6 +178,7 @@ const marketingModules: CrmModule[] = [
       "bookingId",
       "channel",
       "priority",
+      "ownerId",
       "status",
     ],
     statusOptions: [
@@ -200,7 +202,15 @@ const marketingModules: CrmModule[] = [
         type: "select",
         options: ["low", "medium", "high", "urgent"],
       },
+      { key: "assignedTo", label: "Assigned To" },
       { key: "ownerId", label: "Owner User ID" },
+      {
+        key: "firstResponseDueAt",
+        label: "First Response Due",
+        type: "date",
+      },
+      { key: "resolutionDueAt", label: "Resolution Due", type: "date" },
+      { key: "resolvedAt", label: "Resolved At", type: "date" },
       { key: "description", label: "Description", type: "textarea" },
       { key: "messages", label: "Messages", type: "textarea" },
       { key: "tags", label: "Tags", type: "tags" },

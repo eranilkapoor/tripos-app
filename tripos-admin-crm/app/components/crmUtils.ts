@@ -152,6 +152,8 @@ export function toPayload(
               .filter(Boolean)
           : field.type === "textarea"
             ? parseTextareaValue(raw ?? "")
+            : raw === "true" || raw === "false"
+              ? raw === "true"
             : (raw ?? "");
     assignPath(payload, field.key, value);
   }

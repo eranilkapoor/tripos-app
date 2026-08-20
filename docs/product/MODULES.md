@@ -45,6 +45,8 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 - Lead source
 - Lead assignment
 - Pipeline statuses
+- Contacts
+- Activities
 - Tasks and follow-ups
 - Notes and activities
 - Customer profile
@@ -105,6 +107,9 @@ TripOS modules are grouped by launch ownership, not by slow delivery phases. The
 
 - Daily operations dashboard
 - Cross-module tasks and follow-ups
+- Meetings
+- Notes
+- Field force visits and check-ins
 - Hotel confirmations
 - Transfer assignments
 - Driver assignments
@@ -129,6 +134,7 @@ Operations lives inside `tripos-admin-crm` as role-based views for launch.
 ### Communication
 
 - Notifications module
+- Communication log
 - WhatsApp templates
 - Email templates
 - SMS templates
@@ -170,6 +176,8 @@ B2B lives inside `tripos-admin-crm` as restricted role-based views for launch. A
 ### Marketing Automation
 
 - Campaigns
+- Content management
+- Feature flag based rollout campaigns
 - Lead source analytics
 - Funnel reports
 - ROI reports
@@ -188,6 +196,7 @@ B2B lives inside `tripos-admin-crm` as restricted role-based views for launch. A
 ## Current Launch Notes
 
 - Admin CRM modules are API-backed with list/search/sort/pagination, create, edit, import/export, detail, and status mutation patterns.
+- Shared CRM modules for contacts, activities, follow-ups, meetings, notes, service catalog, custom fields, call center, field force, content, analytics, workflows, communications, feature flags, and import/export jobs are implemented as organization-scoped API/CRM modules.
 - SaaS pricing and subscription modules are implemented for TripOS platform ownership.
 - Mobile customer/agent app has persisted secure sessions, refresh handling, and API-backed records for trips, documents, payments, support, and agent work queues.
 - Public website has lead capture, SEO/legal foundations, cookie consent, and production build coverage.

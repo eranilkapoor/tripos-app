@@ -58,6 +58,14 @@ export class AuthService {
       departmentIds: dto.departmentIds ?? [],
       teamIds: dto.teamIds ?? [],
       role: dto.role ?? 'organization_admin',
+      phone: dto.phone,
+      timezone: dto.timezone ?? 'Asia/Kolkata',
+      locale: dto.locale ?? 'en',
+      employeeCode: dto.employeeCode,
+      managerUserId: dto.managerUserId,
+      profile: dto.profile ?? {},
+      preferences: dto.preferences ?? {},
+      notificationPreferences: dto.notificationPreferences ?? {},
       passwordHash: hashPassword(dto.password),
     });
     return sanitizeUser(user.toObject());
@@ -88,6 +96,14 @@ export class AuthService {
             departmentIds: dto.departmentIds ?? [],
             teamIds: dto.teamIds ?? [],
             role: dto.role ?? 'sales',
+            phone: dto.phone,
+            timezone: dto.timezone ?? 'Asia/Kolkata',
+            locale: dto.locale ?? 'en',
+            employeeCode: dto.employeeCode,
+            managerUserId: dto.managerUserId,
+            profile: dto.profile ?? {},
+            preferences: dto.preferences ?? {},
+            notificationPreferences: dto.notificationPreferences ?? {},
             status: 'invited',
             invitationTokenHash: hashToken(invitationToken),
             invitationExpiresAt,
@@ -325,6 +341,7 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
 
     let organizationId = String(session.organizationId);
+    let selectedOrganization: Record<string, unknown> | null = null;
     if (dto.organizationCode) {
       const organization = await this.organizationsService.findByCode(
         dto.organizationCode,
@@ -341,11 +358,15 @@ export class AuthService {
         throw new ForbiddenException('Organization access denied');
       }
       organizationId = requestedOrganizationId;
+      selectedOrganization = organization as unknown as Record<string, unknown>;
     }
 
     const branchId =
       user.role === 'platform_admin'
-        ? (dto.branchId ?? session.branchId)
+        ? (dto.branchId ??
+          (selectedOrganization
+            ? defaultOrganizationBranchId(selectedOrganization)
+            : session.branchId))
         : assertBranchAccess(dto.branchId ?? session.branchId, user);
 
     await this.sessionModel
@@ -555,6 +576,16 @@ export class AuthService {
   ) {
     const update: Record<string, unknown> = {};
     if (dto.role) update.role = dto.role;
+    if (dto.phone !== undefined) update.phone = dto.phone;
+    if (dto.timezone !== undefined) update.timezone = dto.timezone;
+    if (dto.locale !== undefined) update.locale = dto.locale;
+    if (dto.employeeCode !== undefined) update.employeeCode = dto.employeeCode;
+    if (dto.managerUserId !== undefined)
+      update.managerUserId = dto.managerUserId;
+    if (dto.profile) update.profile = dto.profile;
+    if (dto.preferences) update.preferences = dto.preferences;
+    if (dto.notificationPreferences)
+      update.notificationPreferences = dto.notificationPreferences;
     if (dto.status) update.status = dto.status;
     if (dto.branchId) update.branchId = dto.branchId;
     if (dto.branchIds)
@@ -580,6 +611,16 @@ export class AuthService {
     if (dto.name) update.name = dto.name;
     if (dto.email) update.email = dto.email.toLowerCase();
     if (dto.role) update.role = dto.role;
+    if (dto.phone !== undefined) update.phone = dto.phone;
+    if (dto.timezone !== undefined) update.timezone = dto.timezone;
+    if (dto.locale !== undefined) update.locale = dto.locale;
+    if (dto.employeeCode !== undefined) update.employeeCode = dto.employeeCode;
+    if (dto.managerUserId !== undefined)
+      update.managerUserId = dto.managerUserId;
+    if (dto.profile) update.profile = dto.profile;
+    if (dto.preferences) update.preferences = dto.preferences;
+    if (dto.notificationPreferences)
+      update.notificationPreferences = dto.notificationPreferences;
     if (dto.status) update.status = dto.status;
     if (dto.branchId) update.branchId = dto.branchId;
     if (dto.branchIds)
@@ -720,10 +761,21 @@ function mergePermissions(
   ];
 }
 
+function defaultOrganizationBranchId(organization: Record<string, unknown>) {
+  const branches = Array.isArray(organization.branches)
+    ? organization.branches
+    : [];
+  const firstBranch = branches.find(
+    (branch): branch is Record<string, unknown> =>
+      Boolean(branch) && typeof branch === 'object',
+  );
+  return String(firstBranch?.id ?? 'main');
+}
+
 function userScopeFilter(
   query: CrmListQueryDto,
   extra: Record<string, unknown> = {},
-) : Record<string, unknown> {
+): Record<string, unknown> {
   return {
     ...extra,
     organizationId: query.organizationId ?? 'demo-org',

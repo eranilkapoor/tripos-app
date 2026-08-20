@@ -28,6 +28,11 @@ import { TagSchema } from '../tags/schemas/tag.schema';
 import { TaskSchema } from '../tasks/schemas/task.schema';
 import { PricingPlanSchema } from '../subscriptions/schemas/pricing-plan.schema';
 import { SubscriptionSchema } from '../subscriptions/schemas/subscription.schema';
+import { WorkflowRuleSchema } from '../workflows/schemas/workflow-rule.schema';
+import { CommunicationSchema } from '../communications/schemas/communication.schema';
+import { FeatureFlagSchema } from '../feature-flags/schemas/feature-flag.schema';
+import { ImportExportJobSchema } from '../imports-exports/schemas/import-export-job.schema';
+import { OperatingRecordSchema } from '../operating-records/schemas/operating-record.schema';
 import {
   BranchSchema,
   DepartmentSchema,
@@ -74,6 +79,11 @@ async function main() {
   const Task = model('Task', TaskSchema);
   const PricingPlan = model('PricingPlan', PricingPlanSchema);
   const Subscription = model('Subscription', SubscriptionSchema);
+  const WorkflowRule = model('WorkflowRule', WorkflowRuleSchema);
+  const Communication = model('Communication', CommunicationSchema);
+  const FeatureFlag = model('FeatureFlag', FeatureFlagSchema);
+  const ImportExportJob = model('ImportExportJob', ImportExportJobSchema);
+  const OperatingRecord = model('OperatingRecord', OperatingRecordSchema);
   const Branch = model('Branch', BranchSchema);
   const Department = model('Department', DepartmentSchema);
   const Team = model('Team', TeamSchema);
@@ -104,6 +114,50 @@ async function main() {
   ).exec();
 
   const organizationId = String(organization._id);
+  await upsertMany(Organization, 'code', [
+    {
+      name: 'TripOS Demo Company',
+      code: 'TRIPOS',
+      dataHostingMode: 'tripos_cloud',
+      branches: [
+        { id: 'main', name: 'Main Office', city: 'Bengaluru' },
+        { id: 'remote', name: 'Remote Desk', city: 'Remote' },
+      ],
+      syncPolicy: {
+        syncMode: 'realtime',
+        offlineWindowHours: 24,
+        customerManagedStorage: false,
+      },
+      status: 'active',
+    },
+    {
+      name: 'DMC Operations',
+      code: 'DMC',
+      dataHostingMode: 'hybrid_sync',
+      branches: [
+        { id: 'dubai', name: 'Dubai Operations', city: 'Dubai' },
+        { id: 'singapore', name: 'Singapore Desk', city: 'Singapore' },
+      ],
+      syncPolicy: {
+        syncMode: 'scheduled',
+        offlineWindowHours: 48,
+        customerManagedStorage: true,
+      },
+      status: 'active',
+    },
+  ]);
+  const switchableOrganizations = await Organization.find({
+    code: { $in: ['TRIPOS', 'DMC'] },
+  })
+    .lean()
+    .exec();
+  await upsertMany(
+    Branch,
+    'code',
+    switchableOrganizations.flatMap((item) =>
+      normalizeSeedBranches(String(item._id), item.branches),
+    ),
+  );
   await upsertMany(PricingPlan, 'code', [
     {
       code: 'starter',
@@ -389,12 +443,7 @@ async function main() {
   ]);
 
   const seededRoles = await Role.find({ organizationId }).lean().exec();
-  await seedRoleAssignments(
-    UserRole,
-    organizationId,
-    seededUsers,
-    seededRoles,
-  );
+  await seedRoleAssignments(UserRole, organizationId, seededUsers, seededRoles);
   await seedRolePermissionGrants(RolePermission, organizationId, seededRoles);
 
   await upsertMany(Lead, 'phone', [
@@ -843,6 +892,310 @@ async function main() {
     },
   ]);
 
+  await upsertMany(FeatureFlag, 'key', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      key: 'b2c_mobile_vouchers',
+      label: 'B2C Mobile Vouchers',
+      category: 'mobile',
+      enabled: true,
+      rollout: { percentage: 100 },
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      key: 'agent_credit_approval',
+      label: 'Agent Credit Approval',
+      category: 'b2b',
+      enabled: true,
+      rollout: { roles: ['organization_admin', 'finance'] },
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(WorkflowRule, 'code', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Quotation Expiry Follow Up',
+      code: 'quotation-expiry-follow-up',
+      module: 'quotations',
+      trigger: 'quotation_expiring',
+      conditions: { daysBeforeExpiry: 1, status: ['sent'] },
+      actions: [
+        { type: 'create_task', owner: 'sales', priority: 'high' },
+        { type: 'send_whatsapp', templateCode: 'quotation_expiry_reminder' },
+      ],
+      priority: 20,
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      name: 'Supplier SLA Escalation',
+      code: 'supplier-sla-escalation',
+      module: 'operations',
+      trigger: 'task_overdue',
+      conditions: { slaStatus: 'breached' },
+      actions: [{ type: 'notify_role', role: 'operations' }],
+      priority: 10,
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Communication, 'providerMessageId', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      channel: 'whatsapp',
+      category: 'transactional',
+      entityType: 'booking',
+      entityId: 'BK-DXB-001',
+      recipient: '+919811110001',
+      recipientName: 'Rohit Sharma',
+      subject: 'Dubai booking voucher ready',
+      templateCode: 'voucher_ready',
+      provider: 'sandbox',
+      providerMessageId: 'sandbox_msg_voucher_001',
+      sentAt: new Date(),
+      status: 'delivered',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      channel: 'email',
+      category: 'marketing',
+      entityType: 'lead',
+      entityId: 'lead_corporate_demo',
+      recipient: 'travel.manager@example.com',
+      recipientName: 'Travel Manager',
+      subject: 'Corporate Thailand proposal',
+      templateCode: 'quotation_sent',
+      provider: 'sandbox',
+      providerMessageId: 'sandbox_email_quote_001',
+      status: 'sent',
+    },
+  ]);
+
+  await upsertMany(ImportExportJob, 'fileName', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      jobType: 'import',
+      module: 'customers',
+      fileName: 'demo-customer-import.csv',
+      format: 'csv',
+      totalRows: 42,
+      successRows: 40,
+      failedRows: 2,
+      requestedBy: 'admin@tripos.test',
+      completedAt: new Date(),
+      status: 'completed',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      jobType: 'export',
+      module: 'bookings',
+      fileName: 'booking-export-august.xlsx',
+      format: 'xlsx',
+      totalRows: 18,
+      successRows: 18,
+      failedRows: 0,
+      requestedBy: 'finance@tripos.test',
+      completedAt: new Date(),
+      status: 'completed',
+    },
+  ]);
+
+  await upsertMany(OperatingRecord, 'code', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'contacts',
+      title: 'Sharma Family Emergency Contact',
+      code: 'contact-sharma-family-emergency',
+      category: 'Emergency Contact',
+      entityType: 'customer',
+      entityId: 'Rohit Sharma',
+      ownerId: 'operations@tripos.test',
+      assignedTo: 'operations@tripos.test',
+      channel: 'phone',
+      priority: 'high',
+      description:
+        'Primary local contact for Dubai family departure and arrival coordination.',
+      details: { phone: '+919811110001', relation: 'Traveller' },
+      tags: ['family', 'dubai'],
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'activities',
+      title: 'Corporate Thailand Discovery Call',
+      code: 'activity-corporate-thailand-discovery',
+      category: 'Sales Call',
+      entityType: 'lead',
+      entityId: 'Thailand Corporate Incentive',
+      ownerId: 'sales@tripos.test',
+      assignedTo: 'sales@tripos.test',
+      channel: 'phone',
+      priority: 'medium',
+      scheduledAt: new Date(),
+      description:
+        'Captured group size, budget range, preferred dates, and approval workflow.',
+      status: 'completed',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'follow-ups',
+      title: 'Quotation Expiry Reminder',
+      code: 'followup-quotation-expiry-reminder',
+      category: 'Quotation',
+      entityType: 'quotation',
+      entityId: 'Dubai Family Quote',
+      ownerId: 'sales@tripos.test',
+      assignedTo: 'sales@tripos.test',
+      channel: 'whatsapp',
+      priority: 'high',
+      dueAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      description: 'Follow up before supplier rates expire.',
+      status: 'open',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'meetings',
+      title: 'Supplier Review With Desert Safari Partner',
+      code: 'meeting-desert-safari-supplier-review',
+      category: 'Supplier Review',
+      entityType: 'supplier',
+      entityId: 'Desert Safari Partner',
+      ownerId: 'operations@tripos.test',
+      assignedTo: 'operations@tripos.test',
+      channel: 'video',
+      priority: 'medium',
+      scheduledAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      details: { agenda: ['SLA', 'vehicle quality', 'peak season capacity'] },
+      status: 'open',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'notes',
+      title: 'Passport Copy Pending',
+      code: 'note-passport-copy-pending',
+      category: 'Booking Note',
+      entityType: 'booking',
+      entityId: 'Dubai Family Booking',
+      ownerId: 'operations@tripos.test',
+      description:
+        'Two child traveller passport copies are still pending from customer.',
+      priority: 'medium',
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'service-catalog',
+      title: 'Dubai Airport Private Transfer',
+      code: 'service-dubai-private-transfer',
+      category: 'Transfer',
+      entityType: 'service',
+      entityId: 'DXB-TRANSFER-PRIVATE',
+      ownerId: 'operations@tripos.test',
+      priority: 'medium',
+      details: {
+        supplier: 'Dubai Transfers LLC',
+        currency: 'AED',
+        baseCost: 180,
+      },
+      tags: ['transfer', 'dubai'],
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'custom-fields',
+      title: 'Passport Expiry Capture',
+      code: 'custom-field-passport-expiry',
+      category: 'Traveller Field',
+      entityType: 'travel_document',
+      entityId: 'passportExpiryDate',
+      ownerId: 'admin@tripos.test',
+      details: { fieldType: 'date', requiredFor: ['international_booking'] },
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'call-center',
+      title: 'Hot Lead Callback Queue',
+      code: 'call-center-hot-lead-callback',
+      category: 'Outbound',
+      entityType: 'lead',
+      entityId: 'Thailand Corporate Incentive',
+      ownerId: 'sales@tripos.test',
+      assignedTo: 'sales@tripos.test',
+      channel: 'phone',
+      priority: 'urgent',
+      dueAt: new Date(Date.now() + 4 * 60 * 60 * 1000),
+      details: { disposition: 'Interested', nextAction: 'Send revised quote' },
+      status: 'open',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'field-force',
+      title: 'Hotel Inspection Checklist',
+      code: 'field-force-hotel-inspection',
+      category: 'Supplier Visit',
+      entityType: 'supplier',
+      entityId: 'Dubai Marina Hotel',
+      ownerId: 'operations@tripos.test',
+      assignedTo: 'operations@tripos.test',
+      priority: 'medium',
+      scheduledAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      details: {
+        location: 'Dubai Marina',
+        checklist: ['rooms', 'breakfast', 'coach parking'],
+      },
+      status: 'open',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'content',
+      title: 'Dubai Family Package FAQ',
+      code: 'content-dubai-family-faq',
+      category: 'FAQ',
+      entityType: 'tour_package',
+      entityId: 'Dubai Family Package',
+      ownerId: 'marketing@tripos.test',
+      details: { publishTarget: 'public_website', locale: 'en-IN' },
+      status: 'active',
+    },
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      moduleKey: 'analytics',
+      title: 'Sales Funnel Conversion',
+      code: 'analytics-sales-funnel-conversion',
+      category: 'Sales',
+      entityType: 'report',
+      entityId: 'sales_funnel',
+      ownerId: 'admin@tripos.test',
+      details: {
+        dimensions: ['source', 'destination', 'branch'],
+        metrics: ['leadCount', 'quoteValue', 'bookingValue'],
+      },
+      status: 'active',
+    },
+  ]);
+
   await upsertMany(Tag, 'name', [
     {
       organizationId,
@@ -1262,6 +1615,21 @@ function titleCase(value: string) {
     .split(/[-_]/g)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+function normalizeSeedBranches(
+  organizationId: string,
+  branches: Array<Record<string, unknown>>,
+) {
+  return branches.map((branch) => ({
+    organizationId,
+    name: String(branch.name ?? titleCase(String(branch.id ?? 'main'))),
+    code: String(branch.id ?? branch.code ?? 'main'),
+    city: String(branch.city ?? ''),
+    country: String(branch.country ?? ''),
+    timezone: String(branch.timezone ?? 'Asia/Kolkata'),
+    status: 'active',
+  }));
 }
 
 void main().catch((error) => {

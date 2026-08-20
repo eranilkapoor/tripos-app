@@ -32,18 +32,7 @@ import LoginScreen from "./LoginScreen";
 import DashboardPanel from "./DashboardPanel";
 import ThemeSwitcher, { type CrmTheme } from "./ThemeSwitcher";
 import AccountPanel from "./AccountPanel";
-
-const organizationOptions = [
-  { value: "WEBNZA", label: "Webnza Travel Group" },
-  { value: "TRIPOS", label: "TripOS Demo Company" },
-  { value: "DMC", label: "DMC Operations" },
-];
-const branchOptions = [
-  { value: "delhi", label: "Delhi Branch" },
-  { value: "mumbai", label: "Mumbai Branch" },
-  { value: "dubai", label: "Dubai Branch" },
-  { value: "remote", label: "Remote Team" },
-];
+import { apiGet } from "../lib/apiClient";
 
 export default function CrmShell() {
   return (
@@ -71,6 +60,12 @@ function CrmShellContent() {
   const [selectedRecord, setSelectedRecord] = useState<ApiRecord | null>(null);
   const [theme, setTheme] = useState<CrmTheme>("light");
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [organizationOptions, setOrganizationOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [branchOptions, setBranchOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
   const activeNavItemRef = useRef<HTMLButtonElement | null>(null);
   const selected = modules.find((item) => item.id === selectedId) ?? modules[0];
   const { session, authReady, login, logout, updateWorkspace } = useSession();
@@ -116,6 +111,70 @@ function CrmShellContent() {
   const { createRecord, updateRecord, updateStatus, importRecords } =
     useModuleMutations(selected, setToast);
 
+  useEffect(() => {
+    if (!session) return;
+    let mounted = true;
+    const currentOrganization = {
+      value: String(session.organization.code ?? ""),
+      label: String(session.organization.name ?? "Organization"),
+    };
+    if (!isPlatformSession(session)) {
+      setOrganizationOptions(currentOrganization.value ? [currentOrganization] : []);
+      return;
+    }
+    apiGet<unknown>("organizations", {
+      session,
+      cache: "no-store",
+      errorMessage: "Could not load organizations.",
+    })
+      .then((payload) => {
+        if (!mounted) return;
+        const options = normalizeWorkspaceOptions(payload, "code", "name");
+        setOrganizationOptions(
+          options.length || !currentOrganization.value
+            ? options
+            : [currentOrganization],
+        );
+      })
+      .catch((error) => {
+        if (!mounted) return;
+        setOrganizationOptions(currentOrganization.value ? [currentOrganization] : []);
+        setToast(
+          error instanceof Error
+            ? error.message
+            : "Could not load organizations.",
+        );
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [session]);
+
+  useEffect(() => {
+    if (!session) return;
+    let mounted = true;
+    const embeddedBranches = normalizeBranchOptions(
+      session.organization.branches,
+    );
+    setBranchOptions(embeddedBranches);
+    apiGet<unknown>("identity/branches?limit=100", {
+      session,
+      cache: "no-store",
+      errorMessage: "Could not load branches.",
+    })
+      .then((payload) => {
+        if (!mounted) return;
+        const options = normalizeWorkspaceOptions(payload, "code", "name");
+        setBranchOptions(options.length ? options : embeddedBranches);
+      })
+      .catch(() => {
+        if (mounted) setBranchOptions(embeddedBranches);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [session]);
+
   function selectModule(id: string) {
     setProfileMenuOpen(false);
     setSelectedId(id);
@@ -154,18 +213,15 @@ function CrmShellContent() {
   const metrics = buildMetrics(records, dashboard);
   const notificationCount = buildNotificationCount(dashboard, records);
   const isPlatformUser = session?.user.role === "platform_admin";
-  const userBranchIds = Array.isArray(session?.user.branchIds)
-    ? session.user.branchIds.map((branchId) => String(branchId))
-    : [];
   const availableBranchOptions = (
-    userBranchIds.length
-      ? userBranchIds.map((branchId) => ({
-          value: branchId,
-          label:
-            branchOptions.find((item) => item.value === branchId)?.label ??
-            formatDisplayValue(branchId),
-        }))
-      : branchOptions
+    branchOptions.length
+      ? branchOptions
+      : [
+          {
+            value: String(session?.user.branchId ?? "main"),
+            label: formatDisplayValue(String(session?.user.branchId ?? "main")),
+          },
+        ]
   ).filter(
     (item, index, items) =>
       items.findIndex((candidate) => candidate.value === item.value) === index,
@@ -259,7 +315,7 @@ function CrmShellContent() {
                     value={String(
                       session.organization.code ??
                         session.user.organizationCode ??
-                        "WEBNZA",
+                        "",
                     )}
                   >
                     {organizationOptions.map((item) => (
@@ -493,4 +549,58 @@ function CrmShellContent() {
       </section>
     </div>
   );
+}
+
+function isPlatformSession(session: {
+  user?: Record<string, unknown>;
+}) {
+  return session.user?.role === "platform_admin";
+}
+
+function normalizeWorkspaceOptions(
+  payload: unknown,
+  valueKey: string,
+  labelKey: string,
+) {
+  const records = Array.isArray(payload)
+    ? payload
+    : payload && typeof payload === "object"
+      ? ((payload as { items?: unknown; data?: unknown }).items ??
+        (payload as { data?: unknown }).data)
+      : [];
+  if (!Array.isArray(records)) return [];
+  return records
+    .map((record) => {
+      if (!record || typeof record !== "object") return null;
+      const source = record as Record<string, unknown>;
+      const value = String(source[valueKey] ?? "");
+      if (!value) return null;
+      return {
+        value,
+        label: String(source[labelKey] ?? formatDisplayValue(value)),
+      };
+    })
+    .filter(
+      (option): option is { value: string; label: string } =>
+        Boolean(option),
+    );
+}
+
+function normalizeBranchOptions(payload: unknown) {
+  if (!Array.isArray(payload)) return [];
+  return payload
+    .map((branch) => {
+      if (!branch || typeof branch !== "object") return null;
+      const source = branch as Record<string, unknown>;
+      const value = String(source.id ?? source.code ?? "");
+      if (!value) return null;
+      return {
+        value,
+        label: String(source.name ?? formatDisplayValue(value)),
+      };
+    })
+    .filter(
+      (option): option is { value: string; label: string } =>
+        Boolean(option),
+    );
 }

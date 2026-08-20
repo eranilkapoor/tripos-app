@@ -33,6 +33,11 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { TagsModule } from './modules/tags/tags.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { WorkflowsModule } from './modules/workflows/workflows.module';
+import { CommunicationsModule } from './modules/communications/communications.module';
+import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
+import { ImportsExportsModule } from './modules/imports-exports/imports-exports.module';
+import { OperatingRecordsModule } from './modules/operating-records/operating-records.module';
 import { OrganizationContextMiddleware } from './common/middleware/organization-context.middleware';
 import { AppStateModule } from './app-state.module';
 
@@ -85,6 +90,11 @@ import { AppStateModule } from './app-state.module';
     AiAssistantModule,
     SettingsModule,
     SubscriptionsModule,
+    WorkflowsModule,
+    CommunicationsModule,
+    FeatureFlagsModule,
+    ImportsExportsModule,
+    OperatingRecordsModule,
     TagsModule,
     TasksModule,
     TriposModule,

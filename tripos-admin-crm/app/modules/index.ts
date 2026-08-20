@@ -5,6 +5,7 @@ import financeModules from "./config/finance";
 import marketingModules from "./config/marketing";
 import identityModules from "./config/identity";
 import platformModules from "./config/platform";
+import commonSaasModules from "./config/commonSaas";
 
 const ORIGINAL_ORDER = [
   "dashboard",
@@ -15,11 +16,17 @@ const ORIGINAL_ORDER = [
   "subscriptions",
   "leads",
   "customers",
+  "contacts",
+  "activities",
+  "follow-ups",
   "quotations",
   "itineraries",
   "bookings",
+  "meetings",
+  "notes",
   "operations",
   "suppliers",
+  "service-catalog",
   "b2b-agents",
   "payments",
   "destinations",
@@ -27,15 +34,19 @@ const ORIGINAL_ORDER = [
   "travel-documents",
   "vouchers",
   "support-tickets",
+  "call-center",
+  "field-force",
   "notifications",
   "tasks",
   "tags",
   "campaigns",
+  "content",
   "invoices",
   "finance-reports",
   "sales-reports",
   "operations-reports",
   "saved-reports",
+  "analytics",
   "organizations",
   "audit-logs",
   "branches",
@@ -50,6 +61,11 @@ const ORIGINAL_ORDER = [
   "permission-catalog",
   "storage-files",
   "integrations",
+  "custom-fields",
+  "feature-flags",
+  "workflows",
+  "communications",
+  "imports-exports",
   "batch-jobs",
   "settings",
 ];
@@ -57,6 +73,7 @@ const ORIGINAL_ORDER = [
 const byId = new Map<string, CrmModule>(
   [
     ...platformModules,
+    ...commonSaasModules,
     ...crmSalesModules,
     ...operationsModules,
     ...financeModules,

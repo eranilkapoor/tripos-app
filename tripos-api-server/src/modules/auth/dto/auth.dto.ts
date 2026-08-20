@@ -23,12 +23,20 @@ export class RegisterCrmUserDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(6) password!: string;
   @IsString() @MinLength(2) name!: string;
+  @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() timezone?: string;
+  @IsOptional() @IsString() locale?: string;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
   @IsOptional() @IsArray() branchIds?: string[];
   @IsOptional() @IsArray() departmentIds?: string[];
   @IsOptional() @IsArray() teamIds?: string[];
   @IsOptional() @IsString() role?: string;
+  @IsOptional() @IsString() employeeCode?: string;
+  @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsObject() profile?: Record<string, unknown>;
+  @IsOptional() @IsObject() preferences?: Record<string, unknown>;
+  @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;
 }
 
 export class ForgotPasswordDto {
@@ -64,6 +72,14 @@ export class InviteCrmUserDto {
   @IsOptional() @IsArray() departmentIds?: string[];
   @IsOptional() @IsArray() teamIds?: string[];
   @IsOptional() @IsString() role?: string;
+  @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() timezone?: string;
+  @IsOptional() @IsString() locale?: string;
+  @IsOptional() @IsString() employeeCode?: string;
+  @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsObject() profile?: Record<string, unknown>;
+  @IsOptional() @IsObject() preferences?: Record<string, unknown>;
+  @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;
 }
 
 export class AcceptInvitationDto {
@@ -79,4 +95,12 @@ export class UpdateCrmUserPermissionsDto {
   @IsOptional() @IsArray() departmentIds?: string[];
   @IsOptional() @IsArray() teamIds?: string[];
   @IsOptional() @IsArray() permissions?: string[];
+  @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() timezone?: string;
+  @IsOptional() @IsString() locale?: string;
+  @IsOptional() @IsString() employeeCode?: string;
+  @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsObject() profile?: Record<string, unknown>;
+  @IsOptional() @IsObject() preferences?: Record<string, unknown>;
+  @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;
 }

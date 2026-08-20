@@ -17,7 +17,10 @@ export class CreateBranchDto {
   @IsOptional() @IsString() address?: string;
   @IsOptional() @IsString() phone?: string;
   @IsOptional() @IsEmail() email?: string;
+  @IsOptional() @IsObject() operatingHours?: Record<string, unknown>;
+  @IsOptional() @IsObject() taxProfile?: Record<string, unknown>;
   @IsOptional() @IsObject() settings?: Record<string, unknown>;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
 }
 
 export class CreateDepartmentDto {
@@ -26,7 +29,9 @@ export class CreateDepartmentDto {
   @IsString() @MinLength(2) name!: string;
   @IsString() @MinLength(2) code!: string;
   @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsObject() slaPolicy?: Record<string, unknown>;
   @IsOptional() @IsObject() settings?: Record<string, unknown>;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
 }
 
 export class CreateTeamDto {
@@ -37,7 +42,9 @@ export class CreateTeamDto {
   @IsString() @MinLength(2) code!: string;
   @IsOptional() @IsString() leadUserId?: string;
   @IsOptional() @IsArray() memberUserIds?: string[];
+  @IsOptional() @IsObject() queueRules?: Record<string, unknown>;
   @IsOptional() @IsObject() settings?: Record<string, unknown>;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
 }
 
 export class CreateRoleDto {
@@ -46,6 +53,9 @@ export class CreateRoleDto {
   @IsString() @MinLength(2) code!: string;
   @IsOptional() @IsString() description?: string;
   @IsOptional() @IsArray() defaultBranchIds?: string[];
+  @IsOptional() @IsArray() defaultDepartmentIds?: string[];
+  @IsOptional() @IsArray() defaultTeamIds?: string[];
+  @IsOptional() @IsObject() limits?: Record<string, unknown>;
   @IsOptional() @IsString() roleType?: string;
 }
 
@@ -71,4 +81,5 @@ export class CreateRolePermissionDto {
   @IsString() roleId!: string;
   @IsString() permissionCode!: string;
   @IsOptional() @IsObject() conditions?: Record<string, unknown>;
+  @IsOptional() @IsString() scope?: string;
 }

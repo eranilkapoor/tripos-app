@@ -18,6 +18,9 @@ export class CreateSupportTicketDto {
   @IsOptional() @IsString() ownerId?: string;
   @IsOptional() @IsString() category?: string;
   @IsOptional() @IsString() description?: string;
+  @IsOptional() @IsString() firstResponseDueAt?: string;
+  @IsOptional() @IsString() resolutionDueAt?: string;
+  @IsOptional() @IsString() resolvedAt?: string;
   @IsOptional() @IsArray() messages?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() tags?: string[];
   @IsOptional() @IsObject() satisfaction?: Record<string, unknown>;

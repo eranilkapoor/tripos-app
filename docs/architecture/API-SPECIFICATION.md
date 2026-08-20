@@ -43,6 +43,11 @@
 /api/v1/settings
 /api/v1/tags
 /api/v1/tasks
+/api/v1/workflows
+/api/v1/communications
+/api/v1/feature-flags
+/api/v1/imports-exports
+/api/v1/operating-records/:moduleKey
 /api/v1/storage/files
 /api/v1/reporting
 /api/v1/saved-reports
@@ -126,8 +131,14 @@ These modules support the standard CRUD contract and are wired to Admin CRM form
 - `tags`
 - `tasks`
 - `saved-reports`
+- `workflows`
+- `communications`
+- `feature-flags`
+- `imports-exports`
 
 The Admin CRM module configs expose the enterprise schema fields used by the DTOs, including owner/team/department references, external references, tags, metadata, commercial fields, costing, compliance, document references, tax/bank profiles, delivery data, consent, and reporting schedules.
+
+The shared operating modules use `/operating-records/:moduleKey` with the standard CRUD contract. Supported module keys are `contacts`, `activities`, `follow-ups`, `meetings`, `notes`, `service-catalog`, `custom-fields`, `call-center`, `field-force`, `content`, and `analytics`.
 
 ## Finance And Documents
 

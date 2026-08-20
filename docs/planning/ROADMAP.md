@@ -42,7 +42,7 @@ The 2026-08-12 engineering review is closed in code. The resolved items are:
 Completed in the repo:
 
 - Monorepo structure uses product-specific app boundaries for API, CRM, mobile, public website, packages, scripts, and documentation.
-- MongoDB-backed `tripos-api-server` modules for leads, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, organizations, settings, tags, tasks, auth, finance invoices, and audit logs.
+- MongoDB-backed `tripos-api-server` modules for leads, contacts, activities, follow-ups, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, communications, workflows, feature flags, import/export jobs, organizations, settings, tags, tasks, auth, finance invoices, and audit logs.
 - Admin CRM connected to dedicated production APIs with bearer session handling.
 - CRM list pagination, status filtering, server-side search, organization/branch-scoped create/detail/update/delete, and status mutation scoping.
 - Organization, branch, department, team, CRM user, role, permission, user-role, and role-permission CRUD; email/password CRM login, post-login workspace switching, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only organization management.
@@ -56,6 +56,7 @@ Completed in the repo:
 - Admin CRM navigation and live API screens for users/permissions, settings, tags, tasks, audit logs, storage files, integrations, and reporting.
 - Admin CRM schema-driven create/edit forms, detail drawer edit action, import/export, search, sorting, pagination, and status mutation flows are wired to module APIs.
 - Platform pricing plans, organization subscriptions, CRM My Profile, change password, settings, and notifications are API/CRM backed.
+- Shared SaaS/CRM modules for contacts, activities, follow-ups, meetings, notes, service catalog, custom fields, call center, field force, content, and analytics are API/CRM backed through organization-scoped CRUD.
 - Supplier contracts/rates/confirmations, B2B KYC/credit/commission/wallet/invoice actions, operations SLA/escalations/timeline, and saved report templates are API-backed.
 - Mobile app shell with persisted secure session storage and separate customer/agent navigation foundations.
 - Public website lead capture wired to backend public lead endpoint.
@@ -97,6 +98,13 @@ Completed in the repo:
 | 30  | SaaS Pricing Plans                 | Product Ready | Product Ready    | N/A                  | Sandbox/live payment provider selection and commercial sign-off        |
 | 31  | Organization Subscriptions         | Product Ready | Product Ready    | N/A                  | Provider webhook/live billing evidence or manual invoice policy        |
 | 32  | CRM Account Profile/Password       | Product Ready | Product Ready    | N/A                  | Optional MFA/SSO provider selection                                    |
+| 33  | Contacts and Activities            | Product Ready | Product Ready    | N/A                  | Final activity taxonomy sign-off during QA                             |
+| 34  | Meetings and Notes                 | Product Ready | Product Ready    | N/A                  | Calendar provider selection remains external                           |
+| 35  | Service Catalog                    | Product Ready | Product Ready    | N/A                  | Supplier/service taxonomy sign-off during onboarding QA                |
+| 36  | Custom Fields and Feature Flags    | Product Ready | Product Ready    | N/A                  | Production rollout policy sign-off                                     |
+| 37  | Communications                     | Product Ready | Product Ready    | N/A                  | Live provider credentials remain external                              |
+| 38  | Import/Export Jobs                 | Product Ready | Product Ready    | N/A                  | Large-file storage limits depend on deployment target                  |
+| 39  | Call Center and Field Force        | Product Ready | Product Ready    | N/A                  | Telephony/map live credentials remain external                         |
 
 ## Immediate Build-Now Backlog
 
