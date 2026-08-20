@@ -79,12 +79,40 @@ export function RecordCard({ record }: { record: ApiRecord }) {
       record.channel ??
       "",
   );
+  const reference = firstValue(record, [
+    "bookingNo",
+    "quoteNo",
+    "voucherNo",
+    "ticketNo",
+    "paymentNo",
+    "documentNumber",
+    "confirmationNumber",
+  ]);
+  const status = firstValue(record, ["status", "stage", "priority"]);
+  const owner = firstValue(record, ["ownerId", "assignedTo", "agentId"]);
   return (
     <View style={styles.recordCard}>
       <Text style={styles.recordTitle}>{title}</Text>
       {subtitle ? <Text style={styles.body}>{subtitle}</Text> : null}
+      {reference || status || owner ? (
+        <View style={styles.recordMeta}>
+          {reference ? <Text style={styles.metaPill}>{reference}</Text> : null}
+          {status ? <Text style={styles.metaPill}>{status}</Text> : null}
+          {owner ? <Text style={styles.metaPill}>{owner}</Text> : null}
+        </View>
+      ) : null}
     </View>
   );
+}
+
+function firstValue(record: ApiRecord, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (value !== undefined && value !== null && value !== "") {
+      return String(value);
+    }
+  }
+  return "";
 }
 
 export function ListScreen({
@@ -187,6 +215,16 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   recordTitle: { color: colors.text, fontSize: 15, fontWeight: "900" },
+  recordMeta: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 10 },
+  metaPill: {
+    backgroundColor: colors.accentSoft,
+    borderRadius: 6,
+    color: colors.accent,
+    fontSize: 11,
+    fontWeight: "900",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
   segmentButton: {
     alignItems: "center",
     borderColor: colors.line,

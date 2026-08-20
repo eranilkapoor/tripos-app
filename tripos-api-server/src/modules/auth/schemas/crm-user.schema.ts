@@ -35,6 +35,15 @@ export class CrmUser {
   })
   role!: string;
   @Prop({ type: [String], default: [] }) permissions!: string[];
+  @Prop({ trim: true, index: true }) employeeCode?: string;
+  @Prop({ trim: true, index: true }) managerUserId?: string;
+  @Prop({ type: Object, default: {} }) profile!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) preferences!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) security!: Record<string, unknown>;
+  @Prop() lastLoginAt?: Date;
+  @Prop() passwordChangedAt?: Date;
+  @Prop({ default: 0 }) failedLoginAttempts!: number;
+  @Prop() lockedUntil?: Date;
   @Prop({
     enum: ['active', 'inactive', 'locked', 'invited'],
     default: 'active',
@@ -50,3 +59,5 @@ export class CrmUser {
 export const CrmUserSchema = SchemaFactory.createForClass(CrmUser);
 
 CrmUserSchema.index({ organizationId: 1, email: 1 }, { unique: true });
+CrmUserSchema.index({ organizationId: 1, role: 1, status: 1 });
+CrmUserSchema.index({ organizationId: 1, employeeCode: 1 });

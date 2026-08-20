@@ -18,10 +18,22 @@ export class CampaignsService {
     @InjectModel(Campaign.name) private readonly model: Model<Campaign>,
   ) {}
   create(dto: CreateCampaignDto) {
-    return this.model.create({ ...dto, metadata: dto.metadata ?? {} });
+    return this.model.create({
+      ...dto,
+      audience: dto.audience ?? {},
+      budget: dto.budget ?? {},
+      attribution: dto.attribution ?? {},
+      metadata: dto.metadata ?? {},
+    });
   }
   list(query: CrmListQueryDto) {
-    return listCrmRecords(this.model, query, ['name', 'channel', 'source']);
+    return listCrmRecords(this.model, query, [
+      'name',
+      'channel',
+      'source',
+      'campaignCode',
+      'ownerId',
+    ]);
   }
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Campaign not found');

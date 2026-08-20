@@ -32,15 +32,25 @@ export class BookingsService {
       passengers: dto.passengers ?? [],
       services: dto.services ?? [],
       documents: dto.documents ?? [],
+      operationChecklist: dto.operationChecklist ?? [],
       paymentSchedule: [],
       vouchers: [],
+      tags: dto.tags ?? [],
+      customFields: dto.customFields ?? {},
+      metadata: dto.metadata ?? {},
     });
   }
   list(query: CrmListQueryDto) {
     return listCrmRecords(this.model, query, [
+      'bookingNo',
       'customerName',
       'destination',
       'travelDates',
+      'quotationId',
+      'leadId',
+      'customerId',
+      'ownerId',
+      'agentId',
     ]);
   }
   findOne(id: string, query: CrmListQueryDto) {
@@ -87,6 +97,9 @@ export class BookingsService {
       branchId: quotation.branchId,
       quotationId,
       leadId: quotation.leadId,
+      customerId: (quotation as { customerId?: string }).customerId,
+      ownerId: (quotation as { ownerId?: string }).ownerId,
+      agentId: (quotation as { agentId?: string }).agentId,
       customerName: quotation.customerName,
       destination: quotation.destination,
       travelDates: quotation.travelDates,

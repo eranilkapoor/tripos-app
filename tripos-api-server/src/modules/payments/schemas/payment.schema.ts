@@ -10,6 +10,9 @@ export class Payment {
   @Prop({ default: 'main', index: true }) branchId!: string;
   @Prop({ index: true }) bookingId?: string;
   @Prop({ index: true }) agentId?: string;
+  @Prop({ index: true }) invoiceId?: string;
+  @Prop({ trim: true, index: true }) paymentNo?: string;
+  @Prop({ trim: true, index: true }) supplierId?: string;
   @Prop({
     required: true,
     enum: ['receivable', 'payable', 'refund', 'commission'],
@@ -22,6 +25,12 @@ export class Payment {
   @Prop({ trim: true }) partyName?: string;
   @Prop({ trim: true }) dueDate?: string;
   @Prop({ trim: true }) paidAt?: string;
+  @Prop({ trim: true, index: true }) paymentMode?: string;
+  @Prop({ trim: true, index: true }) gatewayProvider?: string;
+  @Prop({ trim: true, index: true }) gatewayReference?: string;
+  @Prop({ trim: true, index: true }) bankReference?: string;
+  @Prop({ type: Object, default: {} }) reconciliation!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) taxBreakup!: Record<string, unknown>;
   @Prop({
     enum: ['pending', 'paid', 'partially_paid', 'overdue', 'cancelled'],
     default: 'pending',
@@ -33,3 +42,5 @@ export class Payment {
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
 PaymentSchema.index({ organizationId: 1, type: 1, status: 1, dueDate: 1 });
+PaymentSchema.index({ organizationId: 1, paymentNo: 1 });
+PaymentSchema.index({ organizationId: 1, gatewayReference: 1 });

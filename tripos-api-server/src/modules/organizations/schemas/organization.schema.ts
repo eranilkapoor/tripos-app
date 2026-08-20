@@ -31,6 +31,13 @@ export class Organization {
     default: { syncMode: 'realtime', offlineWindowHours: 24 },
   })
   syncPolicy!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) billingProfile!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) subscription!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) branding!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) compliance!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) securityPolicy!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) integrations!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['active', 'inactive', 'suspended'],
     default: 'active',
@@ -40,3 +47,4 @@ export class Organization {
 }
 
 export const OrganizationSchema = SchemaFactory.createForClass(Organization);
+OrganizationSchema.index({ status: 1, code: 1 });

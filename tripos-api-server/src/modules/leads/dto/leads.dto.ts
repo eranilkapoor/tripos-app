@@ -72,6 +72,30 @@ export class CreateLeadDto {
   assignedTo?: string;
 
   @IsOptional()
+  @IsString()
+  ownerId?: string;
+
+  @IsOptional()
+  @IsString()
+  teamId?: string;
+
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
+
+  @IsOptional()
+  @IsString()
+  externalReference?: string;
+
+  @IsOptional()
+  @IsObject()
+  consent?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject()
+  customFields?: Record<string, unknown>;
+
+  @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;
 

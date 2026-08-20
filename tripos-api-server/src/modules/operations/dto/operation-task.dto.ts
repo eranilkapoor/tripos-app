@@ -8,12 +8,21 @@ import {
 
 export class CreateOperationTaskDto {
   @IsOptional() @IsString() bookingId?: string;
+  @IsOptional() @IsString() customerId?: string;
   @IsString() @MinLength(2) title!: string;
   @IsString() @MinLength(2) serviceType!: string;
   @IsOptional() @IsString() supplierId?: string;
   @IsOptional() @IsString() assignedTo?: string;
+  @IsOptional() @IsString() ownerId?: string;
+  @IsOptional() @IsString() teamId?: string;
   @IsOptional() @IsDateString() dueAt?: string;
+  @IsOptional() @IsDateString() startedAt?: string;
+  @IsOptional() @IsDateString() completedAt?: string;
   @IsOptional() @IsObject() payload?: Record<string, unknown>;
+  @IsOptional() @IsObject() qualityCheck?: Record<string, unknown>;
+  @IsOptional() @IsObject() supplierConfirmation?: Record<string, unknown>;
+  @IsOptional() @IsString() priority?: string;
+  @IsOptional() @IsString() slaStatus?: string;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
 }

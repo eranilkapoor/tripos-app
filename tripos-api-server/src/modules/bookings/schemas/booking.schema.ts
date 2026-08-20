@@ -10,6 +10,10 @@ export class Booking {
   @Prop({ default: 'main', index: true }) branchId!: string;
   @Prop({ index: true }) quotationId?: string;
   @Prop({ index: true }) leadId?: string;
+  @Prop({ index: true }) customerId?: string;
+  @Prop({ trim: true, index: true }) bookingNo?: string;
+  @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ trim: true, index: true }) agentId?: string;
   @Prop({ required: true, trim: true }) customerName!: string;
   @Prop({ required: true, trim: true, index: true }) destination!: string;
   @Prop({ trim: true }) travelDates?: string;
@@ -28,6 +32,21 @@ export class Booking {
   @Prop({ type: [Object], default: [] }) vouchers!: Array<
     Record<string, unknown>
   >;
+  @Prop({ type: [Object], default: [] }) operationChecklist!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: Object, default: {} }) commercial!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) supplierCosting!: Record<
+    string,
+    unknown
+  >;
+  @Prop({ type: Object, default: {} }) cancellationPolicy!: Record<
+    string,
+    unknown
+  >;
+  @Prop({ type: [String], default: [] }) tags!: string[];
+  @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: [
       'draft',
@@ -45,3 +64,5 @@ export class Booking {
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
 BookingSchema.index({ organizationId: 1, destination: 1, status: 1 });
+BookingSchema.index({ organizationId: 1, bookingNo: 1 });
+BookingSchema.index({ organizationId: 1, ownerId: 1, status: 1 });

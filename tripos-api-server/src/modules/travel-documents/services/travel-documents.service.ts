@@ -24,9 +24,12 @@ export class TravelDocumentsService {
   list(query: CrmListQueryDto) {
     return listCrmRecords(this.model, query, [
       'customerName',
+      'customerId',
       'bookingId',
       'documentType',
       'documentNumber',
+      'fileId',
+      'issuingCountry',
     ]);
   }
   findOne(id: string, query: CrmListQueryDto) {

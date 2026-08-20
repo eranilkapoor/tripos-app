@@ -21,6 +21,9 @@ export class Invoice {
   @Prop({ required: true })
   invoiceDate!: string;
 
+  @Prop()
+  dueDate?: string;
+
   @Prop({ default: 'IN' })
   countryCode!: string;
 
@@ -42,6 +45,15 @@ export class Invoice {
   @Prop({ type: Object, required: true })
   customer!: Record<string, unknown>;
 
+  @Prop({ index: true })
+  customerId?: string;
+
+  @Prop({ index: true })
+  bookingId?: string;
+
+  @Prop({ index: true })
+  quotationId?: string;
+
   @Prop({ type: [Object], default: [] })
   entries!: Array<Record<string, unknown>>;
 
@@ -50,6 +62,18 @@ export class Invoice {
 
   @Prop({ type: Object, required: true })
   totalsMinor!: Record<string, number>;
+
+  @Prop({ type: Object, default: {} })
+  paymentTerms!: Record<string, unknown>;
+
+  @Prop({ type: Object, default: {} })
+  eInvoice!: Record<string, unknown>;
+
+  @Prop({ type: Object, default: {} })
+  exportDetails!: Record<string, unknown>;
+
+  @Prop({ type: Object, default: {} })
+  metadata!: Record<string, unknown>;
 
   @Prop({ default: 'draft', index: true })
   status!: string;
@@ -64,3 +88,4 @@ InvoiceSchema.index(
   { unique: true },
 );
 InvoiceSchema.index({ organizationId: 1, status: 1, createdAt: -1 });
+InvoiceSchema.index({ organizationId: 1, customerId: 1, status: 1 });

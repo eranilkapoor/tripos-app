@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   MinLength,
@@ -8,12 +9,21 @@ import {
 
 export class CreateB2BAgentDto {
   @IsString() @MinLength(2) agencyName!: string;
+  @IsOptional() @IsString() agentCode?: string;
+  @IsOptional() @IsString() ownerId?: string;
   @IsOptional() @IsString() contactName?: string;
   @IsOptional() @IsString() email?: string;
   @IsOptional() @IsString() phone?: string;
   @IsOptional() @IsString() market?: string;
   @IsOptional() @IsNumber() creditLimit?: number;
   @IsOptional() @IsArray() kycDocuments?: Array<Record<string, unknown>>;
+  @IsOptional() @IsObject() taxProfile?: Record<string, unknown>;
+  @IsOptional() @IsObject() bankDetails?: Record<string, unknown>;
+  @IsOptional() @IsObject() contractTerms?: Record<string, unknown>;
+  @IsOptional() @IsObject() creditPolicy?: Record<string, unknown>;
+  @IsOptional() @IsArray() tags?: string[];
+  @IsOptional() @IsObject() customFields?: Record<string, unknown>;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
 }

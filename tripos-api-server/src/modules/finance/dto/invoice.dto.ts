@@ -20,6 +20,10 @@ export class CreateInvoiceDto {
   @IsString()
   invoiceDate!: string;
 
+  @IsOptional()
+  @IsString()
+  dueDate?: string;
+
   @IsString()
   countryCode!: string;
 
@@ -41,8 +45,36 @@ export class CreateInvoiceDto {
   @IsObject()
   customer!: Record<string, unknown>;
 
+  @IsOptional()
+  @IsString()
+  customerId?: string;
+
+  @IsOptional()
+  @IsString()
+  bookingId?: string;
+
+  @IsOptional()
+  @IsString()
+  quotationId?: string;
+
   @IsArray()
   entries!: Array<Record<string, unknown>>;
+
+  @IsOptional()
+  @IsObject()
+  paymentTerms?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject()
+  eInvoice?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject()
+  exportDetails?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
 
   @IsOptional()
   @IsString()

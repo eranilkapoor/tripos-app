@@ -24,10 +24,14 @@ export class SupportTicketsService {
   list(query: CrmListQueryDto) {
     return listCrmRecords(this.model, query, [
       'subject',
+      'ticketNo',
+      'customerId',
       'customerName',
       'bookingId',
       'channel',
       'assignedTo',
+      'ownerId',
+      'category',
     ]);
   }
   findOne(id: string, query: CrmListQueryDto) {

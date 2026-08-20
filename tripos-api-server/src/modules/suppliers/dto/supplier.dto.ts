@@ -11,10 +11,19 @@ export class CreateSupplierDto {
   @IsString() @MinLength(2) name!: string;
   @IsString() @MinLength(2) type!: string;
   @IsOptional() @IsString() destination?: string;
+  @IsOptional() @IsString() supplierCode?: string;
+  @IsOptional() @IsString() ownerId?: string;
   @IsOptional() @IsArray() contacts?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() contracts?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() rates?: Array<Record<string, unknown>>;
   @IsOptional() @IsNumber() creditLimit?: number;
+  @IsOptional() @IsObject() taxProfile?: Record<string, unknown>;
+  @IsOptional() @IsObject() bankDetails?: Record<string, unknown>;
+  @IsOptional() @IsObject() paymentTerms?: Record<string, unknown>;
+  @IsOptional() @IsObject() compliance?: Record<string, unknown>;
+  @IsOptional() @IsArray() tags?: string[];
+  @IsOptional() @IsObject() customFields?: Record<string, unknown>;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
 }

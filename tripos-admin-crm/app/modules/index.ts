@@ -31,6 +31,7 @@ const ORIGINAL_ORDER = [
   "sales-reports",
   "operations-reports",
   "saved-reports",
+  "organizations",
   "audit-logs",
   "branches",
   "departments",

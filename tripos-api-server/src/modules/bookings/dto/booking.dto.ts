@@ -10,12 +10,23 @@ import {
 export class CreateBookingDto {
   @IsOptional() @IsString() quotationId?: string;
   @IsOptional() @IsString() leadId?: string;
+  @IsOptional() @IsString() customerId?: string;
+  @IsOptional() @IsString() bookingNo?: string;
+  @IsOptional() @IsString() ownerId?: string;
+  @IsOptional() @IsString() agentId?: string;
   @IsString() @MinLength(2) customerName!: string;
   @IsString() @MinLength(2) destination!: string;
   @IsOptional() @IsString() travelDates?: string;
   @IsOptional() @IsArray() passengers?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() services?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() documents?: Array<Record<string, unknown>>;
+  @IsOptional() @IsArray() operationChecklist?: Array<Record<string, unknown>>;
+  @IsOptional() @IsObject() commercial?: Record<string, unknown>;
+  @IsOptional() @IsObject() supplierCosting?: Record<string, unknown>;
+  @IsOptional() @IsObject() cancellationPolicy?: Record<string, unknown>;
+  @IsOptional() @IsArray() tags?: string[];
+  @IsOptional() @IsObject() customFields?: Record<string, unknown>;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
 }

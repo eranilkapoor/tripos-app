@@ -1,5 +1,17 @@
 import type { CrmModule } from "../../components/crmTypes";
 
+const ownerFields = [
+  { key: "ownerId", label: "Owner User ID" },
+  { key: "teamId", label: "Team ID" },
+  { key: "departmentId", label: "Department ID" },
+];
+
+const crmMetadataFields = [
+  { key: "tags", label: "Tags", type: "tags" as const },
+  { key: "customFields", label: "Custom Fields", type: "textarea" as const },
+  { key: "metadata", label: "Internal Metadata", type: "textarea" as const },
+];
+
 const crmSalesModules: CrmModule[] = [
   {
     id: "leads",
@@ -8,13 +20,22 @@ const crmSalesModules: CrmModule[] = [
     endpoint: "leads",
     description:
       "Capture B2C, B2B, corporate, campaign, phone, WhatsApp, referral, and website enquiries.",
-    columns: ["Customer", "Destination", "Source", "Stage", "Owner", "Phone"],
+    columns: [
+      "Customer",
+      "Destination",
+      "Source",
+      "Stage",
+      "Owner",
+      "Next Follow-up",
+      "Phone",
+    ],
     rowMap: [
       "customerName",
       "requirement.destination",
       "source",
       "stage",
-      "assignedTo",
+      "ownerId",
+      "nextFollowUpAt",
       "phone",
     ],
     stageEndpoint: true,
@@ -53,6 +74,11 @@ const crmSalesModules: CrmModule[] = [
       { key: "requirement.travelDate", label: "Travel Date", type: "date" },
       { key: "requirement.adults", label: "Adults", type: "number" },
       { key: "assignedTo", label: "Owner" },
+      ...ownerFields,
+      { key: "externalReference", label: "External Reference" },
+      { key: "nextFollowUpAt", label: "Next Follow-up", type: "date" },
+      { key: "consent", label: "Consent Details", type: "textarea" },
+      ...crmMetadataFields,
     ],
   },
   {
@@ -62,8 +88,8 @@ const crmSalesModules: CrmModule[] = [
     endpoint: "customers",
     description:
       "Customer master for B2C travellers, repeat customers, families, and corporate contacts.",
-    columns: ["Customer", "Phone", "Email", "Type", "City", "Status"],
-    rowMap: ["name", "phone", "email", "customerType", "city", "status"],
+    columns: ["Customer", "Phone", "Email", "Type", "Owner", "Tags", "Status"],
+    rowMap: ["name", "phone", "email", "customerType", "ownerId", "tags", "status"],
     statusOptions: ["active", "inactive", "blocked"],
     fields: [
       { key: "name", label: "Customer", required: true },
@@ -84,6 +110,14 @@ const crmSalesModules: CrmModule[] = [
       { key: "source", label: "Source" },
       { key: "city", label: "City" },
       { key: "country", label: "Country" },
+      { key: "ownerId", label: "Owner User ID" },
+      { key: "externalReference", label: "External Reference" },
+      { key: "tags", label: "Tags", type: "tags" },
+      { key: "preferences", label: "Travel Preferences", type: "textarea" },
+      { key: "consent", label: "Consent Details", type: "textarea" },
+      { key: "loyalty", label: "Loyalty Details", type: "textarea" },
+      { key: "customFields", label: "Custom Fields", type: "textarea" },
+      { key: "metadata", label: "Internal Metadata", type: "textarea" },
     ],
   },
   {
@@ -94,6 +128,7 @@ const crmSalesModules: CrmModule[] = [
     description:
       "Build customer pricing with travel dates, travellers, service costs, markup, discount, and status tracking.",
     columns: [
+      "Quote No",
       "Customer",
       "Destination",
       "Travel Dates",
@@ -102,6 +137,7 @@ const crmSalesModules: CrmModule[] = [
       "Status",
     ],
     rowMap: [
+      "quoteNo",
       "customerName",
       "destination",
       "travelDates",
@@ -109,15 +145,24 @@ const crmSalesModules: CrmModule[] = [
       "sellingPrice",
       "status",
     ],
-    statusOptions: ["draft", "sent", "accepted", "rejected", "expired"],
+    statusOptions: ["draft", "sent", "negotiation", "accepted", "rejected"],
     fields: [
       { key: "customerName", label: "Customer", required: true },
+      { key: "quoteNo", label: "Quote No" },
+      { key: "customerId", label: "Customer ID" },
+      { key: "leadId", label: "Lead ID" },
+      { key: "ownerId", label: "Owner User ID" },
+      { key: "agentId", label: "Agent ID" },
       { key: "destination", label: "Destination", required: true },
       { key: "travelDates", label: "Travel Dates" },
       { key: "travellers", label: "Travellers", type: "number" },
       { key: "pricing.baseCost", label: "Base Cost", type: "number" },
       { key: "pricing.markup", label: "Markup", type: "number" },
       { key: "pricing.discount", label: "Discount", type: "number" },
+      { key: "validUntil", label: "Valid Until", type: "date" },
+      { key: "terms", label: "Terms", type: "textarea" },
+      { key: "approval", label: "Approval Details", type: "textarea" },
+      ...crmMetadataFields,
     ],
   },
   {
@@ -127,14 +172,21 @@ const crmSalesModules: CrmModule[] = [
     endpoint: "itineraries",
     description:
       "Create and maintain day-wise travel plans, templates, themes, and customer-ready itinerary content.",
-    columns: ["Itinerary", "Destination", "Days", "Theme", "Status"],
-    rowMap: ["title", "destination", "durationDays", "theme", "status"],
-    statusOptions: ["draft", "ready", "shared", "archived"],
+    columns: ["Itinerary", "Destination", "Owner", "Version", "Tags", "Status"],
+    rowMap: ["title", "destination", "ownerId", "version", "tags", "status"],
+    statusOptions: ["draft", "published", "archived"],
     fields: [
       { key: "title", label: "Itinerary", required: true },
+      { key: "quotationId", label: "Quotation ID" },
+      { key: "bookingId", label: "Booking ID" },
+      { key: "ownerId", label: "Owner User ID" },
+      { key: "version", label: "Version", type: "number" },
       { key: "destination", label: "Destination", required: true },
-      { key: "durationDays", label: "Days", type: "number" },
-      { key: "theme", label: "Theme" },
+      { key: "days", label: "Day Plan", type: "textarea" },
+      { key: "inclusions", label: "Inclusions", type: "textarea" },
+      { key: "exclusions", label: "Exclusions", type: "textarea" },
+      { key: "travellerNotes", label: "Traveller Notes", type: "textarea" },
+      ...crmMetadataFields,
     ],
   },
   {
@@ -145,19 +197,21 @@ const crmSalesModules: CrmModule[] = [
     description:
       "Confirmed travel files with passengers, services, documents, payments, vouchers, and trip status.",
     columns: [
+      "Booking No",
       "Customer",
       "Destination",
       "Travel Dates",
-      "Passengers",
-      "Services",
+      "Owner",
+      "Agent",
       "Status",
     ],
     rowMap: [
+      "bookingNo",
       "customerName",
       "destination",
       "travelDates",
-      "passengers",
-      "services",
+      "ownerId",
+      "agentId",
       "status",
     ],
     statusOptions: [
@@ -170,10 +224,20 @@ const crmSalesModules: CrmModule[] = [
     ],
     fields: [
       { key: "customerName", label: "Customer", required: true },
+      { key: "bookingNo", label: "Booking No" },
+      { key: "customerId", label: "Customer ID" },
+      { key: "ownerId", label: "Owner User ID" },
+      { key: "agentId", label: "Agent ID" },
       { key: "destination", label: "Destination", required: true },
       { key: "travelDates", label: "Travel Dates" },
       { key: "quotationId", label: "Quotation ID" },
       { key: "leadId", label: "Lead ID" },
+      { key: "passengers", label: "Passengers", type: "textarea" },
+      { key: "services", label: "Services", type: "textarea" },
+      { key: "commercial", label: "Commercials", type: "textarea" },
+      { key: "supplierCosting", label: "Supplier Costing", type: "textarea" },
+      { key: "cancellationPolicy", label: "Cancellation Policy", type: "textarea" },
+      ...crmMetadataFields,
     ],
   },
 ];

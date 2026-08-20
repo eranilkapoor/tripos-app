@@ -31,7 +31,17 @@ export class PaymentsService {
     return listCrmRecords(
       this.model,
       query,
-      ['type', 'partyName', 'bookingId', 'agentId'],
+      [
+        'type',
+        'partyName',
+        'bookingId',
+        'agentId',
+        'invoiceId',
+        'supplierId',
+        'paymentNo',
+        'gatewayReference',
+        'bankReference',
+      ],
       { dueDate: 1, updatedAt: -1 },
     );
   }

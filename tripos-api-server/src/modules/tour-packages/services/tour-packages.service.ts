@@ -23,6 +23,9 @@ export class TourPackagesService {
       inclusions: dto.inclusions ?? [],
       exclusions: dto.exclusions ?? [],
       itinerary: dto.itinerary ?? [],
+      tags: dto.tags ?? [],
+      customFields: dto.customFields ?? {},
+      metadata: dto.metadata ?? {},
     });
   }
   list(query: CrmListQueryDto) {
@@ -30,6 +33,8 @@ export class TourPackagesService {
       'title',
       'destination',
       'category',
+      'packageCode',
+      'ownerId',
     ]);
   }
   findOne(id: string, query: CrmListQueryDto) {

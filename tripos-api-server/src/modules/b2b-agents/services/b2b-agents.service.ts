@@ -32,6 +32,9 @@ export class B2BAgentsService {
       walletLedger: [],
       commissionLedger: [],
       invoices: [],
+      tags: dto.tags ?? [],
+      customFields: dto.customFields ?? {},
+      metadata: dto.metadata ?? {},
     });
   }
   list(query: CrmListQueryDto) {
@@ -41,6 +44,8 @@ export class B2BAgentsService {
       'email',
       'phone',
       'market',
+      'agentCode',
+      'ownerId',
     ]);
   }
   findOne(id: string, query: CrmListQueryDto) {

@@ -28,20 +28,34 @@ export class OperationsService {
     return this.model.create({
       ...dto,
       dueAt: dto.dueAt ? new Date(dto.dueAt) : undefined,
+      startedAt: dto.startedAt ? new Date(dto.startedAt) : undefined,
+      completedAt: dto.completedAt ? new Date(dto.completedAt) : undefined,
       payload: dto.payload ?? {},
-      priority: String(dto.payload?.priority ?? 'medium'),
-      slaStatus: 'on_track',
+      priority: dto.priority ?? String(dto.payload?.priority ?? 'medium'),
+      slaStatus: dto.slaStatus ?? 'on_track',
       timeline: [
         { type: 'created', note: 'Task created', at: new Date().toISOString() },
       ],
       escalations: [],
+      dependencies: [],
+      tags: [],
+      customFields: {},
     });
   }
   list(query: CrmListQueryDto) {
     return listCrmRecords(
       this.model,
       query,
-      ['title', 'bookingCode', 'serviceType', 'owner'],
+      [
+        'title',
+        'bookingId',
+        'customerId',
+        'serviceType',
+        'assignedTo',
+        'ownerId',
+        'teamId',
+        'supplierId',
+      ],
       { dueAt: 1, updatedAt: -1 },
     );
   }
@@ -65,6 +79,8 @@ export class OperationsService {
       {
         ...dto,
         ...(dto.dueAt ? { dueAt: new Date(dto.dueAt) } : {}),
+        ...(dto.startedAt ? { startedAt: new Date(dto.startedAt) } : {}),
+        ...(dto.completedAt ? { completedAt: new Date(dto.completedAt) } : {}),
       },
       'Operation task not found',
     );

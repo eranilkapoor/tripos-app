@@ -23,6 +23,9 @@ export class Branch {
   @Prop({ trim: true }) phone?: string;
   @Prop({ trim: true, lowercase: true }) email?: string;
   @Prop({ type: Object, default: {} }) settings!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) operatingHours!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) taxProfile!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({ enum: ['active', 'inactive'], default: 'active', index: true })
   status!: string;
 }
@@ -35,6 +38,8 @@ export class Department {
   @Prop({ required: true, trim: true, index: true }) code!: string;
   @Prop({ trim: true }) managerUserId?: string;
   @Prop({ type: Object, default: {} }) settings!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) slaPolicy!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({ enum: ['active', 'inactive'], default: 'active', index: true })
   status!: string;
 }
@@ -49,6 +54,8 @@ export class Team {
   @Prop({ trim: true }) leadUserId?: string;
   @Prop({ type: [String], default: [] }) memberUserIds!: string[];
   @Prop({ type: Object, default: {} }) settings!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) queueRules!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({ enum: ['active', 'inactive'], default: 'active', index: true })
   status!: string;
 }
@@ -60,6 +67,9 @@ export class Role {
   @Prop({ required: true, trim: true, index: true }) code!: string;
   @Prop({ trim: true }) description?: string;
   @Prop({ type: [String], default: [] }) defaultBranchIds!: string[];
+  @Prop({ type: [String], default: [] }) defaultDepartmentIds!: string[];
+  @Prop({ type: [String], default: [] }) defaultTeamIds!: string[];
+  @Prop({ type: Object, default: {} }) limits!: Record<string, unknown>;
   @Prop({ enum: ['system', 'custom'], default: 'custom', index: true })
   roleType!: string;
   @Prop({ enum: ['active', 'inactive'], default: 'active', index: true })
@@ -96,6 +106,7 @@ export class RolePermission {
   @Prop({ required: true, index: true }) roleId!: string;
   @Prop({ required: true, index: true }) permissionCode!: string;
   @Prop({ type: Object, default: {} }) conditions!: Record<string, unknown>;
+  @Prop({ trim: true }) scope?: string;
   @Prop({ enum: ['active', 'inactive'], default: 'active', index: true })
   status!: string;
 }
@@ -110,6 +121,8 @@ export class Invitation {
   @Prop({ required: true, trim: true, index: true }) role!: string;
   @Prop({ type: [String], default: [] }) branchIds!: string[];
   @Prop({ type: [String], default: [] }) permissions!: string[];
+  @Prop({ type: [String], default: [] }) departmentIds!: string[];
+  @Prop({ type: [String], default: [] }) teamIds!: string[];
   @Prop({ index: true }) tokenHash?: string;
   @Prop() expiresAt?: Date;
   @Prop({
@@ -120,6 +133,7 @@ export class Invitation {
   status!: string;
   @Prop({ trim: true }) invitedBy?: string;
   @Prop() acceptedAt?: Date;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
 }
 
 export const BranchSchema = SchemaFactory.createForClass(Branch);

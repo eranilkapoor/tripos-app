@@ -12,7 +12,13 @@ export class UserSession {
   @Prop({ required: true, index: true }) branchId!: string;
   @Prop({ required: true }) expiresAt!: Date;
   @Prop({ index: true }) revokedAt?: Date;
+  @Prop({ type: Object, default: {} }) device!: Record<string, unknown>;
+  @Prop({ trim: true }) ip?: string;
+  @Prop({ trim: true }) userAgent?: string;
+  @Prop() lastSeenAt?: Date;
+  @Prop({ trim: true, index: true }) revokedReason?: string;
 }
 
 export const UserSessionSchema = SchemaFactory.createForClass(UserSession);
 UserSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+UserSessionSchema.index({ organizationId: 1, userId: 1, revokedAt: 1 });

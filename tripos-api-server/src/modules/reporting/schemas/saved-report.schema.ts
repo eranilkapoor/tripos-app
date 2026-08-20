@@ -13,6 +13,9 @@ export class SavedReport {
   @Prop({ type: Object, default: {} }) filters!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) schedule!: Record<string, unknown>;
   @Prop({ type: [String], default: [] }) recipients!: string[];
+  @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ type: Object, default: {} }) delivery!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) permissions!: Record<string, unknown>;
   @Prop({
     enum: ['active', 'paused', 'archived'],
     default: 'active',
@@ -26,6 +29,7 @@ export class SavedReport {
 
 export const SavedReportSchema = SchemaFactory.createForClass(SavedReport);
 SavedReportSchema.index({ organizationId: 1, reportType: 1, status: 1 });
+SavedReportSchema.index({ organizationId: 1, ownerId: 1, status: 1 });
 SavedReportSchema.index({
   organizationId: 1,
   branchId: 1,

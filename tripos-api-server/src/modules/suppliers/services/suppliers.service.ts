@@ -29,10 +29,19 @@ export class SuppliersService {
       contracts: dto.contracts ?? [],
       rates: dto.rates ?? [],
       confirmations: [],
+      tags: dto.tags ?? [],
+      customFields: dto.customFields ?? {},
+      metadata: dto.metadata ?? {},
     });
   }
   list(query: CrmListQueryDto) {
-    return listCrmRecords(this.model, query, ['name', 'type', 'destination']);
+    return listCrmRecords(this.model, query, [
+      'name',
+      'type',
+      'destination',
+      'supplierCode',
+      'ownerId',
+    ]);
   }
   findOne(id: string, query: CrmListQueryDto) {
     return findScopedCrmRecord(this.model, id, query, 'Supplier not found');

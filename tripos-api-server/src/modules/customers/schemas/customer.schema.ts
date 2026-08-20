@@ -12,7 +12,7 @@ export class Customer {
   @Prop({ trim: true, lowercase: true, index: true }) email?: string;
   @Prop({ trim: true, index: true }) phone?: string;
   @Prop({
-    enum: ['b2c', 'corporate', 'family', 'repeat'],
+    enum: ['b2c', 'b2b', 'corporate', 'family', 'repeat'],
     default: 'b2c',
     index: true,
   })
@@ -20,6 +20,14 @@ export class Customer {
   @Prop({ trim: true }) source?: string;
   @Prop({ trim: true }) city?: string;
   @Prop({ trim: true }) country?: string;
+  @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ trim: true, index: true }) externalReference?: string;
+  @Prop({ type: [String], default: [] }) tags!: string[];
+  @Prop({ type: Object, default: {} }) preferences!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) consent!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) loyalty!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['active', 'inactive', 'blocked'],
     default: 'active',
@@ -30,3 +38,5 @@ export class Customer {
 
 export const CustomerSchema = SchemaFactory.createForClass(Customer);
 CustomerSchema.index({ organizationId: 1, phone: 1 });
+CustomerSchema.index({ organizationId: 1, email: 1 });
+CustomerSchema.index({ organizationId: 1, ownerId: 1, status: 1 });

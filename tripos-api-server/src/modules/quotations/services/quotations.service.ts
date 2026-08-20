@@ -31,9 +31,14 @@ export class QuotationsService {
 
   list(query: CrmListQueryDto) {
     return listCrmRecords(this.model, query, [
+      'quoteNo',
       'customerName',
       'destination',
       'travelDates',
+      'leadId',
+      'customerId',
+      'ownerId',
+      'agentId',
     ]);
   }
 

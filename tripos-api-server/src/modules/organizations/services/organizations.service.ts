@@ -86,7 +86,19 @@ export class OrganizationsService {
 }
 
 function sanitizeOrganizationUpdate(dto: Record<string, unknown>) {
-  const allowed = ['name', 'dataHostingMode', 'branches', 'syncPolicy'];
+  const allowed = [
+    'name',
+    'dataHostingMode',
+    'branches',
+    'syncPolicy',
+    'billingProfile',
+    'subscription',
+    'branding',
+    'compliance',
+    'securityPolicy',
+    'integrations',
+    'metadata',
+  ];
   return Object.fromEntries(
     Object.entries(dto).filter(([key]) => allowed.includes(key)),
   );

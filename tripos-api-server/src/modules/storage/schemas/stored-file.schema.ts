@@ -16,6 +16,11 @@ export class StoredFile {
   @Prop({ required: true, index: true }) storageDriver!: string;
   @Prop({ required: true }) storageKey!: string;
   @Prop() url?: string;
+  @Prop({ trim: true, index: true }) checksum?: string;
+  @Prop({ trim: true, index: true }) uploadedBy?: string;
+  @Prop({ trim: true, index: true }) visibility?: string;
+  @Prop({ type: Object, default: {} }) retention!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) scanResult!: Record<string, unknown>;
   @Prop({
     enum: ['pending_upload', 'available', 'archived'],
     default: 'pending_upload',
@@ -32,3 +37,4 @@ StoredFileSchema.index({
   entityId: 1,
   createdAt: -1,
 });
+StoredFileSchema.index({ organizationId: 1, checksum: 1 });

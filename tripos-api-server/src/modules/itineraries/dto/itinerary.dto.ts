@@ -1,11 +1,27 @@
-import { IsArray, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateItineraryDto {
   @IsOptional() @IsString() quotationId?: string;
+  @IsOptional() @IsString() bookingId?: string;
+  @IsOptional() @IsString() ownerId?: string;
+  @IsOptional() @IsNumber() version?: number;
   @IsString() @MinLength(2) title!: string;
   @IsString() @MinLength(2) destination!: string;
   @IsOptional() @IsArray() days?: Array<Record<string, unknown>>;
   @IsOptional() @IsArray() images?: string[];
+  @IsOptional() @IsObject() inclusions?: Record<string, unknown>;
+  @IsOptional() @IsObject() exclusions?: Record<string, unknown>;
+  @IsOptional() @IsObject() travellerNotes?: Record<string, unknown>;
+  @IsOptional() @IsArray() tags?: string[];
+  @IsOptional() @IsObject() customFields?: Record<string, unknown>;
+  @IsOptional() @IsObject() metadata?: Record<string, unknown>;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;
 }

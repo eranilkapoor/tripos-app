@@ -9,6 +9,8 @@ export class SupportTicket {
   @Prop({ default: 'demo-org', index: true }) organizationId!: string;
   @Prop({ default: 'main', index: true }) branchId!: string;
   @Prop({ required: true, trim: true, index: true }) subject!: string;
+  @Prop({ trim: true, index: true }) ticketNo?: string;
+  @Prop({ index: true }) customerId?: string;
   @Prop({ required: true, trim: true, index: true }) customerName!: string;
   @Prop({ index: true }) bookingId?: string;
   @Prop({ trim: true, index: true }) channel?: string;
@@ -19,7 +21,18 @@ export class SupportTicket {
   })
   priority!: string;
   @Prop({ trim: true, index: true }) assignedTo?: string;
+  @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ trim: true, index: true }) category?: string;
   @Prop({ trim: true }) description?: string;
+  @Prop() firstResponseDueAt?: Date;
+  @Prop() resolutionDueAt?: Date;
+  @Prop() resolvedAt?: Date;
+  @Prop({ type: [Object], default: [] }) messages!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [String], default: [] }) tags!: string[];
+  @Prop({ type: Object, default: {} }) satisfaction!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['open', 'in_progress', 'waiting_customer', 'resolved', 'closed'],
     default: 'open',
@@ -30,3 +43,4 @@ export class SupportTicket {
 
 export const SupportTicketSchema = SchemaFactory.createForClass(SupportTicket);
 SupportTicketSchema.index({ organizationId: 1, status: 1, priority: 1 });
+SupportTicketSchema.index({ organizationId: 1, ticketNo: 1 });

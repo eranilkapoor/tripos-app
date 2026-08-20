@@ -13,6 +13,11 @@ export class Destination {
   @Prop({ trim: true }) bestSeason?: string;
   @Prop({ type: [String], default: [] }) highlights!: string[];
   @Prop({ trim: true }) visaRequirement?: string;
+  @Prop({ type: Object, default: {} }) geo!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) content!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) travelAdvisory!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) seo!: Record<string, unknown>;
+  @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ enum: ['active', 'inactive'], default: 'active', index: true })
   status!: string;
 }

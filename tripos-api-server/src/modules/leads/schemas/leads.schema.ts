@@ -55,6 +55,18 @@ export class Lead {
   @Prop({ trim: true, index: true })
   assignedTo?: string;
 
+  @Prop({ trim: true, index: true })
+  ownerId?: string;
+
+  @Prop({ trim: true, index: true })
+  teamId?: string;
+
+  @Prop({ trim: true, index: true })
+  departmentId?: string;
+
+  @Prop({ trim: true, index: true })
+  externalReference?: string;
+
   @Prop({
     enum: [
       'new',
@@ -82,8 +94,17 @@ export class Lead {
   @Prop()
   nextFollowUpAt?: Date;
 
+  @Prop()
+  lastContactedAt?: Date;
+
+  @Prop({ type: Object, default: {} })
+  consent!: Record<string, unknown>;
+
   @Prop({ type: [String], default: [] })
   tags!: string[];
+
+  @Prop({ type: Object, default: {} })
+  customFields!: Record<string, unknown>;
 
   @Prop({ type: Object, default: {} })
   metadata!: Record<string, unknown>;
@@ -95,6 +116,8 @@ LeadSchema.index({ organizationId: 1, email: 1 });
 LeadSchema.index({ organizationId: 1, stage: 1, createdAt: -1 });
 LeadSchema.index({ organizationId: 1, assignedTo: 1, nextFollowUpAt: 1 });
 LeadSchema.index({ organizationId: 1, 'requirement.destination': 1 });
+LeadSchema.index({ organizationId: 1, ownerId: 1, stage: 1 });
+LeadSchema.index({ organizationId: 1, externalReference: 1 });
 
 @Schema({ collection: COLLECTION_NAMES.LEAD_ACTIVITY, timestamps: true })
 export class LeadActivity {
@@ -122,6 +145,14 @@ export class LeadActivity {
 
   @Prop()
   description?: string;
+
+  @Prop({ trim: true, index: true })
+  actorId?: string;
+
+  @Prop({ trim: true })
+  channel?: string;
+
+  @Prop() occurredAt?: Date;
 
   @Prop({ type: Object, default: {} })
   metadata!: Record<string, unknown>;

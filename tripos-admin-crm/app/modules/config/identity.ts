@@ -20,6 +20,10 @@ const identityModules: CrmModule[] = [
       { key: "phone", label: "Phone" },
       { key: "email", label: "Email", type: "email" },
       { key: "address", label: "Address" },
+      { key: "operatingHours", label: "Operating Hours", type: "textarea" },
+      { key: "taxProfile", label: "Tax Profile", type: "textarea" },
+      { key: "settings", label: "Settings", type: "textarea" },
+      { key: "metadata", label: "Internal Metadata", type: "textarea" },
     ],
   },
   {
@@ -37,6 +41,9 @@ const identityModules: CrmModule[] = [
       { key: "code", label: "Code", required: true },
       { key: "branchId", label: "Branch", required: true },
       { key: "managerUserId", label: "Manager User ID" },
+      { key: "slaPolicy", label: "SLA Policy", type: "textarea" },
+      { key: "settings", label: "Settings", type: "textarea" },
+      { key: "metadata", label: "Internal Metadata", type: "textarea" },
     ],
   },
   {
@@ -63,6 +70,9 @@ const identityModules: CrmModule[] = [
       { key: "departmentId", label: "Department ID", required: true },
       { key: "leadUserId", label: "Lead User ID" },
       { key: "memberUserIds", label: "Member User IDs", type: "tags" },
+      { key: "queueRules", label: "Queue Rules", type: "textarea" },
+      { key: "settings", label: "Settings", type: "textarea" },
+      { key: "metadata", label: "Internal Metadata", type: "textarea" },
     ],
   },
   {
@@ -89,6 +99,9 @@ const identityModules: CrmModule[] = [
       },
       { key: "description", label: "Description" },
       { key: "defaultBranchIds", label: "Default Branch IDs", type: "tags" },
+      { key: "defaultDepartmentIds", label: "Default Department IDs", type: "tags" },
+      { key: "defaultTeamIds", label: "Default Team IDs", type: "tags" },
+      { key: "limits", label: "Limits", type: "textarea" },
     ],
   },
   {
@@ -141,12 +154,14 @@ const identityModules: CrmModule[] = [
     endpoint: "identity/role-permissions",
     description:
       "Role-to-permission grants for enterprise access policy management.",
-    columns: ["Role", "Permission", "Status"],
-    rowMap: ["roleId", "permissionCode", "status"],
+    columns: ["Role", "Permission", "Scope", "Status"],
+    rowMap: ["roleId", "permissionCode", "scope", "status"],
     statusOptions: ["active", "inactive"],
     fields: [
       { key: "roleId", label: "Role ID", required: true },
       { key: "permissionCode", label: "Permission Code", required: true },
+      { key: "scope", label: "Scope" },
+      { key: "conditions", label: "Conditions", type: "textarea" },
     ],
   },
   {
@@ -165,6 +180,11 @@ const identityModules: CrmModule[] = [
       { key: "name", label: "Name", required: true },
       { key: "role", label: "Role" },
       { key: "branchId", label: "Branch" },
+      { key: "branchIds", label: "Branch IDs", type: "tags" },
+      { key: "departmentIds", label: "Department IDs", type: "tags" },
+      { key: "teamIds", label: "Team IDs", type: "tags" },
+      { key: "permissions", label: "Permissions", type: "tags" },
+      { key: "metadata", label: "Internal Metadata", type: "textarea" },
     ],
   },
   {

@@ -18,13 +18,17 @@ export class DestinationsService {
     @InjectModel(Destination.name) private readonly model: Model<Destination>,
   ) {}
   create(dto: CreateDestinationDto) {
-    return this.model.create({ ...dto, highlights: dto.highlights ?? [] });
+    return this.model.create({
+      ...dto,
+      highlights: dto.highlights ?? [],
+      tags: dto.tags ?? [],
+    });
   }
   list(query: CrmListQueryDto) {
     return listCrmRecords(
       this.model,
       query,
-      ['name', 'country', 'region', 'bestSeason'],
+      ['name', 'country', 'region', 'bestSeason', 'visaRequirement'],
       { country: 1, name: 1 },
     );
   }

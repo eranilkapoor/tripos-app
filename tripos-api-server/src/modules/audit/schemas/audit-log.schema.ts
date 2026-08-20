@@ -15,6 +15,10 @@ export class AuditLog {
   @Prop({ index: true }) branchId?: string;
   @Prop({ index: true }) actorId?: string;
   @Prop({ index: true }) actorRole?: string;
+  @Prop({ index: true }) entityType?: string;
+  @Prop({ index: true }) entityId?: string;
+  @Prop({ trim: true }) requestId?: string;
+  @Prop({ trim: true }) correlationId?: string;
   @Prop() ip?: string;
   @Prop() userAgent?: string;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
@@ -24,3 +28,4 @@ export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);
 AuditLogSchema.index({ organizationId: 1, createdAt: -1 });
 AuditLogSchema.index({ actorId: 1, createdAt: -1 });
 AuditLogSchema.index({ path: 1, createdAt: -1 });
+AuditLogSchema.index({ organizationId: 1, entityType: 1, entityId: 1 });

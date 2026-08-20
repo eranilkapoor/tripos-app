@@ -11,11 +11,18 @@ export class Campaign {
   @Prop({ required: true, trim: true, index: true }) name!: string;
   @Prop({ required: true, trim: true, index: true }) channel!: string;
   @Prop({ trim: true, index: true }) source?: string;
+  @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ trim: true, index: true }) campaignCode?: string;
+  @Prop() startsAt?: Date;
+  @Prop() endsAt?: Date;
+  @Prop({ type: Object, default: {} }) audience!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) budget!: Record<string, unknown>;
   @Prop({ default: 0 }) spend!: number;
   @Prop({ default: 0 }) leads!: number;
   @Prop({ default: 0 }) quotations!: number;
   @Prop({ default: 0 }) bookings!: number;
   @Prop({ default: 0 }) revenue!: number;
+  @Prop({ type: Object, default: {} }) attribution!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['draft', 'active', 'paused', 'completed', 'archived'],
@@ -27,3 +34,4 @@ export class Campaign {
 
 export const CampaignSchema = SchemaFactory.createForClass(Campaign);
 CampaignSchema.index({ organizationId: 1, channel: 1, status: 1 });
+CampaignSchema.index({ organizationId: 1, campaignCode: 1 });

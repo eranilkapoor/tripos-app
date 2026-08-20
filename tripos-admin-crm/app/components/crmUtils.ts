@@ -146,10 +146,28 @@ export function toPayload(
               .split(",")
               .map((item) => item.trim())
               .filter(Boolean)
+          : field.type === "textarea"
+            ? parseTextareaValue(raw ?? "")
           : (raw ?? "");
     assignPath(payload, field.key, value);
   }
   return payload;
+}
+
+function parseTextareaValue(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (
+    (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+    (trimmed.startsWith("[") && trimmed.endsWith("]"))
+  ) {
+    try {
+      return JSON.parse(trimmed) as unknown;
+    } catch {
+      return value;
+    }
+  }
+  return value;
 }
 
 function assignPath(

@@ -27,6 +27,8 @@ export class CustomersService {
       'phone',
       'city',
       'country',
+      'ownerId',
+      'externalReference',
     ]);
   }
   findOne(id: string, query: CrmListQueryDto) {
