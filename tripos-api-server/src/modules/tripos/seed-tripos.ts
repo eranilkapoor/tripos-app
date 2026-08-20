@@ -26,6 +26,8 @@ import { AuditLogSchema } from '../audit/schemas/audit-log.schema';
 import { SettingSchema } from '../settings/schemas/setting.schema';
 import { TagSchema } from '../tags/schemas/tag.schema';
 import { TaskSchema } from '../tasks/schemas/task.schema';
+import { PricingPlanSchema } from '../subscriptions/schemas/pricing-plan.schema';
+import { SubscriptionSchema } from '../subscriptions/schemas/subscription.schema';
 import {
   BranchSchema,
   DepartmentSchema,
@@ -70,6 +72,8 @@ async function main() {
   const Setting = model('Setting', SettingSchema);
   const Tag = model('Tag', TagSchema);
   const Task = model('Task', TaskSchema);
+  const PricingPlan = model('PricingPlan', PricingPlanSchema);
+  const Subscription = model('Subscription', SubscriptionSchema);
   const Branch = model('Branch', BranchSchema);
   const Department = model('Department', DepartmentSchema);
   const Team = model('Team', TeamSchema);
@@ -100,6 +104,113 @@ async function main() {
   ).exec();
 
   const organizationId = String(organization._id);
+  await upsertMany(PricingPlan, 'code', [
+    {
+      code: 'starter',
+      name: 'Starter CRM',
+      description:
+        'Core TripOS CRM for small travel teams starting operations.',
+      audience: 'b2b_crm',
+      billingCycle: 'monthly',
+      currencyCode: 'INR',
+      priceMinor: 999900,
+      setupFeeMinor: 0,
+      trialDays: 14,
+      minSeats: 3,
+      includedSeats: 5,
+      extraSeatPriceMinor: 49900,
+      features: [
+        'Lead CRM',
+        'Quotations',
+        'Bookings',
+        'Operations',
+        'Invoices',
+      ],
+      limits: { branches: 1, crmUsers: 5, monthlyBookings: 200 },
+      status: 'active',
+    },
+    {
+      code: 'growth',
+      name: 'Growth Suite',
+      description: 'Multi-branch CRM with B2B agents, suppliers, and finance.',
+      audience: 'enterprise',
+      billingCycle: 'monthly',
+      currencyCode: 'INR',
+      priceMinor: 2499900,
+      setupFeeMinor: 2500000,
+      trialDays: 14,
+      minSeats: 8,
+      includedSeats: 15,
+      extraSeatPriceMinor: 79900,
+      features: [
+        'Multi-branch',
+        'B2B Agents',
+        'Supplier Payables',
+        'Advanced Reports',
+        'Sandbox Integrations',
+      ],
+      limits: { branches: 5, crmUsers: 15, monthlyBookings: 1000 },
+      status: 'active',
+    },
+    {
+      code: 'enterprise',
+      name: 'Enterprise OS',
+      description: 'Private deployment, hybrid sync, SLA support, and add-ons.',
+      audience: 'enterprise',
+      billingCycle: 'yearly',
+      currencyCode: 'INR',
+      priceMinor: 49999000,
+      setupFeeMinor: 7500000,
+      trialDays: 0,
+      minSeats: 25,
+      includedSeats: 50,
+      extraSeatPriceMinor: 59900,
+      features: [
+        'Hybrid Sync',
+        'Custom Branding',
+        'Dedicated Account Manager',
+        'SLA Support',
+        'Data Residency',
+      ],
+      limits: { branches: 25, crmUsers: 50, monthlyBookings: 10000 },
+      status: 'active',
+    },
+  ]);
+
+  await upsertMany(Subscription, 'planCode', [
+    {
+      organizationId,
+      branchId: BRANCH_ID,
+      planCode: 'growth',
+      planName: 'Growth Suite',
+      audience: 'enterprise',
+      billingCycle: 'monthly',
+      currencyCode: 'INR',
+      amountMinor: 2499900,
+      setupFeeMinor: 2500000,
+      seats: 15,
+      trialDays: 14,
+      startsAt: new Date(),
+      renewsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      paymentProvider: 'sandbox',
+      checkoutReference: 'seed_growth_subscription',
+      billingProfile: {
+        legalName: 'Webnza Travels Demo',
+        billingEmail: 'billing@webnza.test',
+        countryCode: 'IN',
+        taxId: 'GSTIN-DEMO-0001',
+      },
+      limitsSnapshot: { branches: 5, crmUsers: 15, monthlyBookings: 1000 },
+      featuresSnapshot: [
+        'Multi-branch',
+        'B2B Agents',
+        'Supplier Payables',
+        'Advanced Reports',
+      ],
+      status: 'trialing',
+    },
+  ]);
+
   await CrmUser.updateOne(
     { email: 'admin@tripos.test' },
     {
@@ -222,6 +333,7 @@ async function main() {
     'audit',
     'reports',
     'settings',
+    'billing',
     'tasks',
     'tags',
     'batch-jobs',

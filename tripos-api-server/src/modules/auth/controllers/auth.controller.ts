@@ -19,12 +19,14 @@ import { Roles } from '../../../common/decorators/roles.decorator';
 import { organizationScopedQuery } from '../../../common/utils/organization-scope.util';
 import {
   AcceptInvitationDto,
+  ChangePasswordDto,
   ForgotPasswordDto,
   InviteCrmUserDto,
   LoginDto,
   RegisterCrmUserDto,
   ResetPasswordDto,
   SwitchWorkspaceDto,
+  UpdateMyProfileDto,
   UpdateCrmUserPermissionsDto,
 } from '../dto/auth.dto';
 import { AuthService } from '../services/auth.service';
@@ -79,6 +81,22 @@ export class AuthController {
 
   @Get('me') me(@Headers('authorization') authorization?: string) {
     return this.service.me(extractBearer(authorization));
+  }
+
+  @Patch('me')
+  updateMe(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() dto: UpdateMyProfileDto,
+  ) {
+    return this.service.updateMe(extractBearer(authorization), dto);
+  }
+
+  @Post('change-password')
+  changePassword(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.service.changePassword(extractBearer(authorization), dto);
   }
   @Post('workspace')
   switchWorkspace(

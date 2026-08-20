@@ -32,6 +32,7 @@ import { AiAssistantModule } from './modules/ai/ai-assistant.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { TagsModule } from './modules/tags/tags.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { OrganizationContextMiddleware } from './common/middleware/organization-context.middleware';
 import { AppStateModule } from './app-state.module';
 
@@ -83,6 +84,7 @@ import { AppStateModule } from './app-state.module';
     ReportingModule,
     AiAssistantModule,
     SettingsModule,
+    SubscriptionsModule,
     TagsModule,
     TasksModule,
     TriposModule,

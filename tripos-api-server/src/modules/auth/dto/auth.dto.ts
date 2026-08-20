@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsEmail,
+  IsObject,
   IsOptional,
   IsString,
   MinLength,
@@ -38,6 +39,20 @@ export class ForgotPasswordDto {
 export class ResetPasswordDto {
   @IsString() token!: string;
   @IsString() @MinLength(6) password!: string;
+}
+
+export class ChangePasswordDto {
+  @IsString() currentPassword!: string;
+  @IsString() @MinLength(6) newPassword!: string;
+}
+
+export class UpdateMyProfileDto {
+  @IsOptional() @IsString() @MinLength(2) name?: string;
+  @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() timezone?: string;
+  @IsOptional() @IsString() locale?: string;
+  @IsOptional() @IsObject() profile?: Record<string, unknown>;
+  @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;
 }
 
 export class InviteCrmUserDto {

@@ -28,6 +28,7 @@ import InvoiceBuilder from "./InvoiceBuilder";
 import LoginScreen from "./LoginScreen";
 import DashboardPanel from "./DashboardPanel";
 import ThemeSwitcher, { type CrmTheme } from "./ThemeSwitcher";
+import AccountPanel from "./AccountPanel";
 
 const organizationOptions = [
   { value: "WEBNZA", label: "Webnza Travel Group" },
@@ -349,12 +350,19 @@ function CrmShellContent() {
             ))}
           </section>
 
+          {selected.id === "my-profile" ? (
+            <AccountPanel mode="profile" onNotify={setToast} />
+          ) : null}
+          {selected.id === "change-password" ? (
+            <AccountPanel mode="password" onNotify={setToast} />
+          ) : null}
           {selected.id === "invoices" ? (
             <InvoiceBuilder onSaved={() => void refetch()} />
           ) : null}
           {selected.id === "dashboard" ? (
             <DashboardPanel dashboard={dashboard} />
-          ) : (
+          ) : selected.id === "my-profile" ||
+            selected.id === "change-password" ? null : (
             <RecordTable
               columns={selected.columns}
               filteredRows={filteredRows}

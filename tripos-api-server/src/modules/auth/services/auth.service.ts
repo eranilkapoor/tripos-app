@@ -13,12 +13,14 @@ import {
 import { Model } from 'mongoose';
 import {
   AcceptInvitationDto,
+  ChangePasswordDto,
   ForgotPasswordDto,
   InviteCrmUserDto,
   LoginDto,
   RegisterCrmUserDto,
   ResetPasswordDto,
   SwitchWorkspaceDto,
+  UpdateMyProfileDto,
   UpdateCrmUserPermissionsDto,
 } from '../dto/auth.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
@@ -217,6 +219,47 @@ export class AuthService {
     };
   }
 
+  async updateMe(token: string, dto: UpdateMyProfileDto) {
+    const session = await this.activeSession(token);
+    const update: Record<string, unknown> = {};
+    if (dto.name) update.name = dto.name;
+    if (dto.phone !== undefined) update.phone = dto.phone;
+    if (dto.timezone !== undefined) update.timezone = dto.timezone;
+    if (dto.locale !== undefined) update.locale = dto.locale;
+    if (dto.profile) update.profile = dto.profile;
+    if (dto.notificationPreferences) {
+      update.notificationPreferences = dto.notificationPreferences;
+    }
+    const user = await this.userModel
+      .findOneAndUpdate(
+        { _id: session.userId, organizationId: session.organizationId },
+        update,
+        { new: true },
+      )
+      .lean()
+      .exec();
+    if (!user) throw new UnauthorizedException('User not found');
+    return this.me(token);
+  }
+
+  async changePassword(token: string, dto: ChangePasswordDto) {
+    const session = await this.activeSession(token);
+    const user = await this.userModel.findById(session.userId).exec();
+    if (!user || !verifyPassword(dto.currentPassword, user.passwordHash)) {
+      throw new UnauthorizedException('Invalid current password');
+    }
+    user.passwordHash = hashPassword(dto.newPassword);
+    user.passwordChangedAt = new Date();
+    await user.save();
+    await this.sessionModel
+      .updateMany(
+        { userId: String(user._id), tokenHash: { $ne: hashToken(token) } },
+        { revokedAt: new Date() },
+      )
+      .exec();
+    return { success: true };
+  }
+
   async refresh(token: string) {
     const session = await this.sessionModel
       .findOne({
@@ -413,6 +456,7 @@ export class AuthService {
       'audit',
       'reports',
       'settings',
+      'billing',
       'tasks',
       'tags',
       'batch-jobs',
@@ -590,6 +634,19 @@ export class AuthService {
       role: 'organization_admin',
       permissions: ['*'],
     });
+  }
+
+  private async activeSession(token: string) {
+    const session = await this.sessionModel
+      .findOne({
+        tokenHash: hashToken(token),
+        revokedAt: { $exists: false },
+        expiresAt: { $gt: new Date() },
+      })
+      .lean()
+      .exec();
+    if (!session) throw new UnauthorizedException('Session expired');
+    return session;
   }
 }
 

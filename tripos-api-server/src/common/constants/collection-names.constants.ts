@@ -32,6 +32,8 @@ export const COLLECTION_NAMES = {
   STORED_FILE: 'stored_files',
   SAVED_REPORT: 'saved_reports',
   SETTING: 'settings',
+  PRICING_PLAN: 'pricing_plans',
+  SUBSCRIPTION: 'subscriptions',
   TAG: 'tags',
   TASK: 'tasks',
 } as const;

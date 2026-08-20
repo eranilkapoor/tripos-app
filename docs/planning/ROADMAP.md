@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-08-12
 
-TripOS is being built for launch as soon as the product is code-ready and the production environment is activated. This roadmap does not use 90-day or future-phase timing. Status reflects current code-side readiness in this repository.
+TripOS is being built for launch as soon as the product is code-ready and the production environment is activated. Status reflects current code-side readiness in this repository.
 
 An independent code-level review was completed on 2026-08-12 across all four apps and repo-level CI/tooling. The launch-blocking code-side risks found in that review are now closed; remaining work is external deployment evidence, live credentials, and final QA sign-off.
 

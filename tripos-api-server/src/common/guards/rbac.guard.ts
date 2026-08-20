@@ -74,6 +74,8 @@ const PROTECTED_MODULES = new Set([
   'ai',
   'batch-jobs',
   'settings',
+  'plans',
+  'subscriptions',
   'tasks',
   'tags',
 ]);
@@ -122,5 +124,7 @@ function permissionModule(moduleName: string) {
     return 'reports';
   }
   if (moduleName === 'ai') return 'settings';
+  if (moduleName === 'plans' || moduleName === 'subscriptions')
+    return 'billing';
   return moduleName;
 }

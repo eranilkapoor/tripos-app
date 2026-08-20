@@ -14,6 +14,9 @@ export class CrmUser {
     index: true,
   })
   email!: string;
+  @Prop({ trim: true }) phone?: string;
+  @Prop({ default: 'Asia/Kolkata' }) timezone!: string;
+  @Prop({ default: 'en' }) locale!: string;
   @Prop({ required: true }) passwordHash!: string;
   @Prop({ required: true, index: true }) organizationId!: string;
   @Prop({ default: 'main', index: true }) branchId!: string;
@@ -39,6 +42,8 @@ export class CrmUser {
   @Prop({ trim: true, index: true }) managerUserId?: string;
   @Prop({ type: Object, default: {} }) profile!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) preferences!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} })
+  notificationPreferences!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) security!: Record<string, unknown>;
   @Prop() lastLoginAt?: Date;
   @Prop() passwordChangedAt?: Date;

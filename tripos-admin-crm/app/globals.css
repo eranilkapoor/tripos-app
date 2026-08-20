@@ -757,6 +757,45 @@ td button:hover {
   margin-bottom: 8px;
 }
 
+.account-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  padding: 20px;
+}
+
+.account-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.account-actions {
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+.account-actions button {
+  background: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 75%, var(--border));
+  border-radius: 8px;
+  color: var(--primary-contrast);
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 40px;
+  padding: 0 16px;
+  text-transform: uppercase;
+}
+
+.account-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .table-card {
   margin-bottom: 16px;
   overflow: hidden;

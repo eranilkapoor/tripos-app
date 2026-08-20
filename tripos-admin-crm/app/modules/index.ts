@@ -8,6 +8,11 @@ import platformModules from "./config/platform";
 
 const ORIGINAL_ORDER = [
   "dashboard",
+  "my-profile",
+  "change-password",
+  "subscription-plans",
+  "pricing-plans",
+  "subscriptions",
   "leads",
   "customers",
   "quotations",
