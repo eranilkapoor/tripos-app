@@ -10,6 +10,9 @@ import {
 export class CreateItineraryDto {
   @IsOptional() @IsString() quotationId?: string;
   @IsOptional() @IsString() bookingId?: string;
+  @IsOptional() @IsString() customerId?: string;
+  @IsOptional() @IsString() templateCode?: string;
+  @IsOptional() @IsString() language?: string;
   @IsOptional() @IsString() ownerId?: string;
   @IsOptional() @IsNumber() version?: number;
   @IsString() @MinLength(2) title!: string;
@@ -19,6 +22,10 @@ export class CreateItineraryDto {
   @IsOptional() @IsObject() inclusions?: Record<string, unknown>;
   @IsOptional() @IsObject() exclusions?: Record<string, unknown>;
   @IsOptional() @IsObject() travellerNotes?: Record<string, unknown>;
+  @IsOptional() @IsObject() presentation?: Record<string, unknown>;
+  @IsOptional() @IsObject() sharing?: Record<string, unknown>;
+  @IsOptional() @IsArray() revisions?: Array<Record<string, unknown>>;
+  @IsOptional() @IsString() publishedAt?: string;
   @IsOptional() @IsArray() tags?: string[];
   @IsOptional() @IsObject() customFields?: Record<string, unknown>;
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;

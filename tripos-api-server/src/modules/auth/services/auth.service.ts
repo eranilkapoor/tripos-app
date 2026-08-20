@@ -59,10 +59,14 @@ export class AuthService {
       teamIds: dto.teamIds ?? [],
       role: dto.role ?? 'organization_admin',
       phone: dto.phone,
+      userType: dto.userType,
+      avatarUrl: dto.avatarUrl,
+      designation: dto.designation,
       timezone: dto.timezone ?? 'Asia/Kolkata',
       locale: dto.locale ?? 'en',
       employeeCode: dto.employeeCode,
       managerUserId: dto.managerUserId,
+      accessPolicy: dto.accessPolicy ?? {},
       profile: dto.profile ?? {},
       preferences: dto.preferences ?? {},
       notificationPreferences: dto.notificationPreferences ?? {},
@@ -97,10 +101,14 @@ export class AuthService {
             teamIds: dto.teamIds ?? [],
             role: dto.role ?? 'sales',
             phone: dto.phone,
+            userType: dto.userType,
+            avatarUrl: dto.avatarUrl,
+            designation: dto.designation,
             timezone: dto.timezone ?? 'Asia/Kolkata',
             locale: dto.locale ?? 'en',
             employeeCode: dto.employeeCode,
             managerUserId: dto.managerUserId,
+            accessPolicy: dto.accessPolicy ?? {},
             profile: dto.profile ?? {},
             preferences: dto.preferences ?? {},
             notificationPreferences: dto.notificationPreferences ?? {},
@@ -577,11 +585,15 @@ export class AuthService {
     const update: Record<string, unknown> = {};
     if (dto.role) update.role = dto.role;
     if (dto.phone !== undefined) update.phone = dto.phone;
+    if (dto.userType !== undefined) update.userType = dto.userType;
+    if (dto.avatarUrl !== undefined) update.avatarUrl = dto.avatarUrl;
+    if (dto.designation !== undefined) update.designation = dto.designation;
     if (dto.timezone !== undefined) update.timezone = dto.timezone;
     if (dto.locale !== undefined) update.locale = dto.locale;
     if (dto.employeeCode !== undefined) update.employeeCode = dto.employeeCode;
     if (dto.managerUserId !== undefined)
       update.managerUserId = dto.managerUserId;
+    if (dto.accessPolicy) update.accessPolicy = dto.accessPolicy;
     if (dto.profile) update.profile = dto.profile;
     if (dto.preferences) update.preferences = dto.preferences;
     if (dto.notificationPreferences)
@@ -612,11 +624,15 @@ export class AuthService {
     if (dto.email) update.email = dto.email.toLowerCase();
     if (dto.role) update.role = dto.role;
     if (dto.phone !== undefined) update.phone = dto.phone;
+    if (dto.userType !== undefined) update.userType = dto.userType;
+    if (dto.avatarUrl !== undefined) update.avatarUrl = dto.avatarUrl;
+    if (dto.designation !== undefined) update.designation = dto.designation;
     if (dto.timezone !== undefined) update.timezone = dto.timezone;
     if (dto.locale !== undefined) update.locale = dto.locale;
     if (dto.employeeCode !== undefined) update.employeeCode = dto.employeeCode;
     if (dto.managerUserId !== undefined)
       update.managerUserId = dto.managerUserId;
+    if (dto.accessPolicy) update.accessPolicy = dto.accessPolicy;
     if (dto.profile) update.profile = dto.profile;
     if (dto.preferences) update.preferences = dto.preferences;
     if (dto.notificationPreferences)

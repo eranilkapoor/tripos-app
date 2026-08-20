@@ -7,6 +7,8 @@ const commonFields = [
   { key: "entityType", label: "Entity Type" },
   { key: "entityId", label: "Entity Ref" },
   { key: "ownerId", label: "Owner User Ref" },
+  { key: "departmentId", label: "Department Ref" },
+  { key: "teamId", label: "Team Ref" },
   { key: "assignedTo", label: "Assigned To" },
   { key: "channel", label: "Channel" },
   {
@@ -17,9 +19,12 @@ const commonFields = [
   },
   { key: "dueAt", label: "Due At", type: "date" as const },
   { key: "scheduledAt", label: "Scheduled At", type: "date" as const },
+  { key: "startedAt", label: "Started At", type: "date" as const },
   { key: "completedAt", label: "Completed At", type: "date" as const },
   { key: "description", label: "Description", type: "textarea" as const },
   { key: "details", label: "Details", type: "textarea" as const },
+  { key: "timeline", label: "Timeline", type: "textarea" as const },
+  { key: "attachments", label: "Attachments", type: "textarea" as const },
   { key: "tags", label: "Tags", type: "tags" as const },
   { key: "metadata", label: "Internal Metadata", type: "textarea" as const },
 ];

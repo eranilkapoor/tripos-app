@@ -12,12 +12,18 @@ export class WorkflowRule {
   @Prop({ required: true, trim: true, index: true }) code!: string;
   @Prop({ default: 'operations', index: true }) module!: string;
   @Prop({ default: 'record_status_changed', index: true }) trigger!: string;
+  @Prop({ trim: true, index: true }) entityType?: string;
   @Prop({ type: Object, default: {} }) conditions!: Record<string, unknown>;
   @Prop({ type: [Object], default: [] }) actions!: Array<
     Record<string, unknown>
   >;
+  @Prop({ type: Object, default: {} }) schedule!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) throttling!: Record<string, unknown>;
   @Prop({ default: 100 }) priority!: number;
   @Prop({ default: false }) runOnce!: boolean;
+  @Prop() lastRunAt?: Date;
+  @Prop() nextRunAt?: Date;
+  @Prop({ type: Object, default: {} }) lastRunResult!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['active', 'inactive', 'paused'],

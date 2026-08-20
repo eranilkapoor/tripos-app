@@ -16,12 +16,21 @@ export class OperatingRecord {
   @Prop({ trim: true, index: true }) entityId?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
   @Prop({ trim: true, index: true }) assignedTo?: string;
+  @Prop({ trim: true, index: true }) departmentId?: string;
+  @Prop({ trim: true, index: true }) teamId?: string;
   @Prop({ trim: true, index: true }) channel?: string;
   @Prop({ trim: true, index: true }) priority?: string;
   @Prop({ trim: true }) description?: string;
   @Prop() dueAt?: Date;
   @Prop() scheduledAt?: Date;
+  @Prop() startedAt?: Date;
   @Prop() completedAt?: Date;
+  @Prop({ type: [Object], default: [] }) timeline!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) attachments!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: Object, default: {} }) details!: Record<string, unknown>;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;

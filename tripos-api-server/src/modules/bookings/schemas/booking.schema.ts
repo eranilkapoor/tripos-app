@@ -14,9 +14,15 @@ export class Booking {
   @Prop({ trim: true, index: true }) bookingNo?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
   @Prop({ trim: true, index: true }) agentId?: string;
+  @Prop({ trim: true, index: true }) supplierCoordinatorId?: string;
+  @Prop({ trim: true, index: true }) operationsOwnerId?: string;
+  @Prop({ trim: true, index: true }) financeOwnerId?: string;
   @Prop({ required: true, trim: true }) customerName!: string;
   @Prop({ required: true, trim: true, index: true }) destination!: string;
   @Prop({ trim: true }) travelDates?: string;
+  @Prop() bookingDate?: Date;
+  @Prop() departureDate?: Date;
+  @Prop() returnDate?: Date;
   @Prop({ type: [Object], default: [] }) passengers!: Array<
     Record<string, unknown>
   >;
@@ -40,9 +46,20 @@ export class Booking {
     string,
     unknown
   >;
+  @Prop({ type: Object, default: {} }) paymentSummary!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) operationsSummary!: Record<
+    string,
+    unknown
+  >;
   @Prop({ type: Object, default: {} }) cancellationPolicy!: Record<
     string,
     unknown
+  >;
+  @Prop({ type: [Object], default: [] }) statusHistory!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) supplierConfirmations!: Array<
+    Record<string, unknown>
   >;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;

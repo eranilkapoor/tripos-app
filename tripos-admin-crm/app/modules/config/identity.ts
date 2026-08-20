@@ -41,7 +41,14 @@ const identityModules: CrmModule[] = [
     description:
       "Branch-level departments for sales, operations, finance, support, and management teams.",
     columns: ["Department", "Code", "Branch", "Type", "Manager", "Status"],
-    rowMap: ["name", "code", "branchId", "departmentType", "managerUserId", "status"],
+    rowMap: [
+      "name",
+      "code",
+      "branchId",
+      "departmentType",
+      "managerUserId",
+      "status",
+    ],
     statusOptions: ["active", "inactive"],
     fields: [
       { key: "name", label: "Department", required: true },
@@ -82,7 +89,11 @@ const identityModules: CrmModule[] = [
       { key: "leadUserId", label: "Lead User ID" },
       { key: "memberUserIds", label: "Member User IDs", type: "tags" },
       { key: "skillTags", label: "Skill Tags", type: "tags" },
-      { key: "supportedDestinations", label: "Supported Destinations", type: "tags" },
+      {
+        key: "supportedDestinations",
+        label: "Supported Destinations",
+        type: "tags",
+      },
       { key: "capacity", label: "Capacity", type: "textarea" },
       { key: "escalationPolicy", label: "Escalation Policy", type: "textarea" },
       { key: "queueRules", label: "Queue Rules", type: "textarea" },
@@ -215,6 +226,18 @@ const identityModules: CrmModule[] = [
       { key: "name", label: "Name", required: true },
       { key: "email", label: "Email", required: true, type: "email" },
       { key: "phone", label: "Phone" },
+      {
+        key: "userType",
+        label: "User Type",
+        type: "select",
+        options: [
+          { value: "platform", label: "Platform" },
+          { value: "organization", label: "Organization" },
+          { value: "customer", label: "Customer" },
+        ],
+      },
+      { key: "designation", label: "Designation" },
+      { key: "avatarUrl", label: "Avatar URL" },
       { key: "password", label: "Temporary Password" },
       {
         key: "role",
@@ -233,9 +256,14 @@ const identityModules: CrmModule[] = [
       { key: "branchIds", label: "Allowed Branch Refs", type: "tags" },
       { key: "departmentIds", label: "Allowed Department Refs", type: "tags" },
       { key: "teamIds", label: "Allowed Team Refs", type: "tags" },
-      { key: "permissions", label: "Direct Permission Overrides", type: "tags" },
+      {
+        key: "permissions",
+        label: "Direct Permission Overrides",
+        type: "tags",
+      },
       { key: "employeeCode", label: "Employee Code" },
       { key: "managerUserId", label: "Manager User Ref" },
+      { key: "accessPolicy", label: "Access Policy", type: "textarea" },
       { key: "timezone", label: "Timezone" },
       { key: "locale", label: "Locale" },
       { key: "profile", label: "Profile", type: "textarea" },
@@ -261,4 +289,3 @@ const identityModules: CrmModule[] = [
 ];
 
 export default identityModules;
-

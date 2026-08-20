@@ -57,6 +57,10 @@ export class CreateInvoiceDto {
   @IsString()
   quotationId?: string;
 
+  @IsOptional() @IsString() agentId?: string;
+  @IsOptional() @IsString() supplierId?: string;
+  @IsOptional() @IsString() paymentId?: string;
+
   @IsArray()
   entries!: Array<Record<string, unknown>>;
 
@@ -71,6 +75,12 @@ export class CreateInvoiceDto {
   @IsOptional()
   @IsObject()
   exportDetails?: Record<string, unknown>;
+
+  @IsOptional() @IsObject() approval?: Record<string, unknown>;
+  @IsOptional() @IsObject() paymentSummary?: Record<string, unknown>;
+  @IsOptional() @IsObject() delivery?: Record<string, unknown>;
+  @IsOptional() @IsString() sentAt?: string;
+  @IsOptional() @IsString() paidAt?: string;
 
   @IsOptional()
   @IsObject()

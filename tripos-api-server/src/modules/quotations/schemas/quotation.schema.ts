@@ -13,6 +13,8 @@ export class Quotation {
   @Prop({ trim: true, index: true }) quoteNo?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
   @Prop({ trim: true, index: true }) agentId?: string;
+  @Prop({ trim: true, index: true }) campaignId?: string;
+  @Prop({ trim: true, index: true }) currencyCode?: string;
   @Prop({ required: true, trim: true }) customerName!: string;
   @Prop({ required: true, trim: true, index: true }) destination!: string;
   @Prop({ trim: true }) travelDates?: string;
@@ -24,7 +26,22 @@ export class Quotation {
   @Prop({ type: Object, default: {} }) margins!: Record<string, number>;
   @Prop({ type: Object, default: {} }) terms!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) approval!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) document!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) supplierCosting!: Record<
+    string,
+    unknown
+  >;
+  @Prop({ type: Object, default: {} }) commission!: Record<string, unknown>;
+  @Prop({ type: [Object], default: [] }) revisions!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) communications!: Array<
+    Record<string, unknown>
+  >;
   @Prop() validUntil?: Date;
+  @Prop() sentAt?: Date;
+  @Prop() acceptedAt?: Date;
+  @Prop() rejectedAt?: Date;
   @Prop({ default: 1 }) version!: number;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;

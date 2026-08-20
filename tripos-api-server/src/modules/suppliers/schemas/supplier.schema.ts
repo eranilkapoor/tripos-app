@@ -13,6 +13,10 @@ export class Supplier {
   @Prop({ trim: true, index: true }) destination?: string;
   @Prop({ trim: true, index: true }) supplierCode?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ trim: true, index: true }) legalName?: string;
+  @Prop({ trim: true, index: true }) market?: string;
+  @Prop({ trim: true, index: true }) preferredCurrency?: string;
+  @Prop({ trim: true, index: true }) accountManagerId?: string;
   @Prop({ type: [Object], default: [] }) contacts!: Array<
     Record<string, unknown>
   >;
@@ -26,10 +30,19 @@ export class Supplier {
   @Prop({ default: 0 }) creditLimit!: number;
   @Prop({ default: 0 }) payable!: number;
   @Prop({ default: 0 }) rating!: number;
+  @Prop({ type: Object, default: {} }) address!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) taxProfile!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) bankDetails!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) paymentTerms!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) compliance!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) performance!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) serviceCoverage!: Record<
+    string,
+    unknown
+  >;
+  @Prop({ type: [Object], default: [] }) documents!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;

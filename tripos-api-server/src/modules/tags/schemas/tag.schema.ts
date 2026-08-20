@@ -11,7 +11,10 @@ export class Tag {
   @Prop({ required: true, trim: true, index: true }) name!: string;
   @Prop({ default: '#2563eb' }) color!: string;
   @Prop({ default: 'general', index: true }) module!: string;
+  @Prop({ default: '', index: true }) entityType!: string;
+  @Prop({ default: 0 }) usageCount!: number;
   @Prop({ default: '' }) description!: string;
+  @Prop({ type: Object, default: {} }) rules!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({ default: 'active', index: true }) status!: string;
 }

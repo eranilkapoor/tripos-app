@@ -10,6 +10,9 @@ export class Itinerary {
   @Prop({ default: 'main', index: true }) branchId!: string;
   @Prop({ index: true }) quotationId?: string;
   @Prop({ index: true }) bookingId?: string;
+  @Prop({ index: true }) customerId?: string;
+  @Prop({ trim: true, index: true }) templateCode?: string;
+  @Prop({ trim: true, index: true }) language?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
   @Prop({ default: 1 }) version!: number;
   @Prop({ required: true, trim: true }) title!: string;
@@ -19,6 +22,12 @@ export class Itinerary {
   @Prop({ type: Object, default: {} }) inclusions!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) exclusions!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) travellerNotes!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) presentation!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) sharing!: Record<string, unknown>;
+  @Prop({ type: [Object], default: [] }) revisions!: Array<
+    Record<string, unknown>
+  >;
+  @Prop() publishedAt?: Date;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;

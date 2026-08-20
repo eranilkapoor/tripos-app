@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
+  IsArray,
   IsInt,
   IsObject,
   IsOptional,
@@ -58,6 +59,10 @@ export class CreateLeadDto {
   @IsString()
   source!: string;
 
+  @IsOptional() @IsString() campaignId?: string;
+  @IsOptional() @IsString() customerId?: string;
+  @IsOptional() @IsString() agentId?: string;
+
   @IsOptional()
   @IsEnum(['b2c', 'b2b', 'corporate'])
   channel?: string;
@@ -91,6 +96,13 @@ export class CreateLeadDto {
   @IsObject()
   consent?: Record<string, unknown>;
 
+  @IsOptional() @IsString() qualifiedAt?: string;
+  @IsOptional() @IsString() wonAt?: string;
+  @IsOptional() @IsString() lostAt?: string;
+  @IsOptional() @IsString() lostReason?: string;
+  @IsOptional() @IsArray() stageHistory?: Array<Record<string, unknown>>;
+  @IsOptional() @IsObject() attribution?: Record<string, unknown>;
+
   @IsOptional()
   @IsObject()
   customFields?: Record<string, unknown>;
@@ -98,6 +110,8 @@ export class CreateLeadDto {
   @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;
+
+  @IsOptional() @IsArray() tags?: string[];
 
   @IsOptional()
   @IsString()
@@ -146,6 +160,11 @@ export class AddLeadActivityDto {
   @IsOptional()
   @IsObject()
   metadata?: Record<string, unknown>;
+
+  @IsOptional() @IsString() channel?: string;
+  @IsOptional() @IsString() entityType?: string;
+  @IsOptional() @IsString() entityId?: string;
+  @IsOptional() @IsArray() attachments?: Array<Record<string, unknown>>;
 }
 
 export class LeadListQueryDto extends PaginationDto {

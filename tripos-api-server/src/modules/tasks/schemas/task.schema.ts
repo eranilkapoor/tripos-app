@@ -12,7 +12,11 @@ export class Task {
   @Prop({ default: '' }) description!: string;
   @Prop({ default: 'general', index: true }) module!: string;
   @Prop({ default: '', index: true }) entityId!: string;
+  @Prop({ default: '', index: true }) entityType!: string;
   @Prop({ default: '', index: true }) assignedTo!: string;
+  @Prop({ trim: true, index: true }) ownerId?: string;
+  @Prop({ trim: true, index: true }) departmentId?: string;
+  @Prop({ trim: true, index: true }) teamId?: string;
   @Prop({
     enum: ['low', 'medium', 'high', 'urgent'],
     default: 'medium',
@@ -20,6 +24,14 @@ export class Task {
   })
   priority!: string;
   @Prop({ index: true }) dueAt?: Date;
+  @Prop() startedAt?: Date;
+  @Prop() completedAt?: Date;
+  @Prop({ type: [Object], default: [] }) checklist!: Array<
+    Record<string, unknown>
+  >;
+  @Prop({ type: [Object], default: [] }) comments!: Array<
+    Record<string, unknown>
+  >;
   @Prop({
     enum: ['open', 'in_progress', 'waiting', 'completed', 'cancelled'],
     default: 'open',

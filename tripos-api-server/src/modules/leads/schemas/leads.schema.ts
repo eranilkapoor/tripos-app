@@ -46,6 +46,15 @@ export class Lead {
   @Prop({ trim: true, index: true })
   source!: string;
 
+  @Prop({ trim: true, index: true })
+  campaignId?: string;
+
+  @Prop({ trim: true, index: true })
+  customerId?: string;
+
+  @Prop({ trim: true, index: true })
+  agentId?: string;
+
   @Prop({ enum: ['b2c', 'b2b', 'corporate'], default: 'b2c', index: true })
   channel!: string;
 
@@ -97,6 +106,24 @@ export class Lead {
   @Prop()
   lastContactedAt?: Date;
 
+  @Prop()
+  qualifiedAt?: Date;
+
+  @Prop()
+  wonAt?: Date;
+
+  @Prop()
+  lostAt?: Date;
+
+  @Prop({ trim: true })
+  lostReason?: string;
+
+  @Prop({ type: [Object], default: [] })
+  stageHistory!: Array<Record<string, unknown>>;
+
+  @Prop({ type: Object, default: {} })
+  attribution!: Record<string, unknown>;
+
   @Prop({ type: Object, default: {} })
   consent!: Record<string, unknown>;
 
@@ -127,6 +154,15 @@ export class LeadActivity {
   @Prop({ required: true, index: true })
   leadId!: string;
 
+  @Prop({ default: 'main', index: true })
+  branchId!: string;
+
+  @Prop({ trim: true, index: true })
+  entityType?: string;
+
+  @Prop({ trim: true, index: true })
+  entityId?: string;
+
   @Prop({
     enum: [
       'lead_created',
@@ -151,6 +187,9 @@ export class LeadActivity {
 
   @Prop({ trim: true })
   channel?: string;
+
+  @Prop({ type: [Object], default: [] })
+  attachments!: Array<Record<string, unknown>>;
 
   @Prop() occurredAt?: Date;
 

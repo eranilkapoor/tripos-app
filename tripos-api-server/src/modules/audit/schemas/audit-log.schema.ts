@@ -15,12 +15,18 @@ export class AuditLog {
   @Prop({ index: true }) branchId?: string;
   @Prop({ index: true }) actorId?: string;
   @Prop({ index: true }) actorRole?: string;
+  @Prop({ index: true }) actorEmail?: string;
   @Prop({ index: true }) entityType?: string;
   @Prop({ index: true }) entityId?: string;
   @Prop({ trim: true }) requestId?: string;
   @Prop({ trim: true }) correlationId?: string;
+  @Prop({ trim: true }) source?: string;
+  @Prop({ trim: true }) severity?: string;
   @Prop() ip?: string;
   @Prop() userAgent?: string;
+  @Prop({ type: Object, default: {} }) before!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) after!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) diff!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
 }
 

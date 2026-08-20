@@ -163,6 +163,12 @@ export class SubscriptionsService {
             providerSubscriptionId: dto.providerSubscriptionId,
             checkoutReference: `sub_${Date.now().toString(36)}`,
             billingProfile: dto.billingProfile ?? {},
+            graceEndsAt: dto.graceEndsAt
+              ? new Date(dto.graceEndsAt)
+              : undefined,
+            paymentMethod: dto.paymentMethod ?? {},
+            usage: dto.usage ?? {},
+            invoices: dto.invoices ?? [],
             limitsSnapshot: plan.limits ?? {},
             featuresSnapshot: plan.features ?? [],
             metadata: dto.metadata ?? {},

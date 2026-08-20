@@ -13,12 +13,16 @@ export class OperationTask {
   @Prop({ required: true, trim: true }) title!: string;
   @Prop({ required: true, trim: true, index: true }) serviceType!: string;
   @Prop({ trim: true, index: true }) supplierId?: string;
+  @Prop({ trim: true, index: true }) voucherId?: string;
+  @Prop({ trim: true, index: true }) departmentId?: string;
   @Prop({ trim: true }) assignedTo?: string;
   @Prop({ trim: true, index: true }) ownerId?: string;
   @Prop({ trim: true, index: true }) teamId?: string;
   @Prop() dueAt?: Date;
   @Prop() startedAt?: Date;
   @Prop() completedAt?: Date;
+  @Prop() confirmedAt?: Date;
+  @Prop({ trim: true }) location?: string;
   @Prop({ type: Object, default: {} }) payload!: Record<string, unknown>;
   @Prop({ default: 'medium', index: true }) priority!: string;
   @Prop({ default: 'on_track', index: true }) slaStatus!: string;
@@ -36,6 +40,8 @@ export class OperationTask {
     string,
     unknown
   >;
+  @Prop({ type: Object, default: {} }) checklist!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) fieldUpdate!: Record<string, unknown>;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;
   @Prop({

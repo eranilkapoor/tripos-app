@@ -12,14 +12,19 @@ export class ImportExportJob {
   jobType!: string;
   @Prop({ required: true, trim: true, index: true }) module!: string;
   @Prop({ trim: true }) fileName?: string;
+  @Prop({ trim: true, index: true }) fileId?: string;
   @Prop({ trim: true }) format?: string;
+  @Prop({ type: Object, default: {} }) mapping!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) filters!: Record<string, unknown>;
   @Prop({ default: 0 }) totalRows!: number;
   @Prop({ default: 0 }) successRows!: number;
   @Prop({ default: 0 }) failedRows!: number;
   @Prop({ trim: true }) requestedBy?: string;
+  @Prop({ trim: true }) approvedBy?: string;
   @Prop({ type: [Object], default: [] }) errorRows!: Array<
     Record<string, unknown>
   >;
+  @Prop({ type: Object, default: {} }) result!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop() startedAt?: Date;
   @Prop() completedAt?: Date;

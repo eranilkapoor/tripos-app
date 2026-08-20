@@ -18,15 +18,23 @@ export class Communication {
   @Prop({ trim: true, index: true }) entityType?: string;
   @Prop({ trim: true, index: true }) entityId?: string;
   @Prop({ trim: true, index: true }) recipient!: string;
+  @Prop({ trim: true, index: true }) sender?: string;
   @Prop({ trim: true }) recipientName?: string;
   @Prop({ trim: true }) subject?: string;
   @Prop({ trim: true }) templateCode?: string;
   @Prop({ trim: true }) provider?: string;
   @Prop({ trim: true }) providerMessageId?: string;
   @Prop({ type: Object, default: {} }) payload!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) delivery!: Record<string, unknown>;
+  @Prop({ type: [Object], default: [] }) events!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop() scheduledAt?: Date;
   @Prop() sentAt?: Date;
+  @Prop() deliveredAt?: Date;
+  @Prop() failedAt?: Date;
+  @Prop({ trim: true }) failureReason?: string;
   @Prop({
     enum: ['draft', 'queued', 'sent', 'delivered', 'failed', 'cancelled'],
     default: 'queued',

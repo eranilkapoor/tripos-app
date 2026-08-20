@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsNumber,
   IsObject,
   IsOptional,
@@ -9,6 +10,7 @@ import {
 export class CreatePaymentDto {
   @IsOptional() @IsString() bookingId?: string;
   @IsOptional() @IsString() agentId?: string;
+  @IsOptional() @IsString() customerId?: string;
   @IsOptional() @IsString() invoiceId?: string;
   @IsOptional() @IsString() paymentNo?: string;
   @IsOptional() @IsString() supplierId?: string;
@@ -17,14 +19,21 @@ export class CreatePaymentDto {
   @IsOptional() @IsNumber() amountMinor?: number;
   @IsOptional() @IsString() currencyCode?: string;
   @IsOptional() @IsString() partyName?: string;
+  @IsOptional() @IsString() partyType?: string;
+  @IsOptional() @IsString() partyId?: string;
   @IsOptional() @IsString() dueDate?: string;
   @IsOptional() @IsString() paidAt?: string;
+  @IsOptional() @IsString() receivedBy?: string;
+  @IsOptional() @IsString() approvedBy?: string;
   @IsOptional() @IsString() paymentMode?: string;
   @IsOptional() @IsString() gatewayProvider?: string;
   @IsOptional() @IsString() gatewayReference?: string;
   @IsOptional() @IsString() bankReference?: string;
   @IsOptional() @IsObject() reconciliation?: Record<string, unknown>;
   @IsOptional() @IsObject() taxBreakup?: Record<string, unknown>;
+  @IsOptional() @IsObject() gatewayPayload?: Record<string, unknown>;
+  @IsOptional() @IsObject() receipt?: Record<string, unknown>;
+  @IsOptional() @IsArray() adjustments?: Array<Record<string, unknown>>;
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;
   @IsOptional() @IsString() organizationId?: string;
   @IsOptional() @IsString() branchId?: string;

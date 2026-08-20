@@ -10,17 +10,21 @@ export class StoredFile {
   @Prop({ default: 'main', index: true }) branchId!: string;
   @Prop({ required: true, index: true }) entityType!: string;
   @Prop({ required: true, index: true }) entityId!: string;
+  @Prop({ trim: true, index: true }) fileCategory?: string;
   @Prop({ required: true, trim: true }) fileName!: string;
   @Prop({ required: true, trim: true }) mimeType!: string;
   @Prop({ required: true, min: 0 }) size!: number;
   @Prop({ required: true, index: true }) storageDriver!: string;
   @Prop({ required: true }) storageKey!: string;
   @Prop() url?: string;
+  @Prop() expiresAt?: Date;
   @Prop({ trim: true, index: true }) checksum?: string;
   @Prop({ trim: true, index: true }) uploadedBy?: string;
   @Prop({ trim: true, index: true }) visibility?: string;
   @Prop({ type: Object, default: {} }) retention!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) scanResult!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) accessPolicy!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) provider!: Record<string, unknown>;
   @Prop({
     enum: ['pending_upload', 'available', 'archived'],
     default: 'pending_upload',

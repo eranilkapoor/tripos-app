@@ -17,12 +17,17 @@ export class CreateOperatingRecordDto {
   @IsOptional() @IsString() entityId?: string;
   @IsOptional() @IsString() ownerId?: string;
   @IsOptional() @IsString() assignedTo?: string;
+  @IsOptional() @IsString() departmentId?: string;
+  @IsOptional() @IsString() teamId?: string;
   @IsOptional() @IsString() channel?: string;
   @IsOptional() @IsString() priority?: string;
   @IsOptional() @IsString() description?: string;
   @IsOptional() @IsString() dueAt?: string;
   @IsOptional() @IsString() scheduledAt?: string;
+  @IsOptional() @IsString() startedAt?: string;
   @IsOptional() @IsString() completedAt?: string;
+  @IsOptional() @IsArray() timeline?: Array<Record<string, unknown>>;
+  @IsOptional() @IsArray() attachments?: Array<Record<string, unknown>>;
   @IsOptional() @IsObject() details?: Record<string, unknown>;
   @IsOptional() @IsArray() tags?: string[];
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;

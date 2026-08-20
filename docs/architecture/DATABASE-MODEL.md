@@ -79,6 +79,7 @@ Rules:
 - Promote embedded records into separate collections when they need independent permissions, high-volume search, reporting, or lifecycle workflows.
 - Use structured JSON objects for flexible enterprise fields such as `metadata`, `customFields`, `commercial`, `supplierCosting`, `taxProfile`, `bankDetails`, `billingProfile`, and `compliance`.
 - Capture enterprise lifecycle fields where operationally important, including assignment, SLA, escalation, delivery, publishing, verification, consent, retention, and provider references.
+- Sales, operations, finance, automation, reporting, storage, and subscription records now include production-facing lifecycle fields such as attribution, revision history, supplier confirmations, payment approvals, delivery events, file access policies, plan entitlements, subscription usage, import/export mappings, and workflow run state.
 - Avoid putting organization isolation only in UI filters; queries must include organization context at API/service level.
 
 ## Implemented Index Patterns

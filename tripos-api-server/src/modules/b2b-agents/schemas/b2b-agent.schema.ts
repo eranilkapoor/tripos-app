@@ -15,9 +15,14 @@ export class B2BAgent {
   @Prop({ lowercase: true, trim: true, index: true }) email?: string;
   @Prop({ trim: true, index: true }) phone?: string;
   @Prop({ trim: true, index: true }) market?: string;
+  @Prop({ trim: true, index: true }) agentType?: string;
+  @Prop({ trim: true, index: true }) territory?: string;
+  @Prop({ trim: true, index: true }) preferredCurrency?: string;
   @Prop({ default: 0 }) creditLimit!: number;
+  @Prop({ default: 0 }) availableCredit!: number;
   @Prop({ default: 0 }) receivable!: number;
   @Prop({ default: 0 }) commissionEarned!: number;
+  @Prop({ default: 0 }) walletBalance!: number;
   @Prop({ type: [Object], default: [] }) kycDocuments!: Array<
     Record<string, unknown>
   >;
@@ -34,6 +39,11 @@ export class B2BAgent {
   @Prop({ type: Object, default: {} }) bankDetails!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) contractTerms!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) creditPolicy!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) pricingPolicy!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) portalAccess!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) performance!: Record<string, unknown>;
+  @Prop() onboardedAt?: Date;
+  @Prop() lastBookingAt?: Date;
   @Prop({ type: [String], default: [] }) tags!: string[];
   @Prop({ type: Object, default: {} }) customFields!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;

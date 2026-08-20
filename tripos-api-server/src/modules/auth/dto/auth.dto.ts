@@ -24,6 +24,9 @@ export class RegisterUserDto {
   @IsString() @MinLength(6) password!: string;
   @IsString() @MinLength(2) name!: string;
   @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() userType?: string;
+  @IsOptional() @IsString() avatarUrl?: string;
+  @IsOptional() @IsString() designation?: string;
   @IsOptional() @IsString() timezone?: string;
   @IsOptional() @IsString() locale?: string;
   @IsOptional() @IsString() organizationId?: string;
@@ -34,6 +37,7 @@ export class RegisterUserDto {
   @IsOptional() @IsString() role?: string;
   @IsOptional() @IsString() employeeCode?: string;
   @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsObject() accessPolicy?: Record<string, unknown>;
   @IsOptional() @IsObject() profile?: Record<string, unknown>;
   @IsOptional() @IsObject() preferences?: Record<string, unknown>;
   @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;
@@ -57,6 +61,9 @@ export class ChangePasswordDto {
 export class UpdateMyProfileDto {
   @IsOptional() @IsString() @MinLength(2) name?: string;
   @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() userType?: string;
+  @IsOptional() @IsString() avatarUrl?: string;
+  @IsOptional() @IsString() designation?: string;
   @IsOptional() @IsString() timezone?: string;
   @IsOptional() @IsString() locale?: string;
   @IsOptional() @IsObject() profile?: Record<string, unknown>;
@@ -73,10 +80,14 @@ export class InviteUserDto {
   @IsOptional() @IsArray() teamIds?: string[];
   @IsOptional() @IsString() role?: string;
   @IsOptional() @IsString() phone?: string;
+  @IsOptional() @IsString() userType?: string;
+  @IsOptional() @IsString() avatarUrl?: string;
+  @IsOptional() @IsString() designation?: string;
   @IsOptional() @IsString() timezone?: string;
   @IsOptional() @IsString() locale?: string;
   @IsOptional() @IsString() employeeCode?: string;
   @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsObject() accessPolicy?: Record<string, unknown>;
   @IsOptional() @IsObject() profile?: Record<string, unknown>;
   @IsOptional() @IsObject() preferences?: Record<string, unknown>;
   @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;
@@ -100,6 +111,10 @@ export class UpdateUserPermissionsDto {
   @IsOptional() @IsString() locale?: string;
   @IsOptional() @IsString() employeeCode?: string;
   @IsOptional() @IsString() managerUserId?: string;
+  @IsOptional() @IsString() userType?: string;
+  @IsOptional() @IsString() avatarUrl?: string;
+  @IsOptional() @IsString() designation?: string;
+  @IsOptional() @IsObject() accessPolicy?: Record<string, unknown>;
   @IsOptional() @IsObject() profile?: Record<string, unknown>;
   @IsOptional() @IsObject() preferences?: Record<string, unknown>;
   @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;

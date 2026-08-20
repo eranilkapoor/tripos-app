@@ -23,15 +23,21 @@ export class Subscription {
   @Prop({ type: Date }) trialEndsAt?: Date;
   @Prop({ type: Date }) startsAt?: Date;
   @Prop({ type: Date }) renewsAt?: Date;
+  @Prop({ type: Date }) graceEndsAt?: Date;
   @Prop({ type: Date }) cancelledAt?: Date;
   @Prop({ trim: true }) cancellationReason?: string;
   @Prop({ default: 'sandbox' }) paymentProvider!: string;
   @Prop({ trim: true }) providerCustomerId?: string;
   @Prop({ trim: true }) providerSubscriptionId?: string;
   @Prop({ trim: true }) checkoutReference?: string;
+  @Prop({ type: Object, default: {} }) paymentMethod!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) billingProfile!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) usage!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) limitsSnapshot!: Record<string, unknown>;
   @Prop({ type: [String], default: [] }) featuresSnapshot!: string[];
+  @Prop({ type: [Object], default: [] }) invoices!: Array<
+    Record<string, unknown>
+  >;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({ default: 'pending' }) status!: string;
 }

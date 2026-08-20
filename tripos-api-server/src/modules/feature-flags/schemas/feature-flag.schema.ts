@@ -12,8 +12,12 @@ export class FeatureFlag {
   @Prop({ required: true, trim: true }) label!: string;
   @Prop({ default: 'platform', index: true }) category!: string;
   @Prop({ default: false }) enabled!: boolean;
+  @Prop({ trim: true }) ownerId?: string;
   @Prop({ type: Object, default: {} }) rollout!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) rules!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) audit!: Record<string, unknown>;
+  @Prop() startsAt?: Date;
+  @Prop() endsAt?: Date;
   @Prop({ type: Object, default: {} }) metadata!: Record<string, unknown>;
   @Prop({
     enum: ['active', 'inactive', 'archived'],

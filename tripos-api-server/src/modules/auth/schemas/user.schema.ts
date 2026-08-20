@@ -15,6 +15,9 @@ export class User {
   })
   email!: string;
   @Prop({ trim: true }) phone?: string;
+  @Prop({ trim: true, index: true }) userType?: string;
+  @Prop({ trim: true }) avatarUrl?: string;
+  @Prop({ trim: true }) designation?: string;
   @Prop({ default: 'Asia/Kolkata' }) timezone!: string;
   @Prop({ default: 'en' }) locale!: string;
   @Prop({ required: true }) passwordHash!: string;
@@ -40,15 +43,19 @@ export class User {
   @Prop({ type: [String], default: [] }) permissions!: string[];
   @Prop({ trim: true, index: true }) employeeCode?: string;
   @Prop({ trim: true, index: true }) managerUserId?: string;
+  @Prop({ type: Object, default: {} }) accessPolicy!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) profile!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) preferences!: Record<string, unknown>;
   @Prop({ type: Object, default: {} })
   notificationPreferences!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) security!: Record<string, unknown>;
   @Prop() lastLoginAt?: Date;
+  @Prop() lastSeenAt?: Date;
   @Prop() passwordChangedAt?: Date;
   @Prop({ default: 0 }) failedLoginAttempts!: number;
   @Prop() lockedUntil?: Date;
+  @Prop() deactivatedAt?: Date;
+  @Prop({ trim: true }) deactivationReason?: string;
   @Prop({
     enum: ['active', 'inactive', 'locked', 'invited'],
     default: 'active',

@@ -25,7 +25,11 @@ export class PricingPlan {
   @Prop({ type: Object, default: {} }) limits!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) providerPrices!: Record<string, unknown>;
   @Prop({ type: Object, default: {} }) terms!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) entitlements!: Record<string, unknown>;
+  @Prop({ type: Object, default: {} }) supportPolicy!: Record<string, unknown>;
   @Prop({ type: [String], default: [] }) tags!: string[];
+  @Prop() publishedAt?: Date;
+  @Prop() retiredAt?: Date;
   @Prop({ default: 'active' }) status!: string;
 }
 

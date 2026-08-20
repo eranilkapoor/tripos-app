@@ -13,6 +13,8 @@ export class CreateQuotationDto {
   @IsOptional() @IsString() quoteNo?: string;
   @IsOptional() @IsString() ownerId?: string;
   @IsOptional() @IsString() agentId?: string;
+  @IsOptional() @IsString() campaignId?: string;
+  @IsOptional() @IsString() currencyCode?: string;
   @IsString() @MinLength(2) customerName!: string;
   @IsString() @MinLength(2) destination!: string;
   @IsOptional() @IsString() travelDates?: string;
@@ -22,7 +24,15 @@ export class CreateQuotationDto {
   @IsOptional() @IsObject() margins?: Record<string, number>;
   @IsOptional() @IsObject() terms?: Record<string, unknown>;
   @IsOptional() @IsObject() approval?: Record<string, unknown>;
+  @IsOptional() @IsObject() document?: Record<string, unknown>;
+  @IsOptional() @IsObject() supplierCosting?: Record<string, unknown>;
+  @IsOptional() @IsObject() commission?: Record<string, unknown>;
+  @IsOptional() @IsArray() revisions?: Array<Record<string, unknown>>;
+  @IsOptional() @IsArray() communications?: Array<Record<string, unknown>>;
   @IsOptional() @IsString() validUntil?: string;
+  @IsOptional() @IsString() sentAt?: string;
+  @IsOptional() @IsString() acceptedAt?: string;
+  @IsOptional() @IsString() rejectedAt?: string;
   @IsOptional() @IsNumber() version?: number;
   @IsOptional() @IsArray() tags?: string[];
   @IsOptional() @IsObject() customFields?: Record<string, unknown>;

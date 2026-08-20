@@ -54,6 +54,15 @@ export class Invoice {
   @Prop({ index: true })
   quotationId?: string;
 
+  @Prop({ index: true })
+  agentId?: string;
+
+  @Prop({ index: true })
+  supplierId?: string;
+
+  @Prop({ trim: true, index: true })
+  paymentId?: string;
+
   @Prop({ type: [Object], default: [] })
   entries!: Array<Record<string, unknown>>;
 
@@ -73,7 +82,22 @@ export class Invoice {
   exportDetails!: Record<string, unknown>;
 
   @Prop({ type: Object, default: {} })
+  approval!: Record<string, unknown>;
+
+  @Prop({ type: Object, default: {} })
+  paymentSummary!: Record<string, unknown>;
+
+  @Prop({ type: Object, default: {} })
+  delivery!: Record<string, unknown>;
+
+  @Prop({ type: Object, default: {} })
   metadata!: Record<string, unknown>;
+
+  @Prop()
+  sentAt?: Date;
+
+  @Prop()
+  paidAt?: Date;
 
   @Prop({ default: 'draft', index: true })
   status!: string;
