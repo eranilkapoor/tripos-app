@@ -21,13 +21,13 @@ import {
   AcceptInvitationDto,
   ChangePasswordDto,
   ForgotPasswordDto,
-  InviteCrmUserDto,
+  InviteUserDto,
   LoginDto,
-  RegisterCrmUserDto,
+  RegisterUserDto,
   ResetPasswordDto,
   SwitchWorkspaceDto,
   UpdateMyProfileDto,
-  UpdateCrmUserPermissionsDto,
+  UpdateUserPermissionsDto,
 } from '../dto/auth.dto';
 import { AuthService } from '../services/auth.service';
 
@@ -60,9 +60,9 @@ export class AuthController {
   }
 
   @Roles('platform_admin', 'organization_admin')
-  @Post('register-crm-user')
+  @Post('register-user')
   register(
-    @Body() dto: RegisterCrmUserDto,
+    @Body() dto: RegisterUserDto,
     @Req()
     request: Request & { user?: { organizationId?: unknown; role?: string } },
   ) {
@@ -72,7 +72,7 @@ export class AuthController {
   @Roles('platform_admin', 'organization_admin')
   @Post('invitations')
   inviteUser(
-    @Body() dto: InviteCrmUserDto,
+    @Body() dto: InviteUserDto,
     @Req()
     request: Request & { user?: { organizationId?: unknown; role?: string } },
   ) {
@@ -139,7 +139,7 @@ export class AuthController {
   updateUser(
     @Param('id') id: string,
     @Body()
-    dto: UpdateCrmUserPermissionsDto & { name?: string; email?: string },
+    dto: UpdateUserPermissionsDto & { name?: string; email?: string },
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
@@ -154,7 +154,7 @@ export class AuthController {
   @Patch('users/:id/status')
   updateUserStatus(
     @Param('id') id: string,
-    @Body() dto: UpdateCrmUserPermissionsDto,
+    @Body() dto: UpdateUserPermissionsDto,
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {
@@ -169,7 +169,7 @@ export class AuthController {
   @Patch('users/:id/permissions')
   updateUserPermissions(
     @Param('id') id: string,
-    @Body() dto: UpdateCrmUserPermissionsDto,
+    @Body() dto: UpdateUserPermissionsDto,
     @Query() query: CrmListQueryDto,
     @Req() request: Request,
   ) {

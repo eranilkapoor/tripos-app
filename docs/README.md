@@ -9,6 +9,7 @@
 
 - [Technical Architecture](architecture/TECHNICAL-ARCHITECTURE.md)
 - [Database Model](architecture/DATABASE-MODEL.md)
+- [Entity Relationship Diagram](architecture/ENTITY-RELATIONSHIP-DIAGRAM.md)
 - [API Specification](architecture/API-SPECIFICATION.md)
 - [Security and Organization Isolation](architecture/SECURITY-ORGANIZATION-ISOLATION.md)
 

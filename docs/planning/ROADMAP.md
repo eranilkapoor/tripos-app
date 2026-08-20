@@ -45,11 +45,11 @@ Completed in the repo:
 - MongoDB-backed `tripos-api-server` modules for leads, contacts, activities, follow-ups, customers, quotations, itineraries, bookings, suppliers, operations, B2B agents, payments, destinations, tour packages, travel documents, vouchers, support tickets, campaigns, communications, workflows, feature flags, import/export jobs, organizations, settings, tags, tasks, auth, finance invoices, and audit logs.
 - Admin CRM connected to dedicated production APIs with bearer session handling.
 - CRM list pagination, status filtering, server-side search, organization/branch-scoped create/detail/update/delete, and status mutation scoping.
-- Organization, branch, department, team, CRM user, role, permission, user-role, and role-permission CRUD; email/password CRM login, post-login workspace switching, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only organization management.
+- Organization, branch, department, team, User, role, permission, user-role, and role-permission CRUD; email/password CRM login, post-login workspace switching, logout, session restore, refresh rotation, RBAC decorators/guard, and platform-only organization management.
 - Basic audit logging for authenticated mutations and sensitive finance/payment/document/organization reads, with scoped list and CSV export APIs.
 - Local/log provider configuration for email, SMS, WhatsApp, payments, maps, AI, monitoring, and local/S3-style file storage.
 - File upload-intent registry for passports, vouchers, tickets, contracts, receipts, and generated document references.
-- Backend permission catalog and scoped CRM user detail/update/delete APIs.
+- Backend permission catalog and scoped User detail/update/delete APIs.
 - Booking conversion from quotation, passenger capture, payment schedule, and voucher subflows.
 - Finance receivables, payables, refunds, booking profitability, and reconciliation endpoints.
 - Organization-current aliases, reporting overview/funnel/operations/finance APIs, and local/provider-ready AI travel assistant endpoints.
@@ -124,7 +124,7 @@ Rows added from the 2026-08-12 independent review are retained as an audit trail
 | P1       | Done   | Require server-side confirmation of organization/branch membership when the admin CRM workspace switcher changes context, not just a client-side header swap.                                                                                     |
 | P1       | Done   | Decompose the admin CRM's single-file `CrmShell.tsx` into per-module screens and shared hooks; add a real API client layer, `react-hook-form`/`zod` validation, and `@tanstack/react-query` for server state.                                     |
 | P1       | Done   | Add mobile token refresh handling with a defined session-expiry recovery path.                                                                                                                                                                    |
-| P1       | Done   | Scope `CrmUser.email` uniqueness per organization instead of globally.                                                                                                                                                                            |
+| P1       | Done   | Scope `User.email` uniqueness per organization instead of globally.                                                                                                                                                                            |
 | P2       | Done   | Build out public website legal pages, SEO scaffolding (sitemap, robots.txt, JSON-LD, per-page metadata), cookie consent, and honeypot/rate-limit protection on the public lead form. Destination/package/blog content routes remain future scope. |
 | P2       | Done   | Wire `packages/api-contract` into a real generated OpenAPI spec (`tripos-api-server` boots its Nest app context to produce it); `contracts:generate`/`contracts:check` now operate on real output.                                                |
 | P1       | Done   | Add `.env.example` and a real ESLint config (`lint` running ESLint, `typecheck` running `tsc --noEmit`) to `tripos-admin-crm`, `tripos-mobile-app`, and `tripos-public-website`. Turborepo/Nx intentionally not introduced.                       |
@@ -144,7 +144,7 @@ Rows added from the 2026-08-12 independent review are retained as an audit trail
 | P1       | Done   | Add scheduled saved-report execution endpoint with next-run tracking and run result metadata.                                                                                                                                                     |
 | P1       | Done   | Add generated HTML document templates for quotations, itineraries, invoices, and vouchers as renderer-ready payloads.                                                                                                                             |
 | P1       | Done   | Add platform pricing plans, organization subscriptions, seeded launch plans, and CRM subscription management screens.                                                                                                                             |
-| P1       | Done   | Add CRM user My Profile, change password, notification preferences, and schema-driven edit forms for module records.                                                                                                                              |
+| P1       | Done   | Add User My Profile, change password, notification preferences, and schema-driven edit forms for module records.                                                                                                                              |
 | P1       | Done   | Align product, planning, database, security, technical architecture, and API documents with the current implementation.                                                                                                                           |
 
 ## Module Completion Focus
@@ -156,3 +156,4 @@ The next code-side completion order, updated after the 2026-08-12 independent re
 3. Produce store release builds for mobile after final branding/legal review.
 
 Step 1 is ordered first because live provider credentials and deployment evidence cannot be completed purely inside the repository.
+

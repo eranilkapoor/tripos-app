@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { COLLECTION_NAMES } from '../../../common/constants/collection-names.constants';
 
-export type CrmUserDocument = HydratedDocument<CrmUser>;
+export type UserDocument = HydratedDocument<User>;
 
-@Schema({ collection: COLLECTION_NAMES.CRM_USER, timestamps: true })
-export class CrmUser {
+@Schema({ collection: COLLECTION_NAMES.USER, timestamps: true })
+export class User {
   @Prop({ required: true, trim: true }) name!: string;
   @Prop({
     required: true,
@@ -61,8 +61,8 @@ export class CrmUser {
   @Prop() invitationExpiresAt?: Date;
 }
 
-export const CrmUserSchema = SchemaFactory.createForClass(CrmUser);
+export const UserSchema = SchemaFactory.createForClass(User);
 
-CrmUserSchema.index({ organizationId: 1, email: 1 }, { unique: true });
-CrmUserSchema.index({ organizationId: 1, role: 1, status: 1 });
-CrmUserSchema.index({ organizationId: 1, employeeCode: 1 });
+UserSchema.index({ organizationId: 1, email: 1 }, { unique: true });
+UserSchema.index({ organizationId: 1, role: 1, status: 1 });
+UserSchema.index({ organizationId: 1, employeeCode: 1 });

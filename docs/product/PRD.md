@@ -23,7 +23,7 @@ The core promise:
 - Platform Super Admin: manages TripOS SaaS organizations, plans, billing, and system settings.
 - Organization Owner: owns a travel business organization.
 - Admin: configures branches, users, permissions, destinations, suppliers, and workflows.
-- CRM User: maintains profile, password, workspace, notifications, and role-specific settings.
+- User: maintains profile, password, workspace, notifications, and role-specific settings.
 - Sales Manager: manages pipeline, performance, and quotation quality.
 - Sales Executive: handles leads, follow-ups, quotations, and customer communication.
 - Operations Manager: coordinates suppliers, drivers, guides, hotels, vouchers, and trip execution.
@@ -108,3 +108,4 @@ Platform Plan Created
 - Marketing team can connect campaign spend to bookings and revenue.
 - B2B agents can self-serve enquiry, booking, commission, payment, and voucher status.
 - Platform owner can manage plans, organization subscriptions, billing profile, and subscription status from the CRM.
+

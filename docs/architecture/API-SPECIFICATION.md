@@ -65,7 +65,7 @@
 - `PATCH /auth/me`
 - `POST /auth/change-password`
 - `POST /auth/workspace`
-- `POST /auth/register-crm-user`
+- `POST /auth/register-user`
 - `POST /auth/password/forgot`
 - `POST /auth/password/reset`
 - `POST /auth/invitations`
@@ -77,7 +77,7 @@
 - `DELETE /auth/users/:id`
 - `GET /auth/permissions/catalog`
 
-CRM users include profile, phone, locale, timezone, branch access, department/team access, permissions, notification preferences, and session security fields.
+Users include profile, phone, locale, timezone, branch access, department/team access, permissions, notification preferences, and session security fields.
 
 ## Organizations
 
@@ -245,3 +245,4 @@ Admin CRM modules use the same `endpoint`, `fields`, `columns`, `rowMap`, and `s
 - Listings support client-side sorting/pagination and API-backed search.
 - Import uses module fields/row maps to submit JSON/CSV records through the same create API.
 - Export supports CSV and JSON from the current filtered listing.
+

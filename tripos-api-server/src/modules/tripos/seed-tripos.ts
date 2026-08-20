@@ -3,7 +3,7 @@ import { config } from 'dotenv';
 import mongoose from 'mongoose';
 import { randomBytes, scryptSync } from 'node:crypto';
 import { OrganizationSchema } from '../organizations/schemas/organization.schema';
-import { CrmUserSchema } from '../auth/schemas/crm-user.schema';
+import { UserSchema } from '../auth/schemas/user.schema';
 import { LeadSchema } from '../leads/schemas/leads.schema';
 import { CustomerSchema } from '../customers/schemas/customer.schema';
 import { QuotationSchema } from '../quotations/schemas/quotation.schema';
@@ -54,7 +54,7 @@ async function main() {
   await mongoose.connect(uri);
 
   const Organization = model('Organization', OrganizationSchema);
-  const CrmUser = model('CrmUser', CrmUserSchema);
+  const User = model('User', UserSchema);
   const Lead = model('Lead', LeadSchema);
   const Customer = model('Customer', CustomerSchema);
   const Quotation = model('Quotation', QuotationSchema);
@@ -180,7 +180,7 @@ async function main() {
         'Operations',
         'Invoices',
       ],
-      limits: { branches: 1, crmUsers: 5, monthlyBookings: 200 },
+      limits: { branches: 1, users: 5, monthlyBookings: 200 },
       status: 'active',
     },
     {
@@ -203,7 +203,7 @@ async function main() {
         'Advanced Reports',
         'Sandbox Integrations',
       ],
-      limits: { branches: 5, crmUsers: 15, monthlyBookings: 1000 },
+      limits: { branches: 5, users: 15, monthlyBookings: 1000 },
       status: 'active',
     },
     {
@@ -226,7 +226,7 @@ async function main() {
         'SLA Support',
         'Data Residency',
       ],
-      limits: { branches: 25, crmUsers: 50, monthlyBookings: 10000 },
+      limits: { branches: 25, users: 50, monthlyBookings: 10000 },
       status: 'active',
     },
   ]);
@@ -254,7 +254,7 @@ async function main() {
         countryCode: 'IN',
         taxId: 'GSTIN-DEMO-0001',
       },
-      limitsSnapshot: { branches: 5, crmUsers: 15, monthlyBookings: 1000 },
+      limitsSnapshot: { branches: 5, users: 15, monthlyBookings: 1000 },
       featuresSnapshot: [
         'Multi-branch',
         'B2B Agents',
@@ -265,9 +265,9 @@ async function main() {
     },
   ]);
 
-  await seedCrmUsers(CrmUser, organizationId);
+  await seedUsers(User, organizationId);
 
-  const seededUsers = await CrmUser.find({ organizationId }).lean().exec();
+  const seededUsers = await User.find({ organizationId }).lean().exec();
   const usersByRole = new Map(
     seededUsers.map((user) => [String(user.role), user]),
   );
@@ -1318,7 +1318,7 @@ async function main() {
     'CRM login: admin@tripos.test / TripOS@123 / organization WEBNZA / branch delhi',
   );
   console.log(
-    'Additional CRM users: platform@tripos.test, manager@tripos.test, sales@tripos.test, operations@tripos.test, finance@tripos.test. Password: TripOS@123',
+    'Additional users: platform@tripos.test, manager@tripos.test, sales@tripos.test, operations@tripos.test, finance@tripos.test. Password: TripOS@123',
   );
 }
 
@@ -1397,7 +1397,7 @@ async function upsertMany(
   }
 }
 
-async function seedCrmUsers(
+async function seedUsers(
   modelRef: mongoose.Model<unknown>,
   organizationId: string,
 ) {
@@ -1484,7 +1484,7 @@ async function seedCrmUsers(
     })),
     { ordered: true },
   );
-  console.log(`Seeded CrmUser: ${users.length} record(s).`);
+  console.log(`Seeded User: ${users.length} record(s).`);
 }
 
 async function seedRoleAssignments(

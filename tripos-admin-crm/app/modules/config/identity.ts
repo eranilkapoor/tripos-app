@@ -126,7 +126,7 @@ const identityModules: CrmModule[] = [
     group: "Access Control",
     endpoint: "identity/user-roles",
     description:
-      "Assign CRM users to roles and restrict access to selected branches, departments, and teams.",
+      "Assign Users to roles and restrict access to selected branches, departments, and teams.",
     columns: ["User", "Role", "Branches", "Departments", "Teams", "Status"],
     rowMap: [
       "userId",
@@ -138,7 +138,7 @@ const identityModules: CrmModule[] = [
     ],
     statusOptions: ["active", "inactive"],
     fields: [
-      { key: "userId", label: "CRM User Ref", required: true },
+      { key: "userId", label: "User Ref", required: true },
       { key: "roleId", label: "Role Ref", required: true },
       { key: "branchIds", label: "Allowed Branch Refs", type: "tags" },
       { key: "departmentIds", label: "Allowed Department Refs", type: "tags" },
@@ -190,9 +190,9 @@ const identityModules: CrmModule[] = [
     title: "Users",
     group: "Access Control",
     endpoint: "auth/users",
-    createEndpoint: "auth/register-crm-user",
+    createEndpoint: "auth/register-user",
     description:
-      "CRM users allowed to access the admin portal. Role policies and branch access are managed through assignments and grants.",
+      "Users allowed to access the admin portal. Role policies and branch access are managed through assignments and grants.",
     columns: ["Name", "Email", "Phone", "Role", "Primary Branch", "Status"],
     rowMap: ["name", "email", "phone", "role", "branchId", "status"],
     statusOptions: ["active", "inactive", "locked", "invited"],
@@ -246,3 +246,4 @@ const identityModules: CrmModule[] = [
 ];
 
 export default identityModules;
+

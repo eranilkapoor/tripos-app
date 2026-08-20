@@ -44,7 +44,7 @@ Public Website       Admin CRM        Mobile App
 
 ## Frontend Applications
 
-- `tripos-admin-crm`: admin, organization management, CRM users, roles/permissions, sales, quotations, bookings, suppliers, operations, B2B agents, finance, invoices, reports, notifications, settings, pricing plans, and subscriptions.
+- `tripos-admin-crm`: admin, organization management, Users, roles/permissions, sales, quotations, bookings, suppliers, operations, B2B agents, finance, invoices, reports, notifications, settings, pricing plans, and subscriptions.
 - `tripos-public-website`: public destination/package/enquiry experience.
 - `tripos-mobile-app`: customer and agent mobile experience for trips, documents, vouchers, payments, support, and role-specific work queues.
 
@@ -196,3 +196,4 @@ Target AI gateway responsibilities:
 - Prompt and response audit logs
 - Safety checks
 - Retrieval over organization destinations, packages, suppliers, and policies
+

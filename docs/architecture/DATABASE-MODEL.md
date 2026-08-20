@@ -6,6 +6,8 @@ TripOS currently uses MongoDB as the source of truth for business data. Mongoose
 
 The current implementation uses document collections with embedded arrays/objects for related operational details such as passengers, itinerary days, supplier rates, KYC documents, payment schedules, settings, metadata, and line items. Separate child collections should be introduced only when volume, reporting, or lifecycle rules justify them.
 
+For the full entity relationship catalogue and Mermaid ER diagram, see [ENTITY-RELATIONSHIP-DIAGRAM.md](ENTITY-RELATIONSHIP-DIAGRAM.md).
+
 ## Core Collections
 
 These collection names are implemented in `tripos-api-server/src/common/constants/collection-names.constants.ts`.
@@ -16,7 +18,7 @@ These collection names are implemented in `tripos-api-server/src/common/constant
 - branches
 - departments
 - teams
-- crm_users
+- users
 - user_sessions
 - roles
 - permissions
@@ -64,7 +66,7 @@ Rules:
 
 - Every organization-owned business collection stores `organizationId`.
 - Branch-level modules also store `branchId` where branch access applies.
-- CRM users can be assigned to multiple branches, departments, and teams.
+- Users can be assigned to multiple branches, departments, and teams.
 - Platform-level collections, such as global pricing plans and permissions, may be unscoped or platform-managed.
 - Session/auth logic resolves the effective organization and branch before domain controllers create, list, update, or delete records.
 
@@ -83,7 +85,7 @@ Rules:
 Implemented schemas include targeted indexes for high-value access paths, including:
 
 - audit logs by organization, actor, path, and entity reference
-- CRM users by organization/email and organization/role/status
+- Users by organization/email and organization/role/status
 - user sessions by token/user/session state
 - organizations by code
 - subscription records by organization/status and organization/plan/status
@@ -120,3 +122,4 @@ These are not separate implemented collections today. They are enterprise upgrad
 - sms_logs
 - ai_requests
 - ai_usage_meters
+

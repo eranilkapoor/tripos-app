@@ -9,7 +9,7 @@ Current code-side controls:
 - CRM sessions are Mongo-backed and bearer-token based.
 - Refresh rotates the bearer token and revokes the previous session.
 - Logout revokes the current session.
-- CRM users are restricted to platform and organization users; agent/customer access belongs in the mobile experience.
+- Users are restricted to platform and organization users; agent/customer access belongs in the mobile experience.
 - RBAC guard enforces explicit roles and inferred module permissions.
 - Organization and branch context is resolved server-side from the authenticated session.
 - Branch switching verifies the user has access to the selected branch.
@@ -32,7 +32,7 @@ Production environment controls still required outside code:
 
 ## Authentication And Session Flow
 
-1. `POST /auth/login` validates the CRM user and creates a Mongo-backed session.
+1. `POST /auth/login` validates the User and creates a Mongo-backed session.
 2. The returned bearer token is sent by Admin CRM and mobile clients.
 3. `SessionAuthGuard` validates the token on protected routes through `AuthService.me`.
 4. The guard writes the authenticated `organizationId` and selected `branchId` onto request query/body context.
@@ -98,3 +98,4 @@ Required controls:
 - Encryption at rest through MongoDB/storage provider configuration.
 
 Current implementation includes stored file registry fields for visibility, retention, scan result, checksum, upload metadata, and entity references. Actual binary storage hardening depends on the configured storage provider.
+

@@ -26,7 +26,7 @@ export const COLLECTION_NAMES = {
   USER_ROLE: 'user_roles',
   ROLE_PERMISSION: 'role_permissions',
   INVITATION: 'invitations',
-  CRM_USER: 'crm_users',
+  USER: 'users',
   USER_SESSION: 'user_sessions',
   AUDIT_LOG: 'audit_logs',
   STORED_FILE: 'stored_files',

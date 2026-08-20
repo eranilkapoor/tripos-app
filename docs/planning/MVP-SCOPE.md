@@ -31,7 +31,7 @@ Organization -> Users -> Leads -> Customers -> Quotations -> Itineraries -> Book
 - WhatsApp and email send logging
 - Sales and finance dashboards
 - Platform pricing plans and organization subscriptions
-- CRM user profile, password, settings, and notifications
+- User profile, password, settings, and notifications
 
 ## Should Have
 
@@ -88,3 +88,4 @@ Remaining before production:
 - Enter live provider credentials and run integration smoke tests.
 - Deploy staging/production infrastructure with MongoDB, storage, monitoring, backups, secrets, strict CORS, and optional Redis/queue services if enabled for the deployment.
 - Complete desktop/tablet/mobile QA, role-policy sign-off, backup/restore drill, load-test evidence, and app store release builds.
+

@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { IdentityModule } from '../identity/identity.module';
 import { AuthController } from './controllers/auth.controller';
-import { CrmUser, CrmUserSchema } from './schemas/crm-user.schema';
+import { User, UserSchema } from './schemas/user.schema';
 import { UserSession, UserSessionSchema } from './schemas/user-session.schema';
 import { AuthService } from './services/auth.service';
 
@@ -15,7 +15,7 @@ import { AuthService } from './services/auth.service';
     OrganizationsModule,
     IdentityModule,
     MongooseModule.forFeature([
-      { name: CrmUser.name, schema: CrmUserSchema },
+      { name: User.name, schema: UserSchema },
       { name: UserSession.name, schema: UserSessionSchema },
     ]),
   ],

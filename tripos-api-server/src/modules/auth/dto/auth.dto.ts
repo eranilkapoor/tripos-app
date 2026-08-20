@@ -19,7 +19,7 @@ export class SwitchWorkspaceDto {
   @IsOptional() @IsString() branchId?: string;
 }
 
-export class RegisterCrmUserDto {
+export class RegisterUserDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(6) password!: string;
   @IsString() @MinLength(2) name!: string;
@@ -63,7 +63,7 @@ export class UpdateMyProfileDto {
   @IsOptional() @IsObject() notificationPreferences?: Record<string, unknown>;
 }
 
-export class InviteCrmUserDto {
+export class InviteUserDto {
   @IsEmail() email!: string;
   @IsString() @MinLength(2) name!: string;
   @IsOptional() @IsString() organizationId?: string;
@@ -87,7 +87,7 @@ export class AcceptInvitationDto {
   @IsString() @MinLength(6) password!: string;
 }
 
-export class UpdateCrmUserPermissionsDto {
+export class UpdateUserPermissionsDto {
   @IsOptional() @IsString() role?: string;
   @IsOptional() @IsString() status?: string;
   @IsOptional() @IsString() branchId?: string;

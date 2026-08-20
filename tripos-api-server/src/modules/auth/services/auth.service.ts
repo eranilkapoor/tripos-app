@@ -15,16 +15,16 @@ import {
   AcceptInvitationDto,
   ChangePasswordDto,
   ForgotPasswordDto,
-  InviteCrmUserDto,
+  InviteUserDto,
   LoginDto,
-  RegisterCrmUserDto,
+  RegisterUserDto,
   ResetPasswordDto,
   SwitchWorkspaceDto,
   UpdateMyProfileDto,
-  UpdateCrmUserPermissionsDto,
+  UpdateUserPermissionsDto,
 } from '../dto/auth.dto';
 import { CrmListQueryDto } from '../../../common/dto/crm-list-query.dto';
-import { CrmUser } from '../schemas/crm-user.schema';
+import { User } from '../schemas/user.schema';
 import { UserSession } from '../schemas/user-session.schema';
 import { OrganizationsService } from '../../organizations/services/organizations.service';
 import { IdentityService } from '../../identity/services/identity.service';
@@ -32,7 +32,7 @@ import { IdentityService } from '../../identity/services/identity.service';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(CrmUser.name) private readonly userModel: Model<CrmUser>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(UserSession.name)
     private readonly sessionModel: Model<UserSession>,
     private readonly organizationsService: OrganizationsService,
@@ -40,7 +40,7 @@ export class AuthService {
   ) {}
 
   async register(
-    dto: RegisterCrmUserDto,
+    dto: RegisterUserDto,
     actor?: { organizationId?: unknown; role?: string },
   ) {
     const organizationId =
@@ -72,7 +72,7 @@ export class AuthService {
   }
 
   async inviteUser(
-    dto: InviteCrmUserDto,
+    dto: InviteUserDto,
     actor?: { organizationId?: unknown; role?: string },
   ) {
     const organizationId =
@@ -129,7 +129,7 @@ export class AuthService {
     });
     return withDevelopmentToken(
       {
-        message: 'CRM user invitation created.',
+        message: 'User invitation created.',
         user: sanitizeUser(user.toObject()),
       },
       'invitationToken',
@@ -565,13 +565,13 @@ export class AuthService {
       .findOne(userScopeFilter(query, { _id: id }))
       .lean()
       .exec();
-    if (!user) throw new ForbiddenException('CRM user not found');
+    if (!user) throw new ForbiddenException('User not found');
     return sanitizeUser(user);
   }
 
   async updateUserPermissions(
     id: string,
-    dto: UpdateCrmUserPermissionsDto,
+    dto: UpdateUserPermissionsDto,
     query: CrmListQueryDto,
   ) {
     const update: Record<string, unknown> = {};
@@ -598,13 +598,13 @@ export class AuthService {
         returnDocument: 'after',
       })
       .exec();
-    if (!user) throw new ForbiddenException('CRM user not found');
+    if (!user) throw new ForbiddenException('User not found');
     return sanitizeUser(user.toObject());
   }
 
   async updateUser(
     id: string,
-    dto: UpdateCrmUserPermissionsDto & { name?: string; email?: string },
+    dto: UpdateUserPermissionsDto & { name?: string; email?: string },
     query: CrmListQueryDto,
   ) {
     const update: Record<string, unknown> = {};
@@ -633,7 +633,7 @@ export class AuthService {
         returnDocument: 'after',
       })
       .exec();
-    if (!user) throw new ForbiddenException('CRM user not found');
+    if (!user) throw new ForbiddenException('User not found');
     return sanitizeUser(user.toObject());
   }
 
@@ -645,7 +645,7 @@ export class AuthService {
         { returnDocument: 'after' },
       )
       .exec();
-    if (!user) throw new ForbiddenException('CRM user not found');
+    if (!user) throw new ForbiddenException('User not found');
     await this.sessionModel
       .updateMany(
         { userId: id, revokedAt: { $exists: false } },
